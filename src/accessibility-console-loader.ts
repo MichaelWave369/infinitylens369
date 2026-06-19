@@ -1,0 +1,3 @@
+import './accessibility-console';
+
+export {};
