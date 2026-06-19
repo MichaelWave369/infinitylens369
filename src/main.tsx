@@ -16,6 +16,7 @@ import './system-health-console.css';
 import './accessibility-console.css';
 import './showcase-console.css';
 import './share-console.css';
+import './launch-packet-console.css';
 import './studio-dock.css';
 
 const rootElement = document.getElementById('root');
@@ -103,7 +104,13 @@ window.setTimeout(() => {
 }, 1100);
 
 window.setTimeout(() => {
+  import('./launch-packet-console-loader').catch((error) => {
+    console.warn('InfinityLens369 Launch Packet Console failed to load. Core visualizer remains available.', error);
+  });
+}, 1200);
+
+window.setTimeout(() => {
   import('./version-sync').catch((error) => {
     console.warn('InfinityLens369 version sync failed to load. Core visualizer remains available.', error);
   });
-}, 1350);
+}, 1450);
