@@ -17,6 +17,7 @@ import './accessibility-console.css';
 import './showcase-console.css';
 import './share-console.css';
 import './launch-packet-console.css';
+import './visual-cleanup.css';
 import './studio-dock.css';
 
 const rootElement = document.getElementById('root');
@@ -110,7 +111,13 @@ window.setTimeout(() => {
 }, 1200);
 
 window.setTimeout(() => {
+  import('./visual-cleanup-loader').catch((error) => {
+    console.warn('InfinityLens369 Visual Cleanup failed to load. Core visualizer remains available.', error);
+  });
+}, 1300);
+
+window.setTimeout(() => {
   import('./version-sync').catch((error) => {
     console.warn('InfinityLens369 version sync failed to load. Core visualizer remains available.', error);
   });
-}, 1450);
+}, 1500);
