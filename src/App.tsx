@@ -1,10 +1,20 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type DragEvent } from 'react';
 import { AudioFeatureAnalyzer } from './audio/analyser';
 import { buildVisualAddress, downloadTextFile, formatVisualAddress } from './ledger/visualAddress';
 import type { AudioFeatures, CameraState, PaletteName, VisualSettings } from './types';
 import { FractalCanvas } from './visual/FractalCanvas';
 
-const APP_VERSION = 'v1.1.0';
+const APP_VERSION = 'v1.2.0';
+
+type TransitionStyle = 'bloom' | 'warp' | 'glitch' | 'fade' | 'pulse';
+
+const transitionOptions: Array<{ value: TransitionStyle; label: string; hint: string }> = [
+  { value: 'bloom', label: 'Bloom flash', hint: 'bright portal flare' },
+  { value: 'warp', label: 'Warp tunnel', hint: 'radial lens sweep' },
+  { value: 'glitch', label: 'Glitch cut', hint: 'pixel tear jump' },
+  { value: 'fade', label: 'Soft fade', hint: 'gentle crossfade veil' },
+  { value: 'pulse', label: 'Beat pulse', hint: 'ring pulse bridge' },
+];
 
 const defaultFeatures: AudioFeatures = {
   bass: 0,
@@ -240,6 +250,8 @@ export default function App() {
   const objectUrlRef = useRef<string | null>(null);
   const animationRef = useRef(0);
   const presetIndexRef = useRef(0);
+  const transitionTimerRef = useRef<number | null>(null);
+  const transitionActionTimerRef = useRef<number | null>(null);
 
   const [features, setFeatures] = useState<AudioFeatures>(defaultFeatures);
   const [settings, setSettings] = useState<VisualSettings>(defaultSettings);
@@ -251,9 +263,16 @@ export default function App() {
   const [hasWebGL2] = useState(checkWebGL2Support);
   const [activeTripLabel, setActiveTripLabel] = useState(tripPresets[0].label);
   const [camera, setCamera] = useState<CameraState>(createDefaultCamera);
+  const [transitionStyle, setTransitionStyle] = useState<TransitionStyle>('bloom');
+  const [transitionMs, setTransitionMs] = useState(900);
+  const [transitionState, setTransitionState] = useState<{ active: boolean; style: TransitionStyle; label: string }>({
+    active: false,
+    style: 'bloom',
+    label: '',
+  });
   const [latestAddress, setLatestAddress] = useState('Drop an audio file, press play, then save a visual address.');
   const [notice, setNotice] = useState(hasWebGL2
-    ? 'v1.1 ready. Drop audio, use Safe Mode for slower devices, or press 0 any time.'
+    ? 'v1.2 ready. Transition Engine is live: choose a bridge style, then use Next, Random, Auto, Safe, or Reset.'
     : 'WebGL2 is not available in this browser/device. Try Chrome, Edge, Firefox, or Safari on a GPU-enabled device.');
 
   const visualFeatures = useMemo(
@@ -266,85 +285,131 @@ export default function App() {
     return buildVisualAddress(settings, camera, time);
   }, [camera, settings]);
 
+  const triggerTransition = useCallback((label: string, action: () => void, styleOverride?: TransitionStyle) => {
+    const style = styleOverride ?? transitionStyle;
+    const duration = clampNumber(transitionMs, 350, 2200);
+    const actionDelay = Math.min(260, Math.max(80, duration * 0.28));
+
+    if (transitionTimerRef.current !== null) window.clearTimeout(transitionTimerRef.current);
+    if (transitionActionTimerRef.current !== null) window.clearTimeout(transitionActionTimerRef.current);
+
+    setTransitionState({ active: true, style, label });
+
+    transitionActionTimerRef.current = window.setTimeout(() => {
+      action();
+      transitionActionTimerRef.current = null;
+    }, actionDelay);
+
+    transitionTimerRef.current = window.setTimeout(() => {
+      setTransitionState((current) => ({ ...current, active: false }));
+      transitionTimerRef.current = null;
+    }, duration);
+  }, [transitionMs, transitionStyle]);
+
   useEffect(() => {
     return () => {
       if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
       cancelAnimationFrame(animationRef.current);
+      if (transitionTimerRef.current !== null) window.clearTimeout(transitionTimerRef.current);
+      if (transitionActionTimerRef.current !== null) window.clearTimeout(transitionActionTimerRef.current);
     };
   }, []);
 
   const applyNextTripPreset = useCallback(() => {
     presetIndexRef.current = (presetIndexRef.current + 1) % tripPresets.length;
     const preset = tripPresets[presetIndexRef.current];
-    setSettings((current) => ({ ...current, ...preset.settings }));
-    setActiveTripLabel(preset.label);
-    setNotice(`Trip preset: ${preset.label}`);
-  }, []);
+
+    triggerTransition(`Next trip · ${preset.label}`, () => {
+      setSettings((current) => ({ ...current, ...preset.settings }));
+      setActiveTripLabel(preset.label);
+      setNotice(`Transitioned into trip preset: ${preset.label}`);
+    });
+  }, [triggerTransition]);
 
   const applyRandomTripPreset = useCallback(() => {
     const presetIndex = Math.floor(Math.random() * tripPresets.length);
     const preset = tripPresets[presetIndex];
     const palettes = Object.keys(paletteLabels) as PaletteName[];
     const palette = palettes[Math.floor(Math.random() * palettes.length)];
+    const randomLabel = `Random ${preset.label}`;
 
     presetIndexRef.current = presetIndex;
-    setSettings((current) => ({
-      ...current,
-      ...preset.settings,
-      palette,
-      showPhi: Math.random() > 0.72,
-      showGrid369: Math.random() > 0.68,
-      showEquations: Math.random() > 0.84,
-      zoomSpeed: randomFloat(0.18, 0.78),
-      audioDrive: randomFloat(0.10, 0.64),
-      glow: randomFloat(0.44, 0.96),
-    }));
-    setActiveTripLabel(`Random ${preset.label}`);
-    setNotice(`Random trip generated from ${preset.label}`);
-  }, []);
+    triggerTransition(randomLabel, () => {
+      setSettings((current) => ({
+        ...current,
+        ...preset.settings,
+        palette,
+        showPhi: Math.random() > 0.72,
+        showGrid369: Math.random() > 0.68,
+        showEquations: Math.random() > 0.84,
+        zoomSpeed: randomFloat(0.18, 0.78),
+        audioDrive: randomFloat(0.10, 0.64),
+        glow: randomFloat(0.44, 0.96),
+      }));
+      setActiveTripLabel(randomLabel);
+      setNotice(`Random trip generated from ${preset.label}`);
+    }, 'glitch');
+  }, [triggerTransition]);
 
   const applySafeMode = useCallback(() => {
-    setSettings(safeModeSettings);
-    setAutoTrip(false);
-    setActiveTripLabel('Safe Mode');
-    setNotice('Safe Mode enabled: slower motion, overlays off, audio reaction paused. Use this for older laptops or projectors.');
-  }, []);
+    triggerTransition('Safe Mode bridge', () => {
+      setSettings(safeModeSettings);
+      setAutoTrip(false);
+      setActiveTripLabel('Safe Mode');
+      setNotice('Safe Mode enabled: slower motion, overlays off, audio reaction paused. Use this for older laptops or projectors.');
+    }, 'fade');
+  }, [triggerTransition]);
 
   const applySlowFlow = useCallback(() => {
-    setSettings((current) => ({
-      ...current,
-      audioReactive: true,
-      zoomSpeed: Math.min(current.zoomSpeed, 0.26),
-      audioDrive: 0.12,
-      glow: Math.max(0.40, Math.min(current.glow, 0.70)),
-    }));
-    setAutoTrip(false);
-    setActiveTripLabel('Slow Flow');
-    setNotice('Slow Flow enabled: audio stays reactive, but motion is softened.');
-  }, []);
+    triggerTransition('Slow Flow bridge', () => {
+      setSettings((current) => ({
+        ...current,
+        audioReactive: true,
+        zoomSpeed: Math.min(current.zoomSpeed, 0.26),
+        audioDrive: 0.12,
+        glow: Math.max(0.40, Math.min(current.glow, 0.70)),
+      }));
+      setAutoTrip(false);
+      setActiveTripLabel('Slow Flow');
+      setNotice('Slow Flow enabled: audio stays reactive, but motion is softened.');
+    }, 'pulse');
+  }, [triggerTransition]);
 
   const resetVisuals = useCallback(() => {
-    setSettings(defaultSettings);
-    setCamera(createDefaultCamera());
-    setFeatures(defaultFeatures);
-    setAutoTrip(false);
-    setActiveTripLabel('Black Hole Lens');
-    setLatestAddress('Visuals reset. Press play or save a fresh visual address.');
-    setNotice('Visuals reset to the v1.1 default scene.');
-  }, []);
+    triggerTransition('Reset visuals', () => {
+      setSettings(defaultSettings);
+      setCamera(createDefaultCamera());
+      setFeatures(defaultFeatures);
+      setAutoTrip(false);
+      setActiveTripLabel('Black Hole Lens');
+      setLatestAddress('Visuals reset. Press play or save a fresh visual address.');
+      setNotice('Visuals reset to the v1.2 default scene.');
+    }, 'bloom');
+  }, [triggerTransition]);
 
   const applyMotionProfile = useCallback((profile: MotionProfile) => {
-    setSettings((current) => ({
-      ...current,
-      audioReactive: true,
-      zoomSpeed: profile.zoomSpeed,
-      audioDrive: profile.audioDrive,
-      glow: profile.glow,
-    }));
-    setAutoTrip(false);
-    setActiveTripLabel(`Motion ${profile.label}`);
-    setNotice(`Motion profile: ${profile.label} — ${profile.hint}.`);
-  }, []);
+    triggerTransition(`Motion ${profile.label}`, () => {
+      setSettings((current) => ({
+        ...current,
+        audioReactive: true,
+        zoomSpeed: profile.zoomSpeed,
+        audioDrive: profile.audioDrive,
+        glow: profile.glow,
+      }));
+      setAutoTrip(false);
+      setActiveTripLabel(`Motion ${profile.label}`);
+      setNotice(`Motion profile: ${profile.label} — ${profile.hint}.`);
+    }, 'pulse');
+  }, [triggerTransition]);
+
+  const cycleTransitionStyle = useCallback(() => {
+    const currentIndex = transitionOptions.findIndex((option) => option.value === transitionStyle);
+    const next = transitionOptions[(currentIndex + 1) % transitionOptions.length];
+    setTransitionStyle(next.value);
+    triggerTransition(`Transition · ${next.label}`, () => {
+      setNotice(`Transition style: ${next.label} — ${next.hint}.`);
+    }, next.value);
+  }, [transitionStyle, triggerTransition]);
 
   const toggleFullscreen = useCallback(async () => {
     if (document.fullscreenElement) {
@@ -353,7 +418,7 @@ export default function App() {
     }
 
     const target = document.querySelector<HTMLElement>('.stage') ?? document.documentElement;
-    await target.requestFullscreen?.().catch(() => undefined);
+    if (target.requestFullscreen) await target.requestFullscreen().catch(() => undefined);
   }, []);
 
   useEffect(() => {
@@ -415,7 +480,7 @@ export default function App() {
       await analyzerRef.current.connect(audio);
       await audio.play();
       setIsPlaying(true);
-      setNotice('Portal playing. Use C for Cinematic, F for Fullscreen, S for Slow Flow, or 0 for Safe Mode.');
+      setNotice('Portal playing. Use N/R/T for transitions, C for Cinematic, F for Fullscreen, S for Slow Flow, or 0 for Safe Mode.');
 
       const loop = () => {
         setFeatures(analyzerRef.current?.sample() ?? defaultFeatures);
@@ -458,6 +523,7 @@ export default function App() {
       if (key === 'n') applyNextTripPreset();
       if (key === 'r') applyRandomTripPreset();
       if (key === 's') applySlowFlow();
+      if (key === 't') cycleTransitionStyle();
       if (key === '0') applySafeMode();
       if (key === 'a') setAutoTrip((current) => !current);
       if (key >= '1' && key <= '4') applyMotionProfile(motionProfiles[Number(key) - 1]);
@@ -465,7 +531,7 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [applyMotionProfile, applyNextTripPreset, applyRandomTripPreset, applySafeMode, applySlowFlow, connectAndPlay, isPlaying, pause, toggleFullscreen]);
+  }, [applyMotionProfile, applyNextTripPreset, applyRandomTripPreset, applySafeMode, applySlowFlow, connectAndPlay, cycleTransitionStyle, isPlaying, pause, toggleFullscreen]);
 
   const saveAddress = async () => {
     const address = formatVisualAddress(visualAddress);
@@ -481,6 +547,10 @@ export default function App() {
       formatted: formatVisualAddress(visualAddress),
       audioName,
       activeTripLabel,
+      transitionEngine: {
+        style: transitionStyle,
+        durationMs: transitionMs,
+      },
       browserSupport: {
         webgl2: hasWebGL2,
       },
@@ -542,9 +612,20 @@ export default function App() {
         {hasWebGL2 && settings.showGrid369 && <Grid369Overlay />}
         {hasWebGL2 && settings.showEquations && <EquationOverlay features={visualFeatures} camera={camera} mode={settings.mode} />}
 
+        {transitionState.active && (
+          <div
+            className={`stage-transition ${transitionState.style}`}
+            style={{ '--transition-ms': `${transitionMs}ms` } as CSSProperties}
+            aria-hidden="true"
+          >
+            <span>{transitionState.label}</span>
+          </div>
+        )}
+
         <div className="stage-badge glass" aria-label="InfinityLens369 status">
           <strong>InfinityLens369 {APP_VERSION}</strong>
           <span>{formatModeLabel(settings.mode)}</span>
+          <span>{transitionOptions.find((option) => option.value === transitionStyle)?.label}</span>
           <span>drive {formatMetric(settings.audioDrive / 1.5)}</span>
           {settings.audioReactive ? <span>reactive</span> : <span>safe/static</span>}
           {autoTrip && <span>auto trip</span>}
@@ -628,6 +709,33 @@ export default function App() {
             Slow flow
           </button>
 
+          <section className="transition-card" aria-label="Transition engine controls">
+            <span>Transition engine</span>
+            <strong>{transitionOptions.find((option) => option.value === transitionStyle)?.label}</strong>
+            <small>Bridges Next, Random, Auto, Safe, Reset, Motion, and manual mode changes.</small>
+            <div className="transition-row">
+              <select value={transitionStyle} onChange={(event) => setTransitionStyle(event.target.value as TransitionStyle)}>
+                {transitionOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <button type="button" onClick={cycleTransitionStyle}>Cycle</button>
+            </div>
+            <label className="slider-row compact-slider">
+              <span>Morph speed · {(transitionMs / 1000).toFixed(2)}s</span>
+              <input
+                type="range"
+                min="450"
+                max="1800"
+                step="50"
+                value={transitionMs}
+                onChange={(event) => setTransitionMs(Number(event.target.value))}
+              />
+            </label>
+          </section>
+
           <section className="motion-card" aria-label="Motion profiles">
             <span>Motion profiles</span>
             <div className="motion-grid">
@@ -651,7 +759,7 @@ export default function App() {
 
           <div className="trip-chip" aria-label="Keyboard shortcuts">
             <span>Keys</span>
-            <strong>Space play · C cinema · F full · N next · R random · S slow · A auto · 0 safe · 1-4 motion</strong>
+            <strong>Space play · C cinema · F full · N next · R random · T transition · S slow · A auto · 0 safe · 1-4 motion</strong>
           </div>
 
           <div className="metrics" aria-label="Audio analysis metrics">
@@ -667,9 +775,12 @@ export default function App() {
             <select
               value={settings.mode}
               onChange={(event) => {
-                setSettings((current) => ({ ...current, mode: event.target.value as VisualSettings['mode'] }));
-                setActiveTripLabel('Custom signal');
-                setNotice('Custom mode selected.');
+                const mode = event.target.value as VisualSettings['mode'];
+                triggerTransition(`Mode · ${formatModeLabel(mode)}`, () => {
+                  setSettings((current) => ({ ...current, mode }));
+                  setActiveTripLabel('Custom signal');
+                  setNotice('Custom mode selected through the v1.2 transition engine.');
+                });
               }}
             >
               <option value="black-hole-lens">Black Hole Lens</option>
