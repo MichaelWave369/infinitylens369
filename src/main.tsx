@@ -7,6 +7,7 @@ import './panel-polish.css';
 import './preset-studio.css';
 import './capture-studio.css';
 import './recording-studio.css';
+import './studio-dock.css';
 
 const rootElement = document.getElementById('root');
 
@@ -37,3 +38,9 @@ window.setTimeout(() => {
     console.warn('InfinityLens369 Recording Studio failed to load. Core visualizer remains available.', error);
   });
 }, 200);
+
+window.setTimeout(() => {
+  import('./version-sync').catch((error) => {
+    console.warn('InfinityLens369 version sync failed to load. Core visualizer remains available.', error);
+  });
+}, 350);
