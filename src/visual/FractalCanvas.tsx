@@ -49,6 +49,48 @@ uniform float uPalette;
 uniform float uMode;
 
 const int MAX_ITER = 300;
+const float TAU = 6.28318530718;
+
+vec3 hsv2rgb(vec3 c) {
+  vec3 rgb = clamp(abs(mod(c.x * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
+  rgb = rgb * rgb * (3.0 - 2.0 * rgb);
+  return c.z * mix(vec3(1.0), rgb, c.y);
+}
+
+float hash21(vec2 p) {
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
+}
+
+float noise2(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+
+  float a = hash21(i);
+  float b = hash21(i + vec2(1.0, 0.0));
+  float c = hash21(i + vec2(0.0, 1.0));
+  float d = hash21(i + vec2(1.0, 1.0));
+
+  vec2 u = f * f * (3.0 - 2.0 * f);
+
+  return mix(a, b, u.x) +
+    (c - a) * u.y * (1.0 - u.x) +
+    (d - b) * u.x * u.y;
+}
+
+float fbm(vec2 p) {
+  float v = 0.0;
+  float a = 0.5;
+
+  for (int i = 0; i < 5; i += 1) {
+    v += a * noise2(p);
+    p = p * 2.03 + vec2(17.1, -9.2);
+    a *= 0.5;
+  }
+
+  return v;
+}
 
 vec3 paletteVioletGold(float t) {
   vec3 a = vec3(0.08, 0.03, 0.16);
@@ -61,7 +103,7 @@ vec3 paletteSolar(float t) {
   return vec3(
     0.10 + 1.10 * pow(t, 0.72),
     0.03 + 0.48 * pow(t, 1.35),
-    0.02 + 0.13 * sin(t * 6.28318)
+    0.02 + 0.13 * sin(t * TAU)
   );
 }
 
@@ -74,7 +116,7 @@ vec3 paletteAbyss(float t) {
 }
 
 vec3 paletteAurora(float t) {
-  vec3 base = 0.5 + 0.5 * cos(6.28318 * (vec3(0.00, 0.33, 0.67) + t + uTime * 0.035));
+  vec3 base = 0.5 + 0.5 * cos(TAU * (vec3(0.00, 0.33, 0.67) + t + uTime * 0.035));
   return mix(vec3(0.03, 0.04, 0.09), base, smoothstep(0.02, 0.95, t));
 }
 
@@ -127,16 +169,7 @@ float ring(vec2 p, float radius, float width) {
   return 1.0 - smoothstep(width, width * 2.0, abs(length(p) - radius));
 }
 
-void main() {
-  vec2 uv = vUv * 2.0 - 1.0;
-  float aspect = uResolution.x / max(uResolution.y, 1.0);
-  uv.x *= aspect;
-
-  float audioWarp = uBass * 0.035 + uBeat * 0.018;
-  float angle = uRotation + audioWarp * sin(uTime * 0.8 + length(uv) * 3.0);
-  mat2 rot = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
-  vec2 p = rot * uv;
-
+vec3 renderFractal(vec2 uv, vec2 p) {
   float scale = 2.85 / max(uZoom, 0.0001);
   vec2 field = uCenter + p * scale;
 
@@ -156,6 +189,97 @@ void main() {
   color = color * (0.38 + 0.92 * vignette) + glow;
   color += vec3(uBeat * 0.08, uBeat * 0.045, uBeat * 0.13);
 
+  return color;
+}
+
+vec2 acidWarp(vec2 p, float t) {
+  vec2 q = vec2(
+    fbm(p * 1.15 + vec2(t * 0.18, -t * 0.12)),
+    fbm(p * 1.15 + vec2(-t * 0.14, t * 0.16))
+  );
+
+  p += (q - 0.5) * (0.72 + uMid * 2.6 + uRms * 0.6);
+  p += 0.18 * sin(vec2(p.y, p.x) * 3.5 + t * (1.2 + uBass * 4.4));
+  p *= 1.0 + 0.15 * sin(t * 0.45 + length(p) * 2.0 + uHigh * 5.0);
+
+  return p;
+}
+
+vec3 renderAcidMelt(vec2 uv) {
+  float aspect = uResolution.x / max(uResolution.y, 1.0);
+  float t = uTime * (0.45 + uRms * 0.28);
+
+  vec2 p = uv * 2.0 - 1.0;
+  p.x *= aspect;
+  p *= 1.85;
+
+  float breath = 1.0 + 0.08 * sin(t * 2.5 + uBass * 8.0 + uBeat * 4.0);
+  p *= breath;
+
+  float spin = uRotation * 0.4 + sin(t * 0.25) * 0.35 + uMid * 0.25;
+  mat2 rot = mat2(cos(spin), -sin(spin), sin(spin), cos(spin));
+  p = rot * acidWarp(p, t);
+
+  float r = length(p);
+  float a = atan(p.y, p.x);
+
+  float tunnel = sin(14.0 / max(r + 0.16, 0.05) - t * 5.0 + uBass * 8.0);
+  float rings = sin(r * (9.0 + uBass * 8.0) - t * 4.4 - uBeat * 5.0);
+  float swirl = sin(a * (7.0 + uMid * 5.0) + r * 6.0 - t * 3.2 + uMid * 4.0);
+  float plasma = fbm(p * (2.25 + uHigh * 1.4) + vec2(t * 0.72, -t * 0.48));
+  float secondPlasma = fbm(p * 5.2 - vec2(t * 0.22, t * 0.31));
+
+  float pulse = 0.5 + 0.5 * sin(t * 5.0 + r * 8.0 + uBass * 10.0 + uBeat * 8.0);
+  float coreGlow = exp(-2.75 * abs(rings + swirl * 0.55 + tunnel * 0.18 - plasma));
+  float hotEdge = smoothstep(0.42, 1.0, coreGlow) + 0.45 * smoothstep(0.55, 1.0, secondPlasma);
+
+  float hue = fract(
+    0.54 +
+    plasma * 0.22 +
+    secondPlasma * 0.09 +
+    swirl * 0.08 +
+    tunnel * 0.035 +
+    t * 0.035 +
+    uHigh * 0.22
+  );
+
+  float sat = 0.74 + 0.24 * pulse;
+  float val = 0.10 + 0.68 * coreGlow + 0.30 * plasma + 0.20 * hotEdge;
+
+  vec3 color = hsv2rgb(vec3(hue, sat, val));
+  color += 0.25 * hsv2rgb(vec3(fract(hue + 0.18), 0.95, coreGlow));
+  color += 0.14 * hsv2rgb(vec3(fract(hue + 0.50), 0.82, pulse));
+
+  vec2 shimmerOffset = vec2(sin(t * 1.7), cos(t * 1.3)) * (0.004 + uHigh * 0.006 + uBeat * 0.006);
+  float redShift = fbm((p + shimmerOffset) * 3.4 + t * 0.18);
+  float blueShift = fbm((p - shimmerOffset) * 3.4 - t * 0.18);
+  color.r += redShift * 0.08 * (0.4 + uHigh);
+  color.b += blueShift * 0.10 * (0.4 + uHigh);
+
+  float centerPull = exp(-r * (1.8 + uBass));
+  color += centerPull * vec3(0.24, 0.12, 0.44) * (0.35 + uGlow);
+  color += vec3(uBeat * 0.11, uBeat * 0.035, uBeat * 0.16);
+
+  float vignette = smoothstep(1.85, 0.16, length(uv * 2.0 - 1.0));
+  color *= 0.42 + 0.94 * vignette;
+  color *= 1.0 + uGlow * 0.78;
+
+  return color;
+}
+
+void main() {
+  vec2 uv = vUv;
+  vec2 centered = uv * 2.0 - 1.0;
+  float aspect = uResolution.x / max(uResolution.y, 1.0);
+  centered.x *= aspect;
+
+  float audioWarp = uBass * 0.035 + uBeat * 0.018;
+  float angle = uRotation + audioWarp * sin(uTime * 0.8 + length(centered) * 3.0);
+  mat2 rot = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
+  vec2 p = rot * centered;
+
+  vec3 color = uMode < 1.5 ? renderFractal(centered, p) : renderAcidMelt(uv);
+
   outColor = vec4(color, 1.0);
 }
 `;
@@ -169,6 +293,18 @@ const paletteIndex = (palette: PaletteName) => {
     case 'aurora-phi':
       return 3;
     case 'violet-gold-duality':
+    default:
+      return 0;
+  }
+};
+
+const modeIndex = (mode: VisualSettings['mode']) => {
+  switch (mode) {
+    case 'julia':
+      return 1;
+    case 'acid-melt':
+      return 2;
+    case 'mandelbrot':
     default:
       return 0;
   }
@@ -301,22 +437,25 @@ export function FractalCanvas({ features, settings, onCameraChange }: FractalCan
       const camera = cameraRef.current;
       const audioPower = currentSettings.audioReactive ? currentFeatures.bass : 0;
       const beatPower = currentSettings.audioReactive ? currentFeatures.beat : 0;
+      const isExplorerMode = currentSettings.mode !== 'acid-melt';
 
-      const zoomPressure = 0.045 + audioPower * 0.24 + beatPower * 0.12;
-      camera.zoom *= 1 + dt * currentSettings.zoomSpeed * zoomPressure;
+      if (isExplorerMode) {
+        const zoomPressure = 0.045 + audioPower * 0.24 + beatPower * 0.12;
+        camera.zoom *= 1 + dt * currentSettings.zoomSpeed * zoomPressure;
 
-      if (currentSettings.mode === 'mandelbrot' && camera.zoom > SAFE_MAX_ZOOM) {
-        anchorIndexRef.current = (anchorIndexRef.current + 1) % mandelbrotFlightAnchors.length;
-        const nextAnchor = mandelbrotFlightAnchors[anchorIndexRef.current];
-        camera.centerX = nextAnchor.centerX;
-        camera.centerY = nextAnchor.centerY;
-        camera.zoom = nextAnchor.zoom;
-        camera.rotation += 0.369;
-      } else {
-        camera.zoom = Math.min(camera.zoom, SAFE_MAX_ZOOM);
+        if (currentSettings.mode === 'mandelbrot' && camera.zoom > SAFE_MAX_ZOOM) {
+          anchorIndexRef.current = (anchorIndexRef.current + 1) % mandelbrotFlightAnchors.length;
+          const nextAnchor = mandelbrotFlightAnchors[anchorIndexRef.current];
+          camera.centerX = nextAnchor.centerX;
+          camera.centerY = nextAnchor.centerY;
+          camera.zoom = nextAnchor.zoom;
+          camera.rotation += 0.369;
+        } else {
+          camera.zoom = Math.min(camera.zoom, SAFE_MAX_ZOOM);
+        }
       }
 
-      camera.rotation += dt * (0.012 + currentFeatures.mid * 0.05);
+      camera.rotation += dt * (currentSettings.mode === 'acid-melt' ? 0.09 + currentFeatures.mid * 0.14 : 0.012 + currentFeatures.mid * 0.05);
 
       gl.useProgram(program);
       gl.enableVertexAttribArray(positionLocation);
@@ -325,17 +464,17 @@ export function FractalCanvas({ features, settings, onCameraChange }: FractalCan
 
       gl.uniform2f(uniforms.resolution, canvas.width, canvas.height);
       gl.uniform2f(uniforms.center, camera.centerX, camera.centerY);
-      gl.uniform1f(uniforms.zoom, camera.zoom);
+      gl.uniform1f(uniforms.zoom, currentSettings.mode === 'acid-melt' ? 1 : camera.zoom);
       gl.uniform1f(uniforms.rotation, camera.rotation);
       gl.uniform1f(uniforms.time, seconds);
-      gl.uniform1f(uniforms.bass, currentFeatures.bass);
-      gl.uniform1f(uniforms.mid, currentFeatures.mid);
-      gl.uniform1f(uniforms.high, currentFeatures.high);
-      gl.uniform1f(uniforms.beat, currentFeatures.beat);
-      gl.uniform1f(uniforms.rms, currentFeatures.rms);
+      gl.uniform1f(uniforms.bass, currentSettings.audioReactive ? currentFeatures.bass : 0.18);
+      gl.uniform1f(uniforms.mid, currentSettings.audioReactive ? currentFeatures.mid : 0.22);
+      gl.uniform1f(uniforms.high, currentSettings.audioReactive ? currentFeatures.high : 0.25);
+      gl.uniform1f(uniforms.beat, currentSettings.audioReactive ? currentFeatures.beat : 0.05);
+      gl.uniform1f(uniforms.rms, currentSettings.audioReactive ? currentFeatures.rms : 0.18);
       gl.uniform1f(uniforms.glow, currentSettings.glow);
       gl.uniform1f(uniforms.palette, paletteIndex(currentSettings.palette));
-      gl.uniform1f(uniforms.mode, currentSettings.mode === 'mandelbrot' ? 0 : 1);
+      gl.uniform1f(uniforms.mode, modeIndex(currentSettings.mode));
 
       gl.drawArrays(gl.TRIANGLES, 0, 3);
 
