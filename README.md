@@ -6,9 +6,23 @@ InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visu
 
 This project is intentionally claim-safe: it is an art, math, and software visualization tool. It is **not** a physics proof, consciousness proof, medical tool, or scientific claim engine.
 
-## v1.0 features
+## v1.1 public hardening release
 
-- Drag/drop `.mp3`, `.wav`, `.ogg`, or `.m4a` audio files
+v1.1 keeps the v1.0 visual engine intact and adds first-wave public release hardening:
+
+- WebGL2 support check with a clear fallback message
+- Safe Mode for older laptops, projectors, and lower-performance devices
+- Reset Visuals button to return to the default release scene
+- Better unsupported-file messaging for audio imports
+- Playback/decode notices for browser audio errors
+- Visible system-status card in the control panel
+- Stage notice overlay for important runtime messages
+- `0` hotkey for Safe Mode
+- Issue templates for bug reports, visual ideas, and feature requests
+
+## Core features
+
+- Drag/drop `.mp3`, `.wav`, `.ogg`, `.oga`, `.m4a`, `.aac`, `.flac`, or `.webm` audio files
 - Local-first playback: your audio stays in your browser
 - Web Audio analysis for bass, mids, highs, waveform energy, and beat pulses
 - GPU visual engine using WebGL2
@@ -22,6 +36,7 @@ This project is intentionally claim-safe: it is an art, math, and software visua
   - Mandelbrot
   - Julia Mirror
 - Trip presets and random trip generation
+- Safe Mode and Reset Visuals for public demos
 - Auto Trip mode for cycling presets during playback
 - Audio speed / drive control for calming or intensifying audio-reactive motion
 - Motion profiles: Dream, Cruise, Live, and Warp
@@ -68,6 +83,7 @@ N      next trip preset
 R      random trip
 S      slow flow
 A      auto trip
+0      safe mode
 1      Dream motion profile
 2      Cruise motion profile
 3      Live motion profile
@@ -81,7 +97,20 @@ A      auto trip
 - **Live** — stage-ready energy
 - **Warp** — maximum face-melt
 
-If audio-reactive motion feels too fast, lower **Audio speed / drive** or press **S** for Slow Flow.
+If audio-reactive motion feels too fast, lower **Audio speed / drive**, press **S** for Slow Flow, or press **0** for Safe Mode.
+
+## Safe Mode
+
+Safe Mode switches the engine into a calmer, lower-motion configuration:
+
+- Cosmic Drift mode
+- Audio reactive off
+- Low motion pressure
+- Low audio drive
+- Lower glow
+- Geometry/equation overlays off
+
+It is meant for public demos, older hardware, browser uncertainty, and projection setups where stability matters more than maximum intensity.
 
 ## Visual addresses
 
@@ -110,9 +139,9 @@ InfinityLens369 is not for:
 - Medical, psychological, or spiritual diagnosis
 - Representing generated visuals as empirical evidence
 
-## v1.0 release stance
+## v2.0 direction
 
-v1.0 is the first public studio release. It is stable enough to demo, perform with, remix, and build on. It is not the final engine. Future work can add saved preset galleries, shareable URL state, WebM capture, deep-zoom fractal math, and additional shader packs.
+The v2.0 roadmap can add smooth mode transitions, audio engine v2, liquid light modes, machine/circuit modes, preset studio, WebM/GIF recording, performance controller support, and composable visual layers.
 
 ## License
 
