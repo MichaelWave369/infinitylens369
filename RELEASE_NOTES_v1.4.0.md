@@ -1,32 +1,40 @@
-# InfinityLens369 v1.4.0 — Liquid Light Pack Sprint
+# InfinityLens369 v1.4.0 — Liquid Light Pack
 
-Sprint 4 begins the Liquid Light lane for InfinityLens369: calmer, softer, more hypnotic visual experiences that balance the intense portal / black-hole / acid / pixel-melt modes.
+Sprint 4 adds the first live **Liquid Light Pack** to InfinityLens369. This release keeps the shader engine stable and introduces softer, more hypnotic preset experiences that balance the intense black-hole, tunnel, acid, pixel, and fractal lanes.
 
-## Sprint goal
+## What shipped
 
-Add a softer visual family focused on beauty, slow flow, aurora ribbons, refractive glass, organic plasma, and dream-pool reflections.
-
-## Planned Liquid Light experiences
-
-- **Aurora Veil** — slow ribbon-like light curtains, gentle highs, smooth drift.
-- **Liquid Glass** — refractive glass flow, soft warping, low beat punch.
-- **Plasma Garden** — organic bloom cells, mid-driven growth, soft pulsing.
-- **Dream Pool** — watery reflections, low-speed motion, ambient glow.
+- App version bumped to `v1.4.0`.
+- The live app now launches into a calmer Liquid Light-style default scene.
+- Four Liquid Light presets are wired into the real trip cycle:
+  - **Aurora Veil** — soft aurora curtains with calm shimmer.
+  - **Liquid Glass** — refractive glass flow and watery ribbons.
+  - **Plasma Garden** — organic mandala blooms with gentle pulse.
+  - **Dream Pool** — slow reflective cosmic pool.
+- Liquid Light one-click preset chips were added to the control panel.
+- Liquid Light presets are included in Next Trip, Random Trip, and Auto Trip flows.
+- Audio Engine v2 tuning was adjusted per Liquid Light preset for calmer response.
+- README updated for v1.4.
 
 ## Implementation stance
 
-For the first v1.4 pass, Liquid Light should prioritize stability. The recommended implementation path is:
+The Liquid Light Pack is implemented as tuned preset experiences using stable shader routes:
 
-1. Add Liquid Light as tuned presets using stable shader routes.
-2. Confirm build stays green.
-3. Promote the best-performing presets into standalone shader modes in the next point release if needed.
+- Aurora Veil → Cosmic Drift base
+- Liquid Glass → Acid Melt base
+- Plasma Garden → Kaleido Trip base
+- Dream Pool → Cosmic Drift base
 
-## Suggested preset mappings
+This keeps the public build safer while users are actively using the app. Standalone Liquid Light shader modes can be promoted later after the best-feeling presets are validated.
 
-- Aurora Veil → Cosmic Drift base, Aurora Phi palette, slow drive, high sparkle softened.
-- Liquid Glass → Acid Melt base, Abyss Cyan palette, lower beat punch, smoother response.
-- Plasma Garden → Kaleido Trip base, Aurora Phi palette, mid motion emphasized.
-- Dream Pool → Cosmic Drift base, Abyss Cyan palette, audio response low and glow moderate.
+## Suggested test flow
+
+1. `npm run build`
+2. `npm run dev`
+3. Load a song.
+4. Try the Liquid Light preset chips.
+5. Try Auto Trip and confirm Liquid Light presets appear in the cycle.
+6. Use Cinematic mode for projector-style testing.
 
 ## Claim boundary
 
