@@ -267,6 +267,62 @@ vec3 renderAcidMelt(vec2 uv) {
   return color;
 }
 
+vec3 renderTunnelBloom(vec2 uv) {
+  float aspect = uResolution.x / max(uResolution.y, 1.0);
+  float t = uTime * (0.52 + uRms * 0.35);
+
+  vec2 p = uv * 2.0 - 1.0;
+  p.x *= aspect;
+
+  float bassBreath = 1.0 + 0.16 * sin(t * 1.75 + uBass * 7.0 + uBeat * 5.0);
+  p *= bassBreath;
+
+  float r = max(length(p), 0.018);
+  float a = atan(p.y, p.x);
+  float pull = 1.0 / r;
+
+  float spin = uRotation * 0.72 + t * (0.18 + uMid * 0.32) + pull * 0.035;
+  a += spin + 0.16 * sin(pull * 0.9 + t * 2.2 + uBass * 4.0);
+
+  vec2 tunnelUv = vec2(
+    a / TAU + 0.5,
+    pull * (0.24 + uRms * 0.09) - t * (0.42 + uBass * 0.36)
+  );
+
+  float tubeNoise = fbm(vec2(tunnelUv.x * 5.0, tunnelUv.y * 1.25));
+  float fineNoise = fbm(vec2(tunnelUv.x * 18.0 + t * 0.12, tunnelUv.y * 2.8 - t * 0.20));
+
+  float lanes = abs(sin((a * (6.0 + floor(uMid * 5.0)) + pull * 0.50 - t * 3.2)));
+  float ringFlow = sin(pull * (1.6 + uBass * 0.9) - t * (7.0 + uBass * 5.0) + tubeNoise * 3.2);
+  float ringMask = smoothstep(0.22, 0.94, 1.0 - abs(ringFlow));
+  float laneMask = smoothstep(0.52, 0.96, lanes);
+
+  float centerStar = exp(-r * (3.2 - uBass * 0.8));
+  float horizon = smoothstep(1.22, 0.10, r);
+  float bloom = ringMask * (0.36 + laneMask * 0.52) + centerStar * (0.65 + uBeat * 1.25);
+  bloom += smoothstep(0.72, 1.0, fineNoise) * 0.20 * (0.3 + uHigh);
+
+  float hue = fract(
+    0.62 +
+    tunnelUv.y * 0.045 +
+    tubeNoise * 0.16 +
+    laneMask * 0.08 +
+    t * 0.025 +
+    uHigh * 0.20
+  );
+
+  vec3 color = hsv2rgb(vec3(hue, 0.72 + 0.25 * laneMask, 0.12 + bloom * 0.88));
+  color += pickPalette(fract(hue + 0.24 + ringMask * 0.12)) * bloom * (0.38 + uGlow * 0.72);
+  color += vec3(0.22, 0.10, 0.52) * centerStar * (0.55 + uBass + uBeat);
+
+  float radialFade = smoothstep(1.65, 0.20, r);
+  color *= 0.34 + 1.04 * radialFade * horizon;
+  color += vec3(uBeat * 0.10, uBeat * 0.045, uBeat * 0.18);
+  color *= 1.0 + uGlow * 0.92;
+
+  return color;
+}
+
 void main() {
   vec2 uv = vUv;
   vec2 centered = uv * 2.0 - 1.0;
@@ -278,7 +334,14 @@ void main() {
   mat2 rot = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
   vec2 p = rot * centered;
 
-  vec3 color = uMode < 1.5 ? renderFractal(centered, p) : renderAcidMelt(uv);
+  vec3 color;
+  if (uMode < 1.5) {
+    color = renderFractal(centered, p);
+  } else if (uMode < 2.5) {
+    color = renderAcidMelt(uv);
+  } else {
+    color = renderTunnelBloom(uv);
+  }
 
   outColor = vec4(color, 1.0);
 }
@@ -304,6 +367,8 @@ const modeIndex = (mode: VisualSettings['mode']) => {
       return 1;
     case 'acid-melt':
       return 2;
+    case 'tunnel-bloom':
+      return 3;
     case 'mandelbrot':
     default:
       return 0;
@@ -437,7 +502,7 @@ export function FractalCanvas({ features, settings, onCameraChange }: FractalCan
       const camera = cameraRef.current;
       const audioPower = currentSettings.audioReactive ? currentFeatures.bass : 0;
       const beatPower = currentSettings.audioReactive ? currentFeatures.beat : 0;
-      const isExplorerMode = currentSettings.mode !== 'acid-melt';
+      const isExplorerMode = currentSettings.mode === 'mandelbrot' || currentSettings.mode === 'julia';
 
       if (isExplorerMode) {
         const zoomPressure = 0.045 + audioPower * 0.24 + beatPower * 0.12;
@@ -455,18 +520,22 @@ export function FractalCanvas({ features, settings, onCameraChange }: FractalCan
         }
       }
 
-      camera.rotation += dt * (currentSettings.mode === 'acid-melt' ? 0.09 + currentFeatures.mid * 0.14 : 0.012 + currentFeatures.mid * 0.05);
+      const performanceModeSpin = currentSettings.mode === 'tunnel-bloom'
+        ? 0.16 + currentFeatures.mid * 0.20 + currentFeatures.beat * 0.10
+        : 0.09 + currentFeatures.mid * 0.14;
+      camera.rotation += dt * (isExplorerMode ? 0.012 + currentFeatures.mid * 0.05 : performanceModeSpin);
 
       gl.useProgram(program);
       gl.enableVertexAttribArray(positionLocation);
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
       gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
 
+      const performanceMode = currentSettings.mode === 'acid-melt' || currentSettings.mode === 'tunnel-bloom';
       gl.uniform2f(uniforms.resolution, canvas.width, canvas.height);
       gl.uniform2f(uniforms.center, camera.centerX, camera.centerY);
-      gl.uniform1f(uniforms.zoom, currentSettings.mode === 'acid-melt' ? 1 : camera.zoom);
+      gl.uniform1f(uniforms.zoom, performanceMode ? 1 : camera.zoom);
       gl.uniform1f(uniforms.rotation, camera.rotation);
-      gl.uniform1f(uniforms.time, seconds);
+      gl.uniform1f(uniforms.time, seconds * (0.8 + currentSettings.zoomSpeed * 0.35));
       gl.uniform1f(uniforms.bass, currentSettings.audioReactive ? currentFeatures.bass : 0.18);
       gl.uniform1f(uniforms.mid, currentSettings.audioReactive ? currentFeatures.mid : 0.22);
       gl.uniform1f(uniforms.high, currentSettings.audioReactive ? currentFeatures.high : 0.25);
