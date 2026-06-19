@@ -2,20 +2,22 @@
 
 **Drop a song. Open a portal.**
 
-InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, and replayable visual-address receipts.
+InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, and replayable visual-address receipts.
 
 This project is intentionally claim-safe: it is an art, math, and software visualization tool. It is **not** a physics proof, consciousness proof, medical tool, or scientific claim engine.
 
-## v1.3 Audio Engine v2 release
+## v1.4 Liquid Light Pack release
 
-v1.3 keeps the v1.2 Transition Engine and adds the first Audio Engine v2 pass:
+v1.4 keeps the v1.3 Audio Engine v2 and wires the first **Liquid Light Pack** directly into the live app. These are softer, calmer, more hypnotic trip experiences built from the stable shader engine so the public build can stay green while the visual family grows.
 
-- Global audio shaping before signals reach the shaders
-- Separate controls for **Bass impact**, **Mids motion**, **High sparkle**, and **Beat punch**
-- **Smooth / Snappy** response control for calmer drift or sharper stage reaction
-- Onset-assisted beat shaping so beat pulses can land with more musical intention
-- Audio Engine v2 settings included in JSON receipt export
-- Updated presets and motion profiles with audio-response tuning
+New Liquid Light presets:
+
+- **Aurora Veil** — soft aurora curtains with calm shimmer.
+- **Liquid Glass** — refractive glass flow and watery ribbons.
+- **Plasma Garden** — organic mandala blooms with gentle pulse.
+- **Dream Pool** — slow reflective cosmic pool.
+
+The app now launches into the calmer Aurora Veil-style v1.4 default scene and exposes Liquid Light one-click preset chips in the control panel.
 
 ## Core features
 
@@ -24,7 +26,7 @@ v1.3 keeps the v1.2 Transition Engine and adds the first Audio Engine v2 pass:
 - Web Audio analysis for bass, mids, highs, waveform energy, and beat pulses
 - Audio Engine v2 signal shaping before the shader engine
 - GPU visual engine using WebGL2
-- Eight visual modes:
+- Eight visual shader modes:
   - Black Hole Lens
   - Cosmic Drift
   - Pixel Melt
@@ -33,6 +35,7 @@ v1.3 keeps the v1.2 Transition Engine and adds the first Audio Engine v2 pass:
   - Acid Melt
   - Mandelbrot
   - Julia Mirror
+- Liquid Light Pack presets built from stable shader routes
 - Trip presets and random trip generation
 - Transition Engine for smoother mode/preset bridges
 - Safe Mode and Reset Visuals for public demos
@@ -90,6 +93,15 @@ A      auto trip
 4      Warp motion profile
 ```
 
+### Liquid Light Pack
+
+Liquid Light is a softer preset family for public demos, ambient music, projector use, chill sessions, and slower visual journeys.
+
+- **Aurora Veil** uses Cosmic Drift with Aurora Phi, very low audio drive, soft high sparkle, and slow motion.
+- **Liquid Glass** uses Acid Melt with Abyss Cyan, lower beat punch, and smooth midrange flow.
+- **Plasma Garden** uses Kaleido Trip with gentle mid-driven bloom.
+- **Dream Pool** uses Cosmic Drift with low response, moderate glow, and reflective slow motion.
+
 ### Audio Engine v2
 
 Audio Engine v2 shapes the raw Web Audio analysis before it reaches the visual shaders.
@@ -145,10 +157,10 @@ It is meant for public demos, older hardware, browser uncertainty, and projectio
 Every scene can be saved as a portable address:
 
 ```text
-INFINITYLENS369://scene?mode=black-hole-lens&center=-0.743643887037151,0.13182590420533&zoom=1.000e+0&palette=solar-ember&overlays=none&audio=bass-reactive&time=42.369
+INFINITYLENS369://scene?mode=cosmic-drift&center=-0.743643887037151,0.13182590420533&zoom=1.000e+0&palette=aurora-phi&overlays=phi&audio=bass-reactive&time=42.369
 ```
 
-The address is not a scientific claim. It is a replay cue for the visual state: formula/mode, center, zoom, palette, overlays, and audio time. v1.3 receipts also include Transition Engine and Audio Engine v2 settings.
+The address is not a scientific claim. It is a replay cue for the visual state: formula/mode, center, zoom, palette, overlays, and audio time. v1.4 receipts include Transition Engine and Audio Engine v2 settings.
 
 ## Project stance
 
@@ -169,7 +181,7 @@ InfinityLens369 is not for:
 
 ## v2.0 direction
 
-The v2.0 roadmap can add deeper shader morphing, liquid light modes, machine/circuit modes, preset studio, WebM/GIF recording, performance controller support, and composable visual layers.
+The v2.0 roadmap can add standalone Liquid Light shaders, machine/circuit modes, preset studio, WebM/GIF recording, performance controller support, and composable visual layers.
 
 ## License
 
