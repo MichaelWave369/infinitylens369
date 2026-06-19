@@ -2,22 +2,22 @@
 
 **Drop a song. Open a portal.**
 
-InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, and replayable visual-address receipts.
+InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, and replayable visual-address receipts.
 
 This project is intentionally claim-safe: it is an art, math, and software visualization tool. It is **not** a physics proof, consciousness proof, medical tool, or scientific claim engine.
 
-## v1.4 Liquid Light Pack release
+## v1.5 Machine Cathedral Pack release
 
-v1.4 keeps the v1.3 Audio Engine v2 and wires the first **Liquid Light Pack** directly into the live app. These are softer, calmer, more hypnotic trip experiences built from the stable shader engine so the public build can stay green while the visual family grows.
+v1.5 keeps the green v1.4 Liquid Light build and adds the first **Machine Cathedral Pack** directly into the live app. These are cyber, vector, circuit, and symbolic geometry experiences built from the stable shader engine so the public build can keep sprinting safely toward v2.0.
 
-New Liquid Light presets:
+New Machine Cathedral presets:
 
-- **Aurora Veil** — soft aurora curtains with calm shimmer.
-- **Liquid Glass** — refractive glass flow and watery ribbons.
-- **Plasma Garden** — organic mandala blooms with gentle pulse.
-- **Dream Pool** — slow reflective cosmic pool.
+- **Circuit Cathedral** — glowing circuit-temple geometry with grid discipline.
+- **Glyph Rain** — symbolic data rain with pixel-glitch energy.
+- **Neon Lattice** — wireframe tunnel lattice and node-field pulse.
+- **Vector Shrine** — retro vector altar with equations and mirror recursion.
 
-The app now launches into the calmer Aurora Veil-style v1.4 default scene and exposes Liquid Light one-click preset chips in the control panel.
+The control panel now exposes one-click chips for both **Liquid Light Pack** and **Machine Cathedral Pack**. Next Trip, Random Trip, and Auto Trip include both families.
 
 ## Core features
 
@@ -36,6 +36,7 @@ The app now launches into the calmer Aurora Veil-style v1.4 default scene and ex
   - Mandelbrot
   - Julia Mirror
 - Liquid Light Pack presets built from stable shader routes
+- Machine Cathedral Pack presets built from stable shader routes
 - Trip presets and random trip generation
 - Transition Engine for smoother mode/preset bridges
 - Safe Mode and Reset Visuals for public demos
@@ -102,6 +103,15 @@ Liquid Light is a softer preset family for public demos, ambient music, projecto
 - **Plasma Garden** uses Kaleido Trip with gentle mid-driven bloom.
 - **Dream Pool** uses Cosmic Drift with low response, moderate glow, and reflective slow motion.
 
+### Machine Cathedral Pack
+
+Machine Cathedral is a cyber/geometry preset family for more structured, digital, and performance-oriented visuals.
+
+- **Circuit Cathedral** uses Tunnel Bloom with Abyss Cyan, grid/equation overlays, and mid/high-driven circuit motion.
+- **Glyph Rain** uses Pixel Melt with Abyss Cyan, grid/equation overlays, high sparkle, and glitch energy.
+- **Neon Lattice** uses Tunnel Bloom with Violet Gold Duality, phi/grid overlays, and stronger beat pulse.
+- **Vector Shrine** uses Julia Mirror with Solar Ember, phi/grid/equation overlays, and slower vector-style recursion.
+
 ### Audio Engine v2
 
 Audio Engine v2 shapes the raw Web Audio analysis before it reaches the visual shaders.
@@ -160,7 +170,7 @@ Every scene can be saved as a portable address:
 INFINITYLENS369://scene?mode=cosmic-drift&center=-0.743643887037151,0.13182590420533&zoom=1.000e+0&palette=aurora-phi&overlays=phi&audio=bass-reactive&time=42.369
 ```
 
-The address is not a scientific claim. It is a replay cue for the visual state: formula/mode, center, zoom, palette, overlays, and audio time. v1.4 receipts include Transition Engine and Audio Engine v2 settings.
+The address is not a scientific claim. It is a replay cue for the visual state: formula/mode, center, zoom, palette, overlays, and audio time. v1.5 receipts include Transition Engine and Audio Engine v2 settings.
 
 ## Project stance
 
@@ -181,7 +191,7 @@ InfinityLens369 is not for:
 
 ## v2.0 direction
 
-The v2.0 roadmap can add standalone Liquid Light shaders, machine/circuit modes, preset studio, WebM/GIF recording, performance controller support, and composable visual layers.
+The v2.0 roadmap can add standalone Liquid Light shaders, standalone Machine Cathedral shaders, preset studio, WebM/GIF recording, performance controller support, and composable visual layers.
 
 ## License
 
