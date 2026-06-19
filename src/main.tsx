@@ -5,6 +5,7 @@ import './styles.css';
 import './transitions.css';
 import './panel-polish.css';
 import './preset-studio.css';
+import './capture-studio.css';
 
 const rootElement = document.getElementById('root');
 
@@ -23,3 +24,9 @@ window.setTimeout(() => {
     console.warn('InfinityLens369 Preset Studio failed to load. Core visualizer remains available.', error);
   });
 }, 0);
+
+window.setTimeout(() => {
+  import('./capture-studio').catch((error) => {
+    console.warn('InfinityLens369 Capture Studio failed to load. Core visualizer remains available.', error);
+  });
+}, 100);
