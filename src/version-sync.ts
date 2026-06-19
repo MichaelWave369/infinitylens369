@@ -1,4 +1,4 @@
-const RELEASE_VERSION = 'v1.14.0';
+const RELEASE_VERSION = 'v1.14.1';
 
 let scheduledSync: number | undefined;
 let safetyPasses = 0;
@@ -27,13 +27,14 @@ const patchTextNode = (node: Text) => {
     /v1\.10 Layer Console is live/i.test(next) ||
     /v1\.11 Launch Console is live/i.test(next) ||
     /v1\.12 Gallery Console is live/i.test(next) ||
-    /v1\.13 Roadmap Console is live/i.test(next)
+    /v1\.13 Roadmap Console is live/i.test(next) ||
+    /v1\.14 System Health Console is live/i.test(next)
   ) {
-    next = 'v1.14 System Health Console is live: local browser readiness checks, copyable diagnostics, and soft reload support are now staged.';
+    next = 'v1.14.1 System Health Console hotfix is live: local browser readiness checks, copyable diagnostics, and TypeScript-safe clipboard detection are staged.';
   }
 
-  if (/stable v1\.(5|11|12|13) default scene/i.test(next)) {
-    next = next.replace(/stable v1\.(5|11|12|13) default scene/gi, 'stable v1.14 default scene');
+  if (/stable v1\.(5|11|12|13|14) default scene/i.test(next)) {
+    next = next.replace(/stable v1\.(5|11|12|13|14) default scene/gi, 'stable v1.14.1 default scene');
   }
 
   if (next !== current) node.nodeValue = next;
@@ -45,7 +46,7 @@ const scanVisibleText = () => {
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
       const value = node.nodeValue ?? '';
-      return /InfinityLens369\s+v\d+\.\d+\.\d+|Capture Studio\s+v\d+\.\d+\.\d+|Recording Studio\s+v\d+\.\d+\.\d+|Performance Console\s+v\d+\.\d+\.\d+|Layer Console\s+v\d+\.\d+\.\d+|Launch Console\s+v\d+\.\d+\.\d+|Gallery Console\s+v\d+\.\d+\.\d+|Roadmap Console\s+v\d+\.\d+\.\d+|System Health Console\s+v\d+\.\d+\.\d+|v1\.5 Machine Cathedral Pack|v1\.9 Performance Console is live|v1\.10 Layer Console is live|v1\.11 Launch Console is live|v1\.12 Gallery Console is live|v1\.13 Roadmap Console is live|stable v1\.(5|11|12|13) default scene/i.test(value)
+      return /InfinityLens369\s+v\d+\.\d+\.\d+|Capture Studio\s+v\d+\.\d+\.\d+|Recording Studio\s+v\d+\.\d+\.\d+|Performance Console\s+v\d+\.\d+\.\d+|Layer Console\s+v\d+\.\d+\.\d+|Launch Console\s+v\d+\.\d+\.\d+|Gallery Console\s+v\d+\.\d+\.\d+|Roadmap Console\s+v\d+\.\d+\.\d+|System Health Console\s+v\d+\.\d+\.\d+|v1\.5 Machine Cathedral Pack|v1\.9 Performance Console is live|v1\.10 Layer Console is live|v1\.11 Launch Console is live|v1\.12 Gallery Console is live|v1\.13 Roadmap Console is live|v1\.14 System Health Console is live|stable v1\.(5|11|12|13|14) default scene/i.test(value)
         ? NodeFilter.FILTER_ACCEPT
         : NodeFilter.FILTER_SKIP;
     },
@@ -108,33 +109,37 @@ const syncVersionLabels = () => {
   scanVisibleText();
 };
 
-const queueSync = () => {
-  if (scheduledSync !== undefined) return;
-
+const scheduleSync = () => {
+  if (scheduledSync !== undefined) window.clearTimeout(scheduledSync);
   scheduledSync = window.setTimeout(() => {
     scheduledSync = undefined;
     syncVersionLabels();
   }, 80);
 };
 
-syncVersionLabels();
-
-const safetySync = window.setInterval(() => {
+const runSafetyLoop = () => {
   syncVersionLabels();
   safetyPasses += 1;
 
-  if (safetyPasses >= 24) window.clearInterval(safetySync);
-}, 250);
+  if (safetyPasses < 10) {
+    window.setTimeout(runSafetyLoop, 350);
+  }
+};
 
-const root = document.getElementById('root');
+const bootstrap = () => {
+  runSafetyLoop();
 
-if (root) {
-  const observer = new MutationObserver(queueSync);
-  observer.observe(root, {
-    childList: true,
-    subtree: true,
-    characterData: true,
-  });
+  const root = document.getElementById('root');
+  if (!root) return;
+
+  const observer = new MutationObserver(scheduleSync);
+  observer.observe(root, { childList: true, subtree: true, characterData: true });
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootstrap, { once: true });
+} else {
+  window.setTimeout(bootstrap, 0);
 }
 
 export {};
