@@ -14,14 +14,14 @@ const defaultFeatures: AudioFeatures = {
 };
 
 const defaultSettings: VisualSettings = {
-  mode: 'kaleido-trip',
+  mode: 'pixel-melt',
   palette: 'aurora-phi',
   showPhi: false,
-  showGrid369: true,
+  showGrid369: false,
   showEquations: false,
   audioReactive: true,
-  zoomSpeed: 0.62,
-  glow: 0.92,
+  zoomSpeed: 0.74,
+  glow: 0.86,
 };
 
 const paletteLabels: Record<PaletteName, string> = {
@@ -38,6 +38,7 @@ const pressureLabel = (mode: VisualSettings['mode']) => {
   if (mode === 'mandelbrot' || mode === 'julia') return 'Zoom pressure';
   if (mode === 'tunnel-bloom') return 'Tunnel pressure';
   if (mode === 'kaleido-trip') return 'Fold pressure';
+  if (mode === 'pixel-melt') return 'Pixel pressure';
   return 'Melt pressure';
 };
 
@@ -52,6 +53,7 @@ export default function App() {
   const [audioName, setAudioName] = useState('No audio loaded yet');
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isCinematic, setIsCinematic] = useState(false);
   const [camera, setCamera] = useState<CameraState>({
     centerX: -0.743643887037151,
     centerY: 0.13182590420533,
@@ -153,7 +155,7 @@ export default function App() {
   };
 
   return (
-    <main className="app-shell">
+    <main className={isCinematic ? 'app-shell is-cinematic' : 'app-shell'}>
       <section className="stage" aria-label="InfinityLens369 visualization stage">
         <FractalCanvas features={features} settings={settings} onCameraChange={setCamera} />
 
@@ -162,118 +164,131 @@ export default function App() {
         {settings.showEquations && <EquationOverlay features={features} camera={camera} mode={settings.mode} />}
 
         <div className="stage-badge glass" aria-label="InfinityLens369 status">
-          <strong>InfinityLens369 v0.4</strong>
+          <strong>InfinityLens369 v0.5</strong>
           <span>{formatModeLabel(settings.mode)}</span>
         </div>
+
+        {isCinematic && (
+          <button className="stage-action glass" type="button" onClick={() => setIsCinematic(false)}>
+            Show controls
+          </button>
+        )}
       </section>
 
-      <aside className="control-panel glass" aria-label="InfinityLens369 controls">
-        <label
-          className="dropzone"
-          onDragOver={(event) => event.preventDefault()}
-          onDrop={handleDrop}
-        >
-          <input
-            type="file"
-            accept="audio/*"
-            onChange={(event) => {
-              const file = event.target.files?.item(0);
-              if (file) ingestFile(file);
-            }}
-          />
-          <span className="drop-icon">∞</span>
-          <strong>Drop MP3/WAV/OGG/M4A</strong>
-          <small>{audioName}</small>
-        </label>
-
-        <audio ref={audioRef} src={audioUrl ?? undefined} onEnded={() => setIsPlaying(false)} />
-
-        <div className="button-row">
-          <button type="button" onClick={connectAndPlay} disabled={!audioUrl || isPlaying}>
-            Play portal
-          </button>
-          <button type="button" onClick={pause} disabled={!isPlaying}>
-            Pause
-          </button>
-        </div>
-
-        <div className="metrics" aria-label="Audio analysis metrics">
-          <Metric label="Bass" value={features.bass} />
-          <Metric label="Mids" value={features.mid} />
-          <Metric label="Highs" value={features.high} />
-          <Metric label="Energy" value={features.rms} />
-        </div>
-
-        <label className="field-row">
-          <span>Mode</span>
-          <select
-            value={settings.mode}
-            onChange={(event) => setSettings((current) => ({ ...current, mode: event.target.value as VisualSettings['mode'] }))}
+      {!isCinematic && (
+        <aside className="control-panel glass" aria-label="InfinityLens369 controls">
+          <label
+            className="dropzone"
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={handleDrop}
           >
-            <option value="kaleido-trip">Kaleido Trip</option>
-            <option value="tunnel-bloom">Tunnel Bloom</option>
-            <option value="acid-melt">Acid Melt</option>
-            <option value="mandelbrot">Mandelbrot</option>
-            <option value="julia">Julia Mirror</option>
-          </select>
-        </label>
+            <input
+              type="file"
+              accept="audio/*"
+              onChange={(event) => {
+                const file = event.target.files?.item(0);
+                if (file) ingestFile(file);
+              }}
+            />
+            <span className="drop-icon">∞</span>
+            <strong>Drop MP3/WAV/OGG/M4A</strong>
+            <small>{audioName}</small>
+          </label>
 
-        <label className="field-row">
-          <span>Palette</span>
-          <select
-            value={settings.palette}
-            onChange={(event) => setSettings((current) => ({ ...current, palette: event.target.value as PaletteName }))}
-          >
-            {Object.entries(paletteLabels).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </label>
+          <audio ref={audioRef} src={audioUrl ?? undefined} onEnded={() => setIsPlaying(false)} />
 
-        <label className="slider-row">
-          <span>{pressureLabel(settings.mode)}</span>
-          <input
-            type="range"
-            min="0"
-            max="1.2"
-            step="0.01"
-            value={settings.zoomSpeed}
-            onChange={(event) => setSettings((current) => ({ ...current, zoomSpeed: Number(event.target.value) }))}
-          />
-        </label>
+          <div className="button-row">
+            <button type="button" onClick={connectAndPlay} disabled={!audioUrl || isPlaying}>
+              Play portal
+            </button>
+            <button type="button" onClick={pause} disabled={!isPlaying}>
+              Pause
+            </button>
+          </div>
 
-        <label className="slider-row">
-          <span>Glow</span>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={settings.glow}
-            onChange={(event) => setSettings((current) => ({ ...current, glow: Number(event.target.value) }))}
-          />
-        </label>
+          <button className="wide-button" type="button" onClick={() => setIsCinematic(true)}>
+            Cinematic view
+          </button>
 
-        <div className="toggle-grid">
-          <Toggle label="Audio reactive" checked={settings.audioReactive} onChange={(audioReactive) => setSettings((current) => ({ ...current, audioReactive }))} />
-          <Toggle label="Phi spiral" checked={settings.showPhi} onChange={(showPhi) => setSettings((current) => ({ ...current, showPhi }))} />
-          <Toggle label="369 grid" checked={settings.showGrid369} onChange={(showGrid369) => setSettings((current) => ({ ...current, showGrid369 }))} />
-          <Toggle label="Equations" checked={settings.showEquations} onChange={(showEquations) => setSettings((current) => ({ ...current, showEquations }))} />
-        </div>
+          <div className="metrics" aria-label="Audio analysis metrics">
+            <Metric label="Bass" value={features.bass} />
+            <Metric label="Mids" value={features.mid} />
+            <Metric label="Highs" value={features.high} />
+            <Metric label="Energy" value={features.rms} />
+          </div>
 
-        <div className="button-row stacked">
-          <button type="button" onClick={saveAddress}>Save visual address</button>
-          <button type="button" onClick={exportReceipt}>Export receipt JSON</button>
-          <button type="button" onClick={exportScreenshot}>Export PNG frame</button>
-        </div>
+          <label className="field-row">
+            <span>Mode</span>
+            <select
+              value={settings.mode}
+              onChange={(event) => setSettings((current) => ({ ...current, mode: event.target.value as VisualSettings['mode'] }))}
+            >
+              <option value="pixel-melt">Pixel Melt</option>
+              <option value="kaleido-trip">Kaleido Trip</option>
+              <option value="tunnel-bloom">Tunnel Bloom</option>
+              <option value="acid-melt">Acid Melt</option>
+              <option value="mandelbrot">Mandelbrot</option>
+              <option value="julia">Julia Mirror</option>
+            </select>
+          </label>
 
-        <section className="address-card" aria-label="Latest visual address">
-          <span>Latest address</span>
-          <code>{latestAddress}</code>
-        </section>
-      </aside>
+          <label className="field-row">
+            <span>Palette</span>
+            <select
+              value={settings.palette}
+              onChange={(event) => setSettings((current) => ({ ...current, palette: event.target.value as PaletteName }))}
+            >
+              {Object.entries(paletteLabels).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="slider-row">
+            <span>{pressureLabel(settings.mode)}</span>
+            <input
+              type="range"
+              min="0"
+              max="1.2"
+              step="0.01"
+              value={settings.zoomSpeed}
+              onChange={(event) => setSettings((current) => ({ ...current, zoomSpeed: Number(event.target.value) }))}
+            />
+          </label>
+
+          <label className="slider-row">
+            <span>Glow</span>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={settings.glow}
+              onChange={(event) => setSettings((current) => ({ ...current, glow: Number(event.target.value) }))}
+            />
+          </label>
+
+          <div className="toggle-grid">
+            <Toggle label="Audio reactive" checked={settings.audioReactive} onChange={(audioReactive) => setSettings((current) => ({ ...current, audioReactive }))} />
+            <Toggle label="Phi spiral" checked={settings.showPhi} onChange={(showPhi) => setSettings((current) => ({ ...current, showPhi }))} />
+            <Toggle label="369 grid" checked={settings.showGrid369} onChange={(showGrid369) => setSettings((current) => ({ ...current, showGrid369 }))} />
+            <Toggle label="Equations" checked={settings.showEquations} onChange={(showEquations) => setSettings((current) => ({ ...current, showEquations }))} />
+          </div>
+
+          <div className="button-row stacked">
+            <button type="button" onClick={saveAddress}>Save visual address</button>
+            <button type="button" onClick={exportReceipt}>Export receipt JSON</button>
+            <button type="button" onClick={exportScreenshot}>Export PNG frame</button>
+          </div>
+
+          <section className="address-card" aria-label="Latest visual address">
+            <span>Latest address</span>
+            <code>{latestAddress}</code>
+          </section>
+        </aside>
+      )}
     </main>
   );
 }
@@ -338,7 +353,9 @@ function EquationOverlay({ features, camera, mode }: { features: AudioFeatures; 
       ? '1/r tunnel + bloom + beat'
       : mode === 'kaleido-trip'
         ? 'radial fold + mirror + audio'
-        : 'z ↦ z² + c';
+        : mode === 'pixel-melt'
+          ? 'quantize(p) + feedback melt'
+          : 'z ↦ z² + c';
 
   return (
     <div className="equation-overlay" aria-hidden="true">
