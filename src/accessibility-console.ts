@@ -74,7 +74,9 @@ const clickExistingControl = (patterns: RegExp[]) => {
 };
 
 const applyComfortClass = (mode: ComfortMode) => {
-  Object.values(MODE_CLASS_NAMES).flat().forEach((className) => {
+  const classNames = Object.values(MODE_CLASS_NAMES).reduce<string[]>((allClassNames, currentClassNames) => [...allClassNames, ...currentClassNames], []);
+
+  classNames.forEach((className) => {
     document.documentElement.classList.remove(className);
   });
 
