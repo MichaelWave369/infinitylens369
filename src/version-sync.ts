@@ -1,4 +1,4 @@
-const RELEASE_VERSION = 'v1.14.1';
+const RELEASE_VERSION = 'v1.15.0';
 
 let scheduledSync: number | undefined;
 let safetyPasses = 0;
@@ -20,6 +20,7 @@ const patchTextNode = (node: Text) => {
   next = next.replace(/Gallery Console\s+v\d+\.\d+\.\d+/gi, `Gallery Console ${RELEASE_VERSION}`);
   next = next.replace(/Roadmap Console\s+v\d+\.\d+\.\d+/gi, `Roadmap Console ${RELEASE_VERSION}`);
   next = next.replace(/System Health Console\s+v\d+\.\d+\.\d+/gi, `System Health Console ${RELEASE_VERSION}`);
+  next = next.replace(/Accessibility Console\s+v\d+\.\d+\.\d+/gi, `Accessibility Console ${RELEASE_VERSION}`);
 
   if (
     /v1\.5 Machine Cathedral Pack is live/i.test(next) ||
@@ -28,13 +29,14 @@ const patchTextNode = (node: Text) => {
     /v1\.11 Launch Console is live/i.test(next) ||
     /v1\.12 Gallery Console is live/i.test(next) ||
     /v1\.13 Roadmap Console is live/i.test(next) ||
-    /v1\.14 System Health Console is live/i.test(next)
+    /v1\.14 System Health Console is live/i.test(next) ||
+    /v1\.14\.1 System Health Console hotfix is live/i.test(next)
   ) {
-    next = 'v1.14.1 System Health Console hotfix is live: local browser readiness checks, copyable diagnostics, and TypeScript-safe clipboard detection are staged.';
+    next = 'v1.15 Accessibility Console is live: reduce motion, soft glow, high readability, and copyable comfort notes are staged.';
   }
 
-  if (/stable v1\.(5|11|12|13|14) default scene/i.test(next)) {
-    next = next.replace(/stable v1\.(5|11|12|13|14) default scene/gi, 'stable v1.14.1 default scene');
+  if (/stable v1\.(5|11|12|13|14|15) default scene/i.test(next)) {
+    next = next.replace(/stable v1\.(5|11|12|13|14|15) default scene/gi, 'stable v1.15.0 default scene');
   }
 
   if (next !== current) node.nodeValue = next;
@@ -46,7 +48,7 @@ const scanVisibleText = () => {
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
       const value = node.nodeValue ?? '';
-      return /InfinityLens369\s+v\d+\.\d+\.\d+|Capture Studio\s+v\d+\.\d+\.\d+|Recording Studio\s+v\d+\.\d+\.\d+|Performance Console\s+v\d+\.\d+\.\d+|Layer Console\s+v\d+\.\d+\.\d+|Launch Console\s+v\d+\.\d+\.\d+|Gallery Console\s+v\d+\.\d+\.\d+|Roadmap Console\s+v\d+\.\d+\.\d+|System Health Console\s+v\d+\.\d+\.\d+|v1\.5 Machine Cathedral Pack|v1\.9 Performance Console is live|v1\.10 Layer Console is live|v1\.11 Launch Console is live|v1\.12 Gallery Console is live|v1\.13 Roadmap Console is live|v1\.14 System Health Console is live|stable v1\.(5|11|12|13|14) default scene/i.test(value)
+      return /InfinityLens369\s+v\d+\.\d+\.\d+|Capture Studio\s+v\d+\.\d+\.\d+|Recording Studio\s+v\d+\.\d+\.\d+|Performance Console\s+v\d+\.\d+\.\d+|Layer Console\s+v\d+\.\d+\.\d+|Launch Console\s+v\d+\.\d+\.\d+|Gallery Console\s+v\d+\.\d+\.\d+|Roadmap Console\s+v\d+\.\d+\.\d+|System Health Console\s+v\d+\.\d+\.\d+|Accessibility Console\s+v\d+\.\d+\.\d+|v1\.5 Machine Cathedral Pack|v1\.9 Performance Console is live|v1\.10 Layer Console is live|v1\.11 Launch Console is live|v1\.12 Gallery Console is live|v1\.13 Roadmap Console is live|v1\.14 System Health Console is live|v1\.14\.1 System Health Console hotfix is live|stable v1\.(5|11|12|13|14|15) default scene/i.test(value)
         ? NodeFilter.FILTER_ACCEPT
         : NodeFilter.FILTER_SKIP;
     },
@@ -103,6 +105,10 @@ const syncVersionLabels = () => {
 
     if (/^System Health Console\s+v/i.test(current)) {
       updateText(label, `System Health Console ${RELEASE_VERSION}`);
+    }
+
+    if (/^Accessibility Console\s+v/i.test(current)) {
+      updateText(label, `Accessibility Console ${RELEASE_VERSION}`);
     }
   });
 
