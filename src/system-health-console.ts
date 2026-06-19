@@ -1,4 +1,4 @@
-const SYSTEM_HEALTH_VERSION = 'v1.14.0';
+const SYSTEM_HEALTH_VERSION = 'v1.14.1';
 
 type HealthState = 'ready' | 'limited' | 'missing';
 
@@ -6,6 +6,10 @@ type HealthCheck = {
   label: string;
   state: HealthState;
   detail: string;
+};
+
+type RuntimeClipboard = {
+  writeText?: (text: string) => Promise<void>;
 };
 
 const findPanel = () =>
@@ -17,6 +21,13 @@ const setStatus = (message: string) => {
   const status = document.querySelector<HTMLElement>('.system-health-status');
   if (status) status.textContent = message;
 };
+
+const getRuntimeClipboard = () => {
+  const runtimeNavigator = navigator as Navigator & { clipboard?: RuntimeClipboard };
+  return runtimeNavigator.clipboard;
+};
+
+const canUseClipboard = () => typeof getRuntimeClipboard()?.writeText === 'function';
 
 const canUseLocalStorage = () => {
   try {
@@ -46,6 +57,7 @@ const canUseAudioContext = () => {
 const getHealthChecks = (): HealthCheck[] => {
   const canvas = document.querySelector<HTMLCanvasElement>('canvas');
   const captureStreamSupported = typeof HTMLCanvasElement !== 'undefined' && 'captureStream' in HTMLCanvasElement.prototype;
+  const clipboardSupported = canUseClipboard();
 
   return [
     {
@@ -80,8 +92,8 @@ const getHealthChecks = (): HealthCheck[] => {
     },
     {
       label: 'Clipboard helper',
-      state: navigator.clipboard?.writeText ? 'ready' : 'limited',
-      detail: navigator.clipboard?.writeText ? 'Copy buttons can write directly.' : 'Copy buttons may fall back to prompt windows.',
+      state: clipboardSupported ? 'ready' : 'limited',
+      detail: clipboardSupported ? 'Copy buttons can write directly.' : 'Copy buttons may fall back to prompt windows.',
     },
     {
       label: 'Fullscreen',
@@ -99,7 +111,9 @@ const stateLabel = (state: HealthState) => {
 
 const copyText = async (label: string, text: string) => {
   try {
-    await navigator.clipboard.writeText(text);
+    const clipboard = getRuntimeClipboard();
+    if (typeof clipboard?.writeText !== 'function') throw new Error('Clipboard writeText is unavailable.');
+    await clipboard.writeText(text);
     setStatus(`${label} copied to clipboard.`);
   } catch {
     window.prompt(`Copy this ${label}:`, text);
