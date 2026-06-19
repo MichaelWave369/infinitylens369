@@ -2,22 +2,23 @@
 
 **Drop a song. Open a portal.**
 
-InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, and replayable visual-address receipts.
+InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, and replayable visual-address receipts.
 
 This project is intentionally claim-safe: it is an art, math, and software visualization tool. It is **not** a physics proof, consciousness proof, medical tool, or scientific claim engine.
 
-## v1.5 Machine Cathedral Pack release
+## v1.6 Preset Studio release
 
-v1.5 keeps the green v1.4 Liquid Light build and adds the first **Machine Cathedral Pack** directly into the live app. These are cyber, vector, circuit, and symbolic geometry experiences built from the stable shader engine so the public build can keep sprinting safely toward v2.0.
+v1.6 keeps the green v1.5 Machine Cathedral build and adds the first **Preset Studio** layer. The studio is a local-first sidecar panel that lets people tune a scene, save it as a named trip recipe, reload it later, export a preset pack, and import a preset pack from another InfinityLens369 user.
 
-New Machine Cathedral presets:
+Preset Studio features:
 
-- **Circuit Cathedral** — glowing circuit-temple geometry with grid discipline.
-- **Glyph Rain** — symbolic data rain with pixel-glitch energy.
-- **Neon Lattice** — wireframe tunnel lattice and node-field pulse.
-- **Vector Shrine** — retro vector altar with equations and mirror recursion.
-
-The control panel now exposes one-click chips for both **Liquid Light Pack** and **Machine Cathedral Pack**. Next Trip, Random Trip, and Auto Trip include both families.
+- Save the current visual mode, palette, overlays, motion pressure, glow, Audio Engine v2 settings, and transition settings
+- Load the latest saved preset
+- Reload individual saved presets from a compact library list
+- Delete local presets
+- Export all local presets as a JSON pack
+- Import a shared preset JSON pack
+- Keep audio local; presets do not contain the user’s audio file
 
 ## Core features
 
@@ -37,6 +38,7 @@ The control panel now exposes one-click chips for both **Liquid Light Pack** and
   - Julia Mirror
 - Liquid Light Pack presets built from stable shader routes
 - Machine Cathedral Pack presets built from stable shader routes
+- Preset Studio for local save/load/import/export of trip recipes
 - Trip presets and random trip generation
 - Transition Engine for smoother mode/preset bridges
 - Safe Mode and Reset Visuals for public demos
@@ -93,6 +95,24 @@ A      auto trip
 3      Live motion profile
 4      Warp motion profile
 ```
+
+### Preset Studio
+
+Preset Studio stores visual recipes in browser `localStorage`. It saves the control state, not the audio file.
+
+A saved preset includes:
+
+- Visual mode
+- Palette
+- Phi / 3-6-9 / equation overlays
+- Audio reactive on/off
+- Motion pressure
+- Glow
+- Audio Engine v2 controls
+- Transition style and morph speed
+- Source trip label and timestamp
+
+Preset packs export as JSON so users can share a tuned scene without sharing audio.
 
 ### Liquid Light Pack
 
@@ -170,7 +190,7 @@ Every scene can be saved as a portable address:
 INFINITYLENS369://scene?mode=cosmic-drift&center=-0.743643887037151,0.13182590420533&zoom=1.000e+0&palette=aurora-phi&overlays=phi&audio=bass-reactive&time=42.369
 ```
 
-The address is not a scientific claim. It is a replay cue for the visual state: formula/mode, center, zoom, palette, overlays, and audio time. v1.5 receipts include Transition Engine and Audio Engine v2 settings.
+The address is not a scientific claim. It is a replay cue for the visual state: formula/mode, center, zoom, palette, overlays, and audio time. v1.6 receipts and preset exports remain creative replay cues, not evidence claims.
 
 ## Project stance
 
@@ -182,6 +202,7 @@ InfinityLens369 is for:
 - Math-inspired creativity
 - Local-first audio-reactive visuals
 - Parallax-style symbolic overlays with clean boundaries
+- Sharing local preset recipes without sharing audio
 
 InfinityLens369 is not for:
 
@@ -191,7 +212,7 @@ InfinityLens369 is not for:
 
 ## v2.0 direction
 
-The v2.0 roadmap can add standalone Liquid Light shaders, standalone Machine Cathedral shaders, preset studio, WebM/GIF recording, performance controller support, and composable visual layers.
+The v2.0 roadmap can add standalone Liquid Light shaders, standalone Machine Cathedral shaders, WebM/GIF recording, performance controller support, composable visual layers, and a more deeply integrated Preset Studio.
 
 ## License
 
