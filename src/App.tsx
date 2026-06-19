@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from 'react';
 import { AudioFeatureAnalyzer } from './audio/analyser';
 import { buildVisualAddress, downloadTextFile, formatVisualAddress } from './ledger/visualAddress';
 import type { AudioFeatures, CameraState, PaletteName, VisualSettings } from './types';
@@ -83,7 +83,7 @@ export default function App() {
   }, []);
 
   const handleDrop = useCallback(
-    (event: React.DragEvent<HTMLLabelElement>) => {
+    (event: DragEvent<HTMLLabelElement>) => {
       event.preventDefault();
       const file = event.dataTransfer.files.item(0);
       if (file) ingestFile(file);
