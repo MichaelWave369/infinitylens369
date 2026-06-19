@@ -5,7 +5,8 @@ export type FractalMode =
   | 'tunnel-bloom'
   | 'kaleido-trip'
   | 'pixel-melt'
-  | 'cosmic-drift';
+  | 'cosmic-drift'
+  | 'black-hole-lens';
 
 export type PaletteName =
   | 'violet-gold-duality'
