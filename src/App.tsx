@@ -4,7 +4,7 @@ import { buildVisualAddress, downloadTextFile, formatVisualAddress } from './led
 import type { AudioFeatures, CameraState, PaletteName, VisualSettings } from './types';
 import { FractalCanvas } from './visual/FractalCanvas';
 
-const APP_VERSION = 'v0.9';
+const APP_VERSION = 'v1.0.0';
 
 const defaultFeatures: AudioFeatures = {
   bass: 0,
@@ -22,9 +22,9 @@ const defaultSettings: VisualSettings = {
   showGrid369: false,
   showEquations: false,
   audioReactive: true,
-  zoomSpeed: 0.52,
-  audioDrive: 0.42,
-  glow: 0.92,
+  zoomSpeed: 0.42,
+  audioDrive: 0.30,
+  glow: 0.84,
 };
 
 const paletteLabels: Record<PaletteName, string> = {
@@ -44,9 +44,9 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       showGrid369: false,
       showEquations: false,
       audioReactive: true,
-      zoomSpeed: 0.52,
-      audioDrive: 0.42,
-      glow: 0.92,
+      zoomSpeed: 0.42,
+      audioDrive: 0.30,
+      glow: 0.84,
     },
   },
   {
@@ -58,9 +58,9 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       showGrid369: false,
       showEquations: false,
       audioReactive: true,
-      zoomSpeed: 0.48,
-      audioDrive: 0.44,
-      glow: 0.90,
+      zoomSpeed: 0.44,
+      audioDrive: 0.34,
+      glow: 0.88,
     },
   },
   {
@@ -72,9 +72,9 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       showGrid369: false,
       showEquations: false,
       audioReactive: true,
-      zoomSpeed: 0.30,
-      audioDrive: 0.24,
-      glow: 0.76,
+      zoomSpeed: 0.24,
+      audioDrive: 0.16,
+      glow: 0.70,
     },
   },
   {
@@ -86,9 +86,9 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       showGrid369: false,
       showEquations: false,
       audioReactive: true,
-      zoomSpeed: 0.46,
-      audioDrive: 0.46,
-      glow: 0.86,
+      zoomSpeed: 0.40,
+      audioDrive: 0.34,
+      glow: 0.82,
     },
   },
   {
@@ -100,9 +100,9 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       showGrid369: false,
       showEquations: false,
       audioReactive: true,
-      zoomSpeed: 0.42,
-      audioDrive: 0.38,
-      glow: 0.42,
+      zoomSpeed: 0.34,
+      audioDrive: 0.28,
+      glow: 0.48,
     },
   },
   {
@@ -114,9 +114,9 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       showGrid369: true,
       showEquations: false,
       audioReactive: true,
-      zoomSpeed: 0.46,
-      audioDrive: 0.42,
-      glow: 0.92,
+      zoomSpeed: 0.42,
+      audioDrive: 0.30,
+      glow: 0.88,
     },
   },
   {
@@ -128,9 +128,9 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       showGrid369: false,
       showEquations: false,
       audioReactive: true,
-      zoomSpeed: 0.40,
-      audioDrive: 0.36,
-      glow: 0.88,
+      zoomSpeed: 0.34,
+      audioDrive: 0.28,
+      glow: 0.84,
     },
   },
   {
@@ -142,11 +142,26 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       showGrid369: false,
       showEquations: true,
       audioReactive: true,
-      zoomSpeed: 0.32,
-      audioDrive: 0.30,
-      glow: 0.68,
+      zoomSpeed: 0.26,
+      audioDrive: 0.22,
+      glow: 0.62,
     },
   },
+];
+
+type MotionProfile = {
+  label: string;
+  hint: string;
+  zoomSpeed: number;
+  audioDrive: number;
+  glow: number;
+};
+
+const motionProfiles: MotionProfile[] = [
+  { label: 'Dream', hint: 'slow ambient drift', zoomSpeed: 0.18, audioDrive: 0.10, glow: 0.58 },
+  { label: 'Cruise', hint: 'smooth balanced motion', zoomSpeed: 0.34, audioDrive: 0.24, glow: 0.74 },
+  { label: 'Live', hint: 'stage-ready energy', zoomSpeed: 0.52, audioDrive: 0.42, glow: 0.88 },
+  { label: 'Warp', hint: 'maximum face-melt', zoomSpeed: 0.86, audioDrive: 0.72, glow: 0.98 },
 ];
 
 const formatMetric = (value: number) => `${Math.round(value * 100).toString().padStart(2, '0')}%`;
@@ -241,9 +256,9 @@ export default function App() {
       showPhi: Math.random() > 0.72,
       showGrid369: Math.random() > 0.68,
       showEquations: Math.random() > 0.84,
-      zoomSpeed: randomFloat(0.20, 0.82),
-      audioDrive: randomFloat(0.14, 0.78),
-      glow: randomFloat(0.46, 0.98),
+      zoomSpeed: randomFloat(0.18, 0.78),
+      audioDrive: randomFloat(0.10, 0.64),
+      glow: randomFloat(0.44, 0.96),
     }));
     setActiveTripLabel(`Random ${preset.label}`);
   }, []);
@@ -252,12 +267,34 @@ export default function App() {
     setSettings((current) => ({
       ...current,
       audioReactive: true,
-      zoomSpeed: Math.min(current.zoomSpeed, 0.32),
-      audioDrive: 0.18,
-      glow: Math.max(0.42, Math.min(current.glow, 0.78)),
+      zoomSpeed: Math.min(current.zoomSpeed, 0.26),
+      audioDrive: 0.12,
+      glow: Math.max(0.40, Math.min(current.glow, 0.70)),
     }));
     setAutoTrip(false);
     setActiveTripLabel('Slow Flow');
+  }, []);
+
+  const applyMotionProfile = useCallback((profile: MotionProfile) => {
+    setSettings((current) => ({
+      ...current,
+      audioReactive: true,
+      zoomSpeed: profile.zoomSpeed,
+      audioDrive: profile.audioDrive,
+      glow: profile.glow,
+    }));
+    setAutoTrip(false);
+    setActiveTripLabel(`Motion ${profile.label}`);
+  }, []);
+
+  const toggleFullscreen = useCallback(async () => {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen().catch(() => undefined);
+      return;
+    }
+
+    const target = document.querySelector<HTMLElement>('.stage') ?? document.documentElement;
+    await target.requestFullscreen?.().catch(() => undefined);
   }, []);
 
   useEffect(() => {
@@ -339,15 +376,17 @@ export default function App() {
       }
 
       if (key === 'c') setIsCinematic((current) => !current);
+      if (key === 'f') void toggleFullscreen();
       if (key === 'n') applyNextTripPreset();
       if (key === 'r') applyRandomTripPreset();
       if (key === 's') applySlowFlow();
       if (key === 'a') setAutoTrip((current) => !current);
+      if (key >= '1' && key <= '4') applyMotionProfile(motionProfiles[Number(key) - 1]);
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [applyNextTripPreset, applyRandomTripPreset, applySlowFlow, connectAndPlay, isPlaying, pause]);
+  }, [applyMotionProfile, applyNextTripPreset, applyRandomTripPreset, applySlowFlow, connectAndPlay, isPlaying, pause, toggleFullscreen]);
 
   const saveAddress = async () => {
     const address = formatVisualAddress(visualAddress);
@@ -357,6 +396,7 @@ export default function App() {
 
   const exportReceipt = () => {
     const receipt = {
+      appVersion: APP_VERSION,
       address: visualAddress,
       formatted: formatVisualAddress(visualAddress),
       audioName,
@@ -435,9 +475,14 @@ export default function App() {
             </button>
           </div>
 
-          <button className="wide-button" type="button" onClick={() => setIsCinematic(true)}>
-            Cinematic view
-          </button>
+          <div className="button-row">
+            <button type="button" onClick={() => setIsCinematic(true)}>
+              Cinematic
+            </button>
+            <button type="button" onClick={toggleFullscreen}>
+              Fullscreen
+            </button>
+          </div>
 
           <div className="button-row">
             <button type="button" onClick={applyNextTripPreset}>
@@ -452,6 +497,18 @@ export default function App() {
             Slow flow
           </button>
 
+          <section className="motion-card" aria-label="Motion profiles">
+            <span>Motion profiles</span>
+            <div className="motion-grid">
+              {motionProfiles.map((profile, index) => (
+                <button key={profile.label} type="button" onClick={() => applyMotionProfile(profile)}>
+                  <strong>{index + 1}. {profile.label}</strong>
+                  <small>{profile.hint}</small>
+                </button>
+              ))}
+            </div>
+          </section>
+
           <button className="wide-button" type="button" onClick={() => setAutoTrip((current) => !current)}>
             {autoTrip ? 'Stop auto trip' : 'Auto trip'}
           </button>
@@ -463,7 +520,7 @@ export default function App() {
 
           <div className="trip-chip" aria-label="Keyboard shortcuts">
             <span>Keys</span>
-            <strong>Space play · C cinema · N next · R random · S slow · A auto</strong>
+            <strong>Space play · C cinema · F full · N next · R random · S slow · A auto · 1-4 motion</strong>
           </div>
 
           <div className="metrics" aria-label="Audio analysis metrics">
