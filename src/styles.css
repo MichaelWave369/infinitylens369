@@ -121,7 +121,7 @@ input[type='range'] {
   display: inline-flex;
   gap: 0.55rem;
   align-items: center;
-  max-width: min(62vw, 360px);
+  max-width: min(72vw, 520px);
   padding: 0.46rem 0.7rem;
   border-radius: 999px;
   color: rgba(255, 255, 255, 0.78);
@@ -214,6 +214,54 @@ input[type='range'] {
 .wide-button {
   width: 100%;
   margin-top: 0.8rem;
+}
+
+.trip-chip,
+.motion-card {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+  padding: 0.82rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.trip-chip span,
+.motion-card > span {
+  color: var(--gold);
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.trip-chip strong {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.motion-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.motion-grid button {
+  display: grid;
+  gap: 0.22rem;
+  justify-items: start;
+  min-height: 72px;
+  padding: 0.7rem;
+  border-radius: 18px;
+  text-align: left;
+}
+
+.motion-grid small {
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  line-height: 1.25;
 }
 
 .metrics {
@@ -439,7 +487,8 @@ input[type='range'] {
   }
 
   .toggle-grid,
-  .button-row {
+  .button-row,
+  .motion-grid {
     grid-template-columns: 1fr;
   }
 }
