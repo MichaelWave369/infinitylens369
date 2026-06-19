@@ -2,9 +2,25 @@
 
 **Drop a song. Open a portal.**
 
-InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, Layer Console overlay scenes, Launch Console onboarding helpers, Gallery Console scene discovery, Roadmap Console feedback/runway tools, System Health Console browser readiness checks, and replayable visual-address receipts.
+InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, Layer Console overlay scenes, Launch Console onboarding helpers, Gallery Console scene discovery, Roadmap Console feedback/runway tools, System Health Console browser readiness checks, Accessibility Console comfort controls, and replayable visual-address receipts.
 
 This project is intentionally claim-safe: it is an art, math, and software visualization tool. It is **not** a physics proof, consciousness proof, medical tool, or scientific claim engine.
+
+## v1.15 Accessibility Console release
+
+v1.15 adds a boot-safe **Accessibility Console** sidecar for viewer comfort and public demo safety. It loads after the core React/WebGL app and existing studios, then provides presentation-only controls for lower motion, softer glow, and higher readability.
+
+Accessibility Console features:
+
+- Default Lens to restore the public visual balance
+- Reduce Motion comfort mode with Safe/Slow control requests when available
+- Soft Glow comfort mode for dimmer long-viewing sessions
+- High Readability mode for demos, projection, and screen sharing
+- Copy Comfort Note for clean public feedback and support notes
+- Motion Safety Note with a claim-safe boundary
+- Alt+M shortcut to cycle comfort modes
+- Boot-safe loading after the visualizer is already mounted
+- Version sync for Accessibility Console labels
 
 ## v1.14 System Health Console release
 
