@@ -4,7 +4,7 @@ import { buildVisualAddress, downloadTextFile, formatVisualAddress } from './led
 import type { AudioFeatures, CameraState, PaletteName, VisualSettings } from './types';
 import { FractalCanvas } from './visual/FractalCanvas';
 
-const APP_VERSION = 'v1.2.0';
+const APP_VERSION = 'v1.3.0';
 
 type TransitionStyle = 'bloom' | 'warp' | 'glitch' | 'fade' | 'pulse';
 
@@ -25,6 +25,22 @@ const defaultFeatures: AudioFeatures = {
   waveform: 0,
 };
 
+const defaultAudioEngine = {
+  audioBassDrive: 0.76,
+  audioMidDrive: 0.62,
+  audioHighDrive: 0.56,
+  audioBeatDrive: 0.58,
+  audioResponse: 0.34,
+};
+
+const gentleAudioEngine = {
+  audioBassDrive: 0.42,
+  audioMidDrive: 0.34,
+  audioHighDrive: 0.28,
+  audioBeatDrive: 0.22,
+  audioResponse: 0.12,
+};
+
 const defaultSettings: VisualSettings = {
   mode: 'black-hole-lens',
   palette: 'solar-ember',
@@ -34,6 +50,7 @@ const defaultSettings: VisualSettings = {
   audioReactive: true,
   zoomSpeed: 0.42,
   audioDrive: 0.30,
+  ...defaultAudioEngine,
   glow: 0.84,
 };
 
@@ -46,6 +63,7 @@ const safeModeSettings: VisualSettings = {
   audioReactive: false,
   zoomSpeed: 0.12,
   audioDrive: 0.06,
+  ...gentleAudioEngine,
   glow: 0.42,
 };
 
@@ -75,6 +93,11 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       audioReactive: true,
       zoomSpeed: 0.42,
       audioDrive: 0.30,
+      audioBassDrive: 0.78,
+      audioMidDrive: 0.52,
+      audioHighDrive: 0.44,
+      audioBeatDrive: 0.66,
+      audioResponse: 0.30,
       glow: 0.84,
     },
   },
@@ -89,6 +112,11 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       audioReactive: true,
       zoomSpeed: 0.44,
       audioDrive: 0.34,
+      audioBassDrive: 0.64,
+      audioMidDrive: 0.70,
+      audioHighDrive: 0.72,
+      audioBeatDrive: 0.48,
+      audioResponse: 0.28,
       glow: 0.88,
     },
   },
@@ -103,6 +131,7 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       audioReactive: true,
       zoomSpeed: 0.24,
       audioDrive: 0.16,
+      ...gentleAudioEngine,
       glow: 0.70,
     },
   },
@@ -121,6 +150,11 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       audioReactive: true,
       zoomSpeed: 0.40,
       audioDrive: 0.34,
+      audioBassDrive: 0.68,
+      audioMidDrive: 0.72,
+      audioHighDrive: 0.82,
+      audioBeatDrive: 0.46,
+      audioResponse: 0.58,
       glow: 0.82,
     },
   },
@@ -135,6 +169,11 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       audioReactive: true,
       zoomSpeed: 0.34,
       audioDrive: 0.28,
+      audioBassDrive: 0.50,
+      audioMidDrive: 0.82,
+      audioHighDrive: 0.74,
+      audioBeatDrive: 0.52,
+      audioResponse: 0.36,
       glow: 0.48,
     },
   },
@@ -149,6 +188,11 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       audioReactive: true,
       zoomSpeed: 0.42,
       audioDrive: 0.30,
+      audioBassDrive: 0.72,
+      audioMidDrive: 0.56,
+      audioHighDrive: 0.50,
+      audioBeatDrive: 0.78,
+      audioResponse: 0.42,
       glow: 0.88,
     },
   },
@@ -163,6 +207,11 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       audioReactive: true,
       zoomSpeed: 0.34,
       audioDrive: 0.28,
+      audioBassDrive: 0.58,
+      audioMidDrive: 0.80,
+      audioHighDrive: 0.70,
+      audioBeatDrive: 0.42,
+      audioResponse: 0.48,
       glow: 0.84,
     },
   },
@@ -177,6 +226,11 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       audioReactive: true,
       zoomSpeed: 0.26,
       audioDrive: 0.22,
+      audioBassDrive: 0.66,
+      audioMidDrive: 0.46,
+      audioHighDrive: 0.38,
+      audioBeatDrive: 0.28,
+      audioResponse: 0.20,
       glow: 0.62,
     },
   },
@@ -187,14 +241,15 @@ type MotionProfile = {
   hint: string;
   zoomSpeed: number;
   audioDrive: number;
+  audioResponse: number;
   glow: number;
 };
 
 const motionProfiles: MotionProfile[] = [
-  { label: 'Dream', hint: 'slow ambient drift', zoomSpeed: 0.18, audioDrive: 0.10, glow: 0.58 },
-  { label: 'Cruise', hint: 'smooth balanced motion', zoomSpeed: 0.34, audioDrive: 0.24, glow: 0.74 },
-  { label: 'Live', hint: 'stage-ready energy', zoomSpeed: 0.52, audioDrive: 0.42, glow: 0.88 },
-  { label: 'Warp', hint: 'maximum face-melt', zoomSpeed: 0.86, audioDrive: 0.72, glow: 0.98 },
+  { label: 'Dream', hint: 'slow ambient drift', zoomSpeed: 0.18, audioDrive: 0.10, audioResponse: 0.10, glow: 0.58 },
+  { label: 'Cruise', hint: 'smooth balanced motion', zoomSpeed: 0.34, audioDrive: 0.24, audioResponse: 0.28, glow: 0.74 },
+  { label: 'Live', hint: 'stage-ready energy', zoomSpeed: 0.52, audioDrive: 0.42, audioResponse: 0.56, glow: 0.88 },
+  { label: 'Warp', hint: 'maximum face-melt', zoomSpeed: 0.86, audioDrive: 0.72, audioResponse: 0.82, glow: 0.98 },
 ];
 
 const supportedAudioExtensions = new Set(['mp3', 'wav', 'ogg', 'oga', 'm4a', 'aac', 'flac', 'webm']);
@@ -229,18 +284,42 @@ const isSupportedAudioFile = (file: File) => {
   return file.type.startsWith('audio/') || supportedAudioExtensions.has(extension);
 };
 
-const shapeAudioFeatures = (features: AudioFeatures, audioDrive: number): AudioFeatures => {
-  const drive = clampNumber(audioDrive, 0, 1.5);
+const smoothSignal = (previous: number, target: number, response: number) => {
+  const attack = 0.045 + response * 0.62;
+  const release = 0.020 + response * 0.20;
+  const amount = target > previous ? attack : release;
+  return clampNumber(previous + (target - previous) * amount, 0, 1);
+};
+
+const shapeAudioFeatures = (
+  features: AudioFeatures,
+  settings: VisualSettings,
+  previous: AudioFeatures,
+): AudioFeatures => {
+  if (!settings.audioReactive) return defaultFeatures;
+
+  const drive = clampNumber(settings.audioDrive, 0, 1.5);
+  const response = clampNumber(settings.audioResponse, 0, 1);
   const softDrive = drive * (0.64 + drive * 0.24);
-  const beatDrive = Math.min(1, drive * 0.78);
+  const band = (value: number, multiplier: number) => clampNumber(value * softDrive * multiplier, 0, 1);
+  const onset = Math.max(0, features.bass - previous.bass, features.rms - previous.rms);
+
+  const shaped: AudioFeatures = {
+    bass: band(features.bass, settings.audioBassDrive),
+    mid: band(features.mid, settings.audioMidDrive),
+    high: band(features.high, settings.audioHighDrive),
+    rms: band(features.rms, (settings.audioBassDrive + settings.audioMidDrive + settings.audioHighDrive) / 3),
+    beat: clampNumber(Math.max(features.beat, onset * 1.7) * Math.min(1, drive * 0.86) * settings.audioBeatDrive, 0, 1),
+    waveform: band(features.waveform, settings.audioMidDrive),
+  };
 
   return {
-    bass: clampNumber(features.bass * softDrive, 0, 1),
-    mid: clampNumber(features.mid * softDrive, 0, 1),
-    high: clampNumber(features.high * softDrive, 0, 1),
-    rms: clampNumber(features.rms * softDrive, 0, 1),
-    beat: clampNumber(features.beat * beatDrive, 0, 1),
-    waveform: clampNumber(features.waveform * softDrive, 0, 1),
+    bass: smoothSignal(previous.bass, shaped.bass, response),
+    mid: smoothSignal(previous.mid, shaped.mid, response),
+    high: smoothSignal(previous.high, shaped.high, response),
+    rms: smoothSignal(previous.rms, shaped.rms, response),
+    beat: smoothSignal(previous.beat, shaped.beat, Math.min(1, response + 0.18)),
+    waveform: smoothSignal(previous.waveform, shaped.waveform, response),
   };
 };
 
@@ -252,6 +331,7 @@ export default function App() {
   const presetIndexRef = useRef(0);
   const transitionTimerRef = useRef<number | null>(null);
   const transitionActionTimerRef = useRef<number | null>(null);
+  const smoothedFeaturesRef = useRef<AudioFeatures>(defaultFeatures);
 
   const [features, setFeatures] = useState<AudioFeatures>(defaultFeatures);
   const [settings, setSettings] = useState<VisualSettings>(defaultSettings);
@@ -272,13 +352,14 @@ export default function App() {
   });
   const [latestAddress, setLatestAddress] = useState('Drop an audio file, press play, then save a visual address.');
   const [notice, setNotice] = useState(hasWebGL2
-    ? 'v1.2 ready. Transition Engine is live: choose a bridge style, then use Next, Random, Auto, Safe, or Reset.'
+    ? 'v1.3 ready. Audio Engine v2 is live: tune bass, mids, highs, beat punch, and smooth/snappy response.'
     : 'WebGL2 is not available in this browser/device. Try Chrome, Edge, Firefox, or Safari on a GPU-enabled device.');
 
-  const visualFeatures = useMemo(
-    () => shapeAudioFeatures(features, settings.audioDrive),
-    [features, settings.audioDrive],
-  );
+  const visualFeatures = useMemo(() => {
+    const next = shapeAudioFeatures(features, settings, smoothedFeaturesRef.current);
+    smoothedFeaturesRef.current = next;
+    return next;
+  }, [features, settings]);
 
   const visualAddress = useMemo(() => {
     const time = audioRef.current?.currentTime ?? 0;
@@ -320,6 +401,7 @@ export default function App() {
     const preset = tripPresets[presetIndexRef.current];
 
     triggerTransition(`Next trip · ${preset.label}`, () => {
+      smoothedFeaturesRef.current = defaultFeatures;
       setSettings((current) => ({ ...current, ...preset.settings }));
       setActiveTripLabel(preset.label);
       setNotice(`Transitioned into trip preset: ${preset.label}`);
@@ -335,6 +417,7 @@ export default function App() {
 
     presetIndexRef.current = presetIndex;
     triggerTransition(randomLabel, () => {
+      smoothedFeaturesRef.current = defaultFeatures;
       setSettings((current) => ({
         ...current,
         ...preset.settings,
@@ -344,6 +427,11 @@ export default function App() {
         showEquations: Math.random() > 0.84,
         zoomSpeed: randomFloat(0.18, 0.78),
         audioDrive: randomFloat(0.10, 0.64),
+        audioBassDrive: randomFloat(0.35, 1.12),
+        audioMidDrive: randomFloat(0.35, 1.12),
+        audioHighDrive: randomFloat(0.30, 1.18),
+        audioBeatDrive: randomFloat(0.20, 1.05),
+        audioResponse: randomFloat(0.12, 0.76),
         glow: randomFloat(0.44, 0.96),
       }));
       setActiveTripLabel(randomLabel);
@@ -353,6 +441,7 @@ export default function App() {
 
   const applySafeMode = useCallback(() => {
     triggerTransition('Safe Mode bridge', () => {
+      smoothedFeaturesRef.current = defaultFeatures;
       setSettings(safeModeSettings);
       setAutoTrip(false);
       setActiveTripLabel('Safe Mode');
@@ -362,28 +451,31 @@ export default function App() {
 
   const applySlowFlow = useCallback(() => {
     triggerTransition('Slow Flow bridge', () => {
+      smoothedFeaturesRef.current = defaultFeatures;
       setSettings((current) => ({
         ...current,
         audioReactive: true,
         zoomSpeed: Math.min(current.zoomSpeed, 0.26),
         audioDrive: 0.12,
+        ...gentleAudioEngine,
         glow: Math.max(0.40, Math.min(current.glow, 0.70)),
       }));
       setAutoTrip(false);
       setActiveTripLabel('Slow Flow');
-      setNotice('Slow Flow enabled: audio stays reactive, but motion is softened.');
+      setNotice('Slow Flow enabled: audio stays reactive, but Audio Engine v2 softens band response and beat punch.');
     }, 'pulse');
   }, [triggerTransition]);
 
   const resetVisuals = useCallback(() => {
     triggerTransition('Reset visuals', () => {
+      smoothedFeaturesRef.current = defaultFeatures;
       setSettings(defaultSettings);
       setCamera(createDefaultCamera());
       setFeatures(defaultFeatures);
       setAutoTrip(false);
       setActiveTripLabel('Black Hole Lens');
       setLatestAddress('Visuals reset. Press play or save a fresh visual address.');
-      setNotice('Visuals reset to the v1.2 default scene.');
+      setNotice('Visuals reset to the v1.3 default scene.');
     }, 'bloom');
   }, [triggerTransition]);
 
@@ -394,6 +486,7 @@ export default function App() {
         audioReactive: true,
         zoomSpeed: profile.zoomSpeed,
         audioDrive: profile.audioDrive,
+        audioResponse: profile.audioResponse,
         glow: profile.glow,
       }));
       setAutoTrip(false);
@@ -448,6 +541,7 @@ export default function App() {
 
     const url = URL.createObjectURL(file);
     objectUrlRef.current = url;
+    smoothedFeaturesRef.current = defaultFeatures;
     setAudioUrl(url);
     setAudioName(file.name);
     setIsPlaying(false);
@@ -551,6 +645,14 @@ export default function App() {
         style: transitionStyle,
         durationMs: transitionMs,
       },
+      audioEngineV2: {
+        drive: settings.audioDrive,
+        bassImpact: settings.audioBassDrive,
+        midMotion: settings.audioMidDrive,
+        highSparkle: settings.audioHighDrive,
+        beatPunch: settings.audioBeatDrive,
+        response: settings.audioResponse,
+      },
       browserSupport: {
         webgl2: hasWebGL2,
       },
@@ -627,6 +729,7 @@ export default function App() {
           <span>{formatModeLabel(settings.mode)}</span>
           <span>{transitionOptions.find((option) => option.value === transitionStyle)?.label}</span>
           <span>drive {formatMetric(settings.audioDrive / 1.5)}</span>
+          <span>response {formatMetric(settings.audioResponse)}</span>
           {settings.audioReactive ? <span>reactive</span> : <span>safe/static</span>}
           {autoTrip && <span>auto trip</span>}
         </div>
@@ -766,6 +869,7 @@ export default function App() {
             <Metric label="Bass" value={features.bass} />
             <Metric label="Mids" value={features.mid} />
             <Metric label="Highs" value={features.high} />
+            <Metric label="Beat" value={features.beat} />
             <Metric label="Energy" value={features.rms} />
             <Metric label="Drive" value={settings.audioDrive / 1.5} />
           </div>
@@ -777,9 +881,10 @@ export default function App() {
               onChange={(event) => {
                 const mode = event.target.value as VisualSettings['mode'];
                 triggerTransition(`Mode · ${formatModeLabel(mode)}`, () => {
+                  smoothedFeaturesRef.current = defaultFeatures;
                   setSettings((current) => ({ ...current, mode }));
                   setActiveTripLabel('Custom signal');
-                  setNotice('Custom mode selected through the v1.2 transition engine.');
+                  setNotice('Custom mode selected through the v1.3 transition engine.');
                 });
               }}
             >
@@ -832,6 +937,67 @@ export default function App() {
             />
           </label>
 
+          <section className="transition-card" aria-label="Audio Engine v2 controls">
+            <span>Audio Engine v2</span>
+            <strong>Smooth / Snappy · {formatMetric(settings.audioResponse)}</strong>
+            <small>Shape the audio before it reaches every shader. Lower values drift. Higher values punch.</small>
+            <label className="slider-row compact-slider">
+              <span>Response</span>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={settings.audioResponse}
+                onChange={(event) => setSettings((current) => ({ ...current, audioResponse: Number(event.target.value) }))}
+              />
+            </label>
+            <label className="slider-row compact-slider">
+              <span>Bass impact · {formatMetric(settings.audioBassDrive / 1.5)}</span>
+              <input
+                type="range"
+                min="0"
+                max="1.5"
+                step="0.01"
+                value={settings.audioBassDrive}
+                onChange={(event) => setSettings((current) => ({ ...current, audioBassDrive: Number(event.target.value) }))}
+              />
+            </label>
+            <label className="slider-row compact-slider">
+              <span>Mids motion · {formatMetric(settings.audioMidDrive / 1.5)}</span>
+              <input
+                type="range"
+                min="0"
+                max="1.5"
+                step="0.01"
+                value={settings.audioMidDrive}
+                onChange={(event) => setSettings((current) => ({ ...current, audioMidDrive: Number(event.target.value) }))}
+              />
+            </label>
+            <label className="slider-row compact-slider">
+              <span>High sparkle · {formatMetric(settings.audioHighDrive / 1.5)}</span>
+              <input
+                type="range"
+                min="0"
+                max="1.5"
+                step="0.01"
+                value={settings.audioHighDrive}
+                onChange={(event) => setSettings((current) => ({ ...current, audioHighDrive: Number(event.target.value) }))}
+              />
+            </label>
+            <label className="slider-row compact-slider">
+              <span>Beat punch · {formatMetric(settings.audioBeatDrive / 1.5)}</span>
+              <input
+                type="range"
+                min="0"
+                max="1.5"
+                step="0.01"
+                value={settings.audioBeatDrive}
+                onChange={(event) => setSettings((current) => ({ ...current, audioBeatDrive: Number(event.target.value) }))}
+              />
+            </label>
+          </section>
+
           <label className="slider-row">
             <span>Glow</span>
             <input
@@ -872,7 +1038,7 @@ function Metric({ label, value }: { label: string; value: number }) {
     <div className="metric">
       <span>{label}</span>
       <strong>{formatMetric(value)}</strong>
-      <i style={{ transform: `scaleX(${Math.max(0.02, value)})` }} />
+      <i style={{ transform: `scaleX(${Math.max(0.02, Math.min(1, value))})` }} />
     </div>
   );
 }
