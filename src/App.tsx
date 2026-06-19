@@ -4,7 +4,7 @@ import { buildVisualAddress, downloadTextFile, formatVisualAddress } from './led
 import type { AudioFeatures, CameraState, PaletteName, VisualSettings } from './types';
 import { FractalCanvas } from './visual/FractalCanvas';
 
-const APP_VERSION = 'v0.7';
+const APP_VERSION = 'v0.8';
 
 const defaultFeatures: AudioFeatures = {
   bass: 0,
@@ -16,14 +16,14 @@ const defaultFeatures: AudioFeatures = {
 };
 
 const defaultSettings: VisualSettings = {
-  mode: 'cosmic-drift',
-  palette: 'aurora-phi',
+  mode: 'black-hole-lens',
+  palette: 'solar-ember',
   showPhi: false,
   showGrid369: false,
   showEquations: false,
   audioReactive: true,
-  zoomSpeed: 0.76,
-  glow: 0.90,
+  zoomSpeed: 0.88,
+  glow: 0.92,
 };
 
 const paletteLabels: Record<PaletteName, string> = {
@@ -34,6 +34,19 @@ const paletteLabels: Record<PaletteName, string> = {
 };
 
 const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> = [
+  {
+    label: 'Black Hole Lens',
+    settings: {
+      mode: 'black-hole-lens',
+      palette: 'solar-ember',
+      showPhi: false,
+      showGrid369: false,
+      showEquations: false,
+      audioReactive: true,
+      zoomSpeed: 0.88,
+      glow: 0.92,
+    },
+  },
   {
     label: 'Cosmic Drift',
     settings: {
@@ -123,8 +136,11 @@ const pressureLabel = (mode: VisualSettings['mode']) => {
   if (mode === 'kaleido-trip') return 'Fold pressure';
   if (mode === 'pixel-melt') return 'Pixel pressure';
   if (mode === 'cosmic-drift') return 'Warp pressure';
+  if (mode === 'black-hole-lens') return 'Gravity pressure';
   return 'Melt pressure';
 };
+
+const randomFloat = (min: number, max: number) => min + Math.random() * (max - min);
 
 export default function App() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -166,6 +182,26 @@ export default function App() {
     const preset = tripPresets[presetIndexRef.current];
     setSettings((current) => ({ ...current, ...preset.settings }));
     setActiveTripLabel(preset.label);
+  }, []);
+
+  const applyRandomTripPreset = useCallback(() => {
+    const presetIndex = Math.floor(Math.random() * tripPresets.length);
+    const preset = tripPresets[presetIndex];
+    const palettes = Object.keys(paletteLabels) as PaletteName[];
+    const palette = palettes[Math.floor(Math.random() * palettes.length)];
+
+    presetIndexRef.current = presetIndex;
+    setSettings((current) => ({
+      ...current,
+      ...preset.settings,
+      palette,
+      showPhi: Math.random() > 0.72,
+      showGrid369: Math.random() > 0.68,
+      showEquations: Math.random() > 0.84,
+      zoomSpeed: randomFloat(0.42, 1.08),
+      glow: randomFloat(0.46, 0.98),
+    }));
+    setActiveTripLabel(`Random ${preset.label}`);
   }, []);
 
   useEffect(() => {
@@ -248,12 +284,13 @@ export default function App() {
 
       if (key === 'c') setIsCinematic((current) => !current);
       if (key === 'n') applyNextTripPreset();
+      if (key === 'r') applyRandomTripPreset();
       if (key === 'a') setAutoTrip((current) => !current);
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [applyNextTripPreset, connectAndPlay, isPlaying, pause]);
+  }, [applyNextTripPreset, applyRandomTripPreset, connectAndPlay, isPlaying, pause]);
 
   const saveAddress = async () => {
     const address = formatVisualAddress(visualAddress);
@@ -343,10 +380,14 @@ export default function App() {
             <button type="button" onClick={applyNextTripPreset}>
               Next trip
             </button>
-            <button type="button" onClick={() => setAutoTrip((current) => !current)}>
-              {autoTrip ? 'Stop auto' : 'Auto trip'}
+            <button type="button" onClick={applyRandomTripPreset}>
+              Random trip
             </button>
           </div>
+
+          <button className="wide-button" type="button" onClick={() => setAutoTrip((current) => !current)}>
+            {autoTrip ? 'Stop auto trip' : 'Auto trip'}
+          </button>
 
           <div className="trip-chip" aria-label="Active trip preset">
             <span>Trip preset</span>
@@ -355,7 +396,7 @@ export default function App() {
 
           <div className="trip-chip" aria-label="Keyboard shortcuts">
             <span>Keys</span>
-            <strong>Space play · C cinema · N next · A auto</strong>
+            <strong>Space play · C cinema · N next · R random · A auto</strong>
           </div>
 
           <div className="metrics" aria-label="Audio analysis metrics">
@@ -374,6 +415,7 @@ export default function App() {
                 setActiveTripLabel('Custom signal');
               }}
             >
+              <option value="black-hole-lens">Black Hole Lens</option>
               <option value="cosmic-drift">Cosmic Drift</option>
               <option value="pixel-melt">Pixel Melt</option>
               <option value="kaleido-trip">Kaleido Trip</option>
@@ -509,7 +551,9 @@ function EquationOverlay({ features, camera, mode }: { features: AudioFeatures; 
           ? 'quantize(p) + feedback melt'
           : mode === 'cosmic-drift'
             ? 'starfield + nebula warp + beat'
-            : 'z ↦ z² + c';
+            : mode === 'black-hole-lens'
+              ? 'lens(r) + accretion + beat'
+              : 'z ↦ z² + c';
 
   return (
     <div className="equation-overlay" aria-hidden="true">
