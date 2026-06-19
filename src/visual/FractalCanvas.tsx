@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type PointerEvent, type WheelEvent } from 'react';
 import type { AudioFeatures, CameraState, PaletteName, VisualSettings } from '../types';
 
 type FractalCanvasProps = {
@@ -240,6 +240,7 @@ export function FractalCanvas({ features, settings, onCameraChange }: FractalCan
     const gl = canvas.getContext('webgl2', {
       antialias: false,
       alpha: false,
+      preserveDrawingBuffer: true,
       powerPreference: 'high-performance',
     });
 
@@ -275,6 +276,7 @@ export function FractalCanvas({ features, settings, onCameraChange }: FractalCan
 
     let frame = 0;
     let lastTime = performance.now();
+    let lastCameraEmit = 0;
 
     const render = (now: number) => {
       const seconds = now * 0.001;
@@ -312,7 +314,12 @@ export function FractalCanvas({ features, settings, onCameraChange }: FractalCan
       gl.uniform1f(uniforms.mode, currentSettings.mode === 'mandelbrot' ? 0 : 1);
 
       gl.drawArrays(gl.TRIANGLES, 0, 3);
-      onCameraChange({ ...camera });
+
+      if (now - lastCameraEmit > 100) {
+        onCameraChange({ ...camera });
+        lastCameraEmit = now;
+      }
+
       frame = requestAnimationFrame(render);
     };
 
@@ -325,18 +332,18 @@ export function FractalCanvas({ features, settings, onCameraChange }: FractalCan
     };
   }, [onCameraChange]);
 
-  const handleWheel = (event: React.WheelEvent<HTMLCanvasElement>) => {
+  const handleWheel = (event: WheelEvent<HTMLCanvasElement>) => {
     event.preventDefault();
     const direction = event.deltaY > 0 ? 0.92 : 1.12;
     cameraRef.current.zoom = Math.max(0.25, Math.min(1.0e9, cameraRef.current.zoom * direction));
   };
 
-  const handlePointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
+  const handlePointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
     event.currentTarget.setPointerCapture(event.pointerId);
     draggingRef.current = { x: event.clientX, y: event.clientY };
   };
 
-  const handlePointerMove = (event: React.PointerEvent<HTMLCanvasElement>) => {
+  const handlePointerMove = (event: PointerEvent<HTMLCanvasElement>) => {
     const previous = draggingRef.current;
     const canvas = canvasRef.current;
     if (!previous || !canvas) return;
@@ -353,7 +360,7 @@ export function FractalCanvas({ features, settings, onCameraChange }: FractalCan
     draggingRef.current = { x: event.clientX, y: event.clientY };
   };
 
-  const handlePointerUp = (event: React.PointerEvent<HTMLCanvasElement>) => {
+  const handlePointerUp = (event: PointerEvent<HTMLCanvasElement>) => {
     event.currentTarget.releasePointerCapture(event.pointerId);
     draggingRef.current = null;
   };
