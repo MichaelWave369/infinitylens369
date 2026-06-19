@@ -2,9 +2,24 @@
 
 **Drop a song. Open a portal.**
 
-InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, Layer Console overlay scenes, Launch Console onboarding helpers, Gallery Console scene discovery, Roadmap Console feedback/runway tools, System Health Console browser readiness checks, Accessibility Console comfort controls, Showcase Console public demo modes, Share Console public handoff notes, and replayable visual-address receipts.
+InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, Layer Console overlay scenes, Launch Console onboarding helpers, Gallery Console scene discovery, Roadmap Console feedback/runway tools, System Health Console browser readiness checks, Accessibility Console comfort controls, Showcase Console public demo modes, Share Console public handoff notes, Launch Packet Console release-copy tools, and replayable visual-address receipts.
 
 This project is intentionally claim-safe: it is an art, math, and software visualization tool. It is **not** a physics proof, consciousness proof, medical tool, or scientific claim engine.
+
+## v1.18 Launch Packet Console release
+
+v1.18 adds a boot-safe **Launch Packet Console** sidecar for public launch packaging. It loads after the core React/WebGL app and existing studios, then prepares copy-ready launch blurbs, tester checklists, creator handoffs, and v2.0 readiness notes.
+
+Launch Packet Console features:
+
+- Copy Launch Blurb for public/social sharing
+- Copy Tester Checklist for structured feedback and browser reports
+- Copy Creator Handoff for artists, video makers, and live demo users
+- Copy v2 Readiness for the current release stack and remaining runway
+- Open Repo for project/source access
+- Refresh Label Sync for public label cleanup
+- Boot-safe loading after the visualizer is already mounted
+- Version sync for Launch Packet Console labels
 
 ## v1.17 Share Console release
 
