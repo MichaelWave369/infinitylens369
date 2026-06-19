@@ -1,0 +1,59 @@
+name: Bug report
+description: Report a problem with InfinityLens369
+title: "Bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping harden InfinityLens369. Please include enough detail for someone else to reproduce the issue.
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: Example: v1.1.0
+      placeholder: v1.1.0
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the bug clearly.
+      placeholder: The visualizer froze when...
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: List the exact steps.
+      placeholder: |
+        1. Open the app
+        2. Drop an MP3
+        3. Select Black Hole Lens
+        4. Press Cinematic
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and OS
+      placeholder: Chrome on Windows 11, Safari on macOS, etc.
+    validations:
+      required: true
+  - type: dropdown
+    id: webgl
+    attributes:
+      label: Did WebGL2 appear to work?
+      options:
+        - Yes
+        - No
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Extra notes / screenshots
+      description: Add console errors, screenshots, or exported receipt JSON if helpful.
