@@ -1,0 +1,74 @@
+.launch-packet-console {
+  border-color: rgba(245, 190, 110, 0.4);
+  background: linear-gradient(180deg, rgba(245, 190, 110, 0.13), rgba(16, 13, 26, 0.74));
+}
+
+.launch-packet-console h2 {
+  margin-bottom: 0.35rem;
+}
+
+.launch-packet-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin: 0.8rem 0;
+}
+
+.launch-packet-grid button,
+.launch-packet-actions button {
+  border: 1px solid rgba(245, 190, 110, 0.34);
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+  cursor: pointer;
+  padding: 0.62rem 0.72rem;
+  text-align: left;
+}
+
+.launch-packet-grid button:hover,
+.launch-packet-actions button:hover {
+  border-color: rgba(255, 230, 178, 0.72);
+  background: rgba(245, 190, 110, 0.16);
+}
+
+.launch-packet-grid strong {
+  display: block;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.launch-packet-grid span {
+  display: block;
+  font-size: 0.72rem;
+  line-height: 1.3;
+  margin-top: 0.22rem;
+  opacity: 0.78;
+}
+
+.launch-packet-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-bottom: 0.75rem;
+}
+
+.launch-packet-actions button {
+  text-align: center;
+}
+
+.launch-packet-console-status {
+  border-top: 1px solid rgba(245, 190, 110, 0.25);
+  font-size: 0.74rem;
+  line-height: 1.35;
+  margin: 0.65rem 0 0;
+  opacity: 0.82;
+  padding-top: 0.65rem;
+}
+
+@media (max-width: 720px) {
+  .launch-packet-grid,
+  .launch-packet-actions {
+    grid-template-columns: 1fr;
+  }
+}
