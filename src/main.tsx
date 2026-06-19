@@ -15,6 +15,7 @@ import './roadmap-console.css';
 import './system-health-console.css';
 import './accessibility-console.css';
 import './showcase-console.css';
+import './share-console.css';
 import './studio-dock.css';
 
 const rootElement = document.getElementById('root');
@@ -96,7 +97,13 @@ window.setTimeout(() => {
 }, 1000);
 
 window.setTimeout(() => {
+  import('./share-console-loader').catch((error) => {
+    console.warn('InfinityLens369 Share Console failed to load. Core visualizer remains available.', error);
+  });
+}, 1100);
+
+window.setTimeout(() => {
   import('./version-sync').catch((error) => {
     console.warn('InfinityLens369 version sync failed to load. Core visualizer remains available.', error);
   });
-}, 1250);
+}, 1350);
