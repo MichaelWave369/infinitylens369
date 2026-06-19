@@ -34,41 +34,58 @@
 
 @keyframes visual-cleanup-transition {
   0% { opacity: 0; }
-  20% { opacity: 0.16; }
+  20% { opacity: 0.12; }
   100% { opacity: 0; }
 }
 
-body[data-infinitylens-scene='circuit-cathedral-retuned'] .stage::after {
+body[data-infinitylens-scene='circuit-cathedral-identity'] .stage {
+  isolation: isolate;
+  background: #02050a;
+}
+
+body[data-infinitylens-scene='circuit-cathedral-identity'] .stage canvas,
+body[data-infinitylens-scene='circuit-cathedral-identity'] .fractal-canvas {
+  filter: brightness(0.62) contrast(1.28) saturate(0.78) hue-rotate(188deg);
+}
+
+body[data-infinitylens-scene='circuit-cathedral-identity'] .stage::after {
   content: '';
   position: absolute;
   inset: 0;
   z-index: 4;
   pointer-events: none;
-  opacity: 0.26;
+  opacity: 0.44;
   mix-blend-mode: screen;
   background:
-    linear-gradient(90deg, transparent 0 11%, rgba(112, 240, 255, 0.18) 11.3% 11.6%, transparent 11.9% 22%, rgba(244, 200, 106, 0.13) 22.3% 22.6%, transparent 22.9% 33%, rgba(112, 240, 255, 0.20) 33.3% 33.6%, transparent 33.9% 66%, rgba(112, 240, 255, 0.20) 66.3% 66.6%, transparent 66.9% 77%, rgba(244, 200, 106, 0.13) 77.3% 77.6%, transparent 77.9% 88%, rgba(112, 240, 255, 0.18) 88.3% 88.6%, transparent 88.9%),
-    linear-gradient(0deg, transparent 0 17%, rgba(112, 240, 255, 0.11) 17.2% 17.5%, transparent 17.7% 36%, rgba(244, 200, 106, 0.12) 36.2% 36.5%, transparent 36.7% 63%, rgba(244, 200, 106, 0.12) 63.2% 63.5%, transparent 63.7% 82%, rgba(112, 240, 255, 0.11) 82.2% 82.5%, transparent 82.7%),
-    radial-gradient(ellipse at 50% 58%, transparent 0 18%, rgba(112, 240, 255, 0.18) 18.3% 18.9%, transparent 19.4% 29%, rgba(244, 200, 106, 0.14) 29.3% 30%, transparent 30.8% 100%);
+    linear-gradient(90deg, transparent 0 7%, rgba(52, 232, 255, 0.16) 7.1% 7.25%, transparent 7.4% 14%, rgba(52, 232, 255, 0.11) 14.1% 14.2%, transparent 14.35% 25%, rgba(215, 166, 72, 0.10) 25.1% 25.25%, transparent 25.4% 39%, rgba(52, 232, 255, 0.18) 39.1% 39.32%, transparent 39.55% 60%, rgba(52, 232, 255, 0.18) 60.68% 60.9%, transparent 61.1% 74%, rgba(215, 166, 72, 0.10) 74.75% 74.9%, transparent 75.1% 86%, rgba(52, 232, 255, 0.11) 85.8% 85.95%, transparent 86.15% 93%, rgba(52, 232, 255, 0.16) 92.75% 92.9%, transparent 93.1%),
+    linear-gradient(0deg, transparent 0 9%, rgba(52, 232, 255, 0.10) 9.1% 9.24%, transparent 9.4% 21%, rgba(215, 166, 72, 0.11) 21.1% 21.25%, transparent 21.4% 38%, rgba(52, 232, 255, 0.15) 38.1% 38.28%, transparent 38.45% 62%, rgba(52, 232, 255, 0.15) 61.72% 61.9%, transparent 62.1% 79%, rgba(215, 166, 72, 0.11) 78.75% 78.9%, transparent 79.1% 91%, rgba(52, 232, 255, 0.10) 90.76% 90.9%, transparent 91.1%),
+    repeating-linear-gradient(90deg, rgba(52, 232, 255, 0.055) 0 1px, transparent 1px 54px),
+    repeating-linear-gradient(0deg, rgba(52, 232, 255, 0.045) 0 1px, transparent 1px 54px),
+    radial-gradient(ellipse at 50% 50%, transparent 0 15%, rgba(52, 232, 255, 0.10) 15.2% 15.7%, transparent 16.2% 27%, rgba(215, 166, 72, 0.10) 27.2% 27.7%, transparent 28.4% 100%),
+    radial-gradient(ellipse at 50% 50%, transparent 0 48%, rgba(1, 6, 14, 0.72) 74%, rgba(1, 5, 10, 0.94) 100%);
 }
 
-body[data-infinitylens-scene='circuit-cathedral-retuned'] .stage::before {
+body[data-infinitylens-scene='circuit-cathedral-identity'] .stage::before {
   content: '';
   position: absolute;
-  inset: 7% 14% 10%;
+  inset: 8% 18% 11%;
   z-index: 4;
   pointer-events: none;
-  opacity: 0.18;
+  opacity: 0.46;
   mix-blend-mode: screen;
-  border: 1px solid rgba(112, 240, 255, 0.34);
-  border-bottom-color: rgba(244, 200, 106, 0.30);
-  border-radius: 48% 48% 10% 10% / 60% 60% 12% 12%;
+  border: 1px solid rgba(52, 232, 255, 0.42);
+  border-bottom-color: rgba(215, 166, 72, 0.34);
+  border-radius: 48% 48% 8% 8% / 62% 62% 10% 10%;
   box-shadow:
-    inset 0 0 42px rgba(112, 240, 255, 0.20),
-    0 0 46px rgba(244, 200, 106, 0.12);
+    inset 0 0 34px rgba(52, 232, 255, 0.20),
+    inset 0 -18px 34px rgba(215, 166, 72, 0.10),
+    0 0 26px rgba(52, 232, 255, 0.18);
+  background:
+    linear-gradient(90deg, transparent 0 49.6%, rgba(52, 232, 255, 0.34) 49.8% 50.2%, transparent 50.4%),
+    linear-gradient(0deg, transparent 0 49.65%, rgba(215, 166, 72, 0.24) 49.85% 50.15%, transparent 50.35%);
 }
 
-body[data-infinitylens-comfort='reduced-motion'][data-infinitylens-scene='circuit-cathedral-retuned'] .stage::before,
-body[data-infinitylens-comfort='reduced-motion'][data-infinitylens-scene='circuit-cathedral-retuned'] .stage::after {
+body[data-infinitylens-comfort='reduced-motion'][data-infinitylens-scene='circuit-cathedral-identity'] .stage::before,
+body[data-infinitylens-comfort='reduced-motion'][data-infinitylens-scene='circuit-cathedral-identity'] .stage::after {
   animation: none !important;
 }
