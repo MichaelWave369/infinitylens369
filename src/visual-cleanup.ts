@@ -1,9 +1,9 @@
 const CIRCUIT_RETUNE_DELAY_MS = 360;
 const ACTIVE_SCENE = 'circuit-cathedral-identity';
 
-let circuitRetuneAppliedForSelection = false;
 let retuneInProgress = false;
 let scheduledSceneSync: number | undefined;
+let scheduledRetune: number | undefined;
 
 const setNativeValue = (input: HTMLInputElement | HTMLSelectElement, value: string) => {
   const prototype = input instanceof HTMLSelectElement ? HTMLSelectElement.prototype : HTMLInputElement.prototype;
@@ -28,22 +28,6 @@ const setNativeChecked = (input: HTMLInputElement, checked: boolean) => {
 
 const normalize = (value: string | null | undefined) => (value ?? '').replace(/\s+/g, ' ').trim().toLowerCase();
 
-const findControlGroup = (title: string) => {
-  const target = normalize(title);
-
-  return Array.from(document.querySelectorAll<HTMLElement>('.control-group')).find((group) => {
-    const heading = group.querySelector('h2');
-    return normalize(heading?.textContent) === target;
-  });
-};
-
-const setSelectValue = (groupTitle: string, index: number, value: string) => {
-  const group = findControlGroup(groupTitle);
-  const select = group?.querySelectorAll<HTMLSelectElement>('select').item(index);
-  if (!select || select.value === value) return;
-  setNativeValue(select, value);
-};
-
 const findLabel = (needle: string) => {
   const target = normalize(needle);
   return Array.from(document.querySelectorAll<HTMLLabelElement>('label')).find((label) => normalize(label.textContent).includes(target));
@@ -59,6 +43,34 @@ const setRange = (labelText: string, value: number) => {
   const input = findLabel(labelText)?.querySelector<HTMLInputElement>('input[type="range"]');
   if (!input) return;
   setNativeValue(input, value.toFixed(2));
+};
+
+const findSelectWithOptionLabel = (optionLabel: string) => {
+  const target = normalize(optionLabel);
+
+  return Array.from(document.querySelectorAll<HTMLSelectElement>('select')).find((select) => {
+    return Array.from(select.options).some((option) => normalize(option.textContent) === target || normalize(option.label) === target);
+  });
+};
+
+const setSelectByOptionLabel = (optionLabel: string) => {
+  const select = findSelectWithOptionLabel(optionLabel);
+  if (!select) return false;
+
+  const target = normalize(optionLabel);
+  const option = Array.from(select.options).find((candidate) => {
+    return normalize(candidate.textContent) === target || normalize(candidate.label) === target;
+  });
+
+  if (!option) return false;
+  if (select.value !== option.value) setNativeValue(select, option.value);
+  return true;
+};
+
+const isOptionSelected = (optionLabel: string) => {
+  const select = findSelectWithOptionLabel(optionLabel);
+  if (!select) return false;
+  return normalize(select.selectedOptions.item(0)?.textContent) === normalize(optionLabel);
 };
 
 const updateStageCleanupState = () => {
@@ -95,6 +107,10 @@ const isCircuitCathedralSelected = () => {
   });
 };
 
+const circuitCathedralControlsLocked = () => {
+  return isOptionSelected('Kaleido Trip') && isOptionSelected('Abyss Cyan');
+};
+
 const applyCircuitCathedralIdentity = () => {
   if (!isCircuitCathedralSelected()) {
     setCircuitCathedralScope(false);
@@ -105,20 +121,20 @@ const applyCircuitCathedralIdentity = () => {
   setCircuitCathedralScope(true);
 
   try {
-    setSelectValue('Visual mode', 0, 'kaleido-trip');
-    setSelectValue('Visual mode', 1, 'abyss-cyan');
+    setSelectByOptionLabel('Kaleido Trip');
+    setSelectByOptionLabel('Abyss Cyan');
     setCheckbox('Audio reactive', true);
     setCheckbox('Phi spiral', false);
     setCheckbox('3-6-9 grid', true);
     setCheckbox('Equation overlay', true);
-    setRange('Audio speed / drive', 0.10);
-    setRange('Response', 0.26);
-    setRange('Bass impact', 0.18);
-    setRange('Mids motion', 0.38);
-    setRange('High sparkle', 0.30);
-    setRange('Beat punch', 0.14);
-    setRange('Fold pressure', 0.16);
-    setRange('Glow', 0.26);
+    setRange('Audio speed / drive', 0.08);
+    setRange('Response', 0.22);
+    setRange('Bass impact', 0.14);
+    setRange('Mids motion', 0.34);
+    setRange('High sparkle', 0.24);
+    setRange('Beat punch', 0.10);
+    setRange('Fold pressure', 0.12);
+    setRange('Glow', 0.20);
   } finally {
     window.setTimeout(() => {
       retuneInProgress = false;
@@ -127,26 +143,31 @@ const applyCircuitCathedralIdentity = () => {
   }
 
   window.dispatchEvent(new CustomEvent('infinitylens369:visual-cleanup-applied', {
-    detail: { scene: 'Circuit Cathedral', identity: 'darker-architectural-retune' },
+    detail: { scene: 'Circuit Cathedral', identity: 'locked-cyber-cathedral-retune' },
   }));
+};
+
+const scheduleCircuitRetune = () => {
+  if (scheduledRetune !== undefined) window.clearTimeout(scheduledRetune);
+  scheduledRetune = window.setTimeout(() => {
+    scheduledRetune = undefined;
+    applyCircuitCathedralIdentity();
+  }, CIRCUIT_RETUNE_DELAY_MS);
 };
 
 const syncCircuitCathedralScope = () => {
   updateStageCleanupState();
 
-  if (isCircuitCathedralSelected()) {
-    if (!circuitRetuneAppliedForSelection) {
-      circuitRetuneAppliedForSelection = true;
-      window.setTimeout(applyCircuitCathedralIdentity, CIRCUIT_RETUNE_DELAY_MS);
-      return;
-    }
-
-    setCircuitCathedralScope(true);
+  if (!isCircuitCathedralSelected()) {
+    setCircuitCathedralScope(false);
     return;
   }
 
-  circuitRetuneAppliedForSelection = false;
-  setCircuitCathedralScope(false);
+  setCircuitCathedralScope(true);
+
+  if (!retuneInProgress && !circuitCathedralControlsLocked()) {
+    scheduleCircuitRetune();
+  }
 };
 
 const scheduleSceneSync = () => {
@@ -192,7 +213,7 @@ const bootstrap = () => {
     scheduleSceneSync();
   });
 
-  observer.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'aria-pressed', 'aria-current'] });
+  observer.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'aria-pressed', 'aria-current', 'value'] });
 };
 
 if (document.readyState === 'loading') {
