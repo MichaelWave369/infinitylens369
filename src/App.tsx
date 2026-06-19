@@ -32,6 +32,7 @@ const paletteLabels: Record<PaletteName, string> = {
 };
 
 const formatMetric = (value: number) => `${Math.round(value * 100).toString().padStart(2, '0')}%`;
+const formatModeLabel = (mode: VisualSettings['mode']) => mode.replace(/-/g, ' ');
 
 const pressureLabel = (mode: VisualSettings['mode']) => {
   if (mode === 'mandelbrot' || mode === 'julia') return 'Zoom pressure';
@@ -162,7 +163,7 @@ export default function App() {
 
         <div className="stage-badge glass" aria-label="InfinityLens369 status">
           <strong>InfinityLens369 v0.4</strong>
-          <span>{settings.mode.replaceAll('-', ' ')}</span>
+          <span>{formatModeLabel(settings.mode)}</span>
         </div>
       </section>
 
