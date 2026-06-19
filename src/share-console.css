@@ -1,0 +1,78 @@
+.share-console {
+  border-color: rgba(122, 255, 214, 0.24);
+  background:
+    radial-gradient(circle at top right, rgba(122, 255, 214, 0.1), transparent 38%),
+    rgba(8, 10, 24, 0.74);
+}
+
+.share-console h2 {
+  margin-bottom: 0.45rem;
+}
+
+.share-action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin: 0.75rem 0;
+}
+
+.share-action-grid button {
+  min-height: 5.6rem;
+  padding: 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.055);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.share-action-grid button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(122, 255, 214, 0.48);
+  background: rgba(122, 255, 214, 0.11);
+}
+
+.share-action-grid strong,
+.share-action-grid span {
+  display: block;
+}
+
+.share-action-grid strong {
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.share-action-grid span {
+  margin-top: 0.34rem;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  opacity: 0.76;
+}
+
+.share-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-top: 0.65rem;
+}
+
+.share-actions button {
+  min-height: 2.4rem;
+}
+
+.share-console-status {
+  margin: 0.65rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  opacity: 0.78;
+}
+
+@media (max-width: 720px) {
+  .share-action-grid,
+  .share-actions {
+    grid-template-columns: 1fr;
+  }
+}
