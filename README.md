@@ -6,6 +6,19 @@ InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visu
 
 This project is intentionally claim-safe: it is an art, math, and software visualization tool. It is **not** a physics proof, consciousness proof, medical tool, or scientific claim engine.
 
+## v1.8.1 UI sync and studio dock hotfix
+
+v1.8.1 syncs the visible release labels across the public GitHub Pages UI and docks the right-side studio menu inside the viewport. The control panel now owns its own scroll lane, stays available in normal view, and disappears cleanly when Cinematic mode/fullscreen presentation takes over.
+
+Hotfix features:
+
+- Visible InfinityLens369 badge syncs to the current release
+- Capture Studio and Recording Studio labels sync to the current release
+- Right-side studio panel stays inside the browser viewport
+- Panel gets its own scrollbar instead of relying on the whole page
+- Sticky panel header keeps the upload/play controls close while scrolling
+- Cinematic/fullscreen mode keeps the stage clean
+
 ## v1.8 Recording Studio release
 
 v1.8 keeps the boot-safe sidecar pattern and adds **Recording Studio**. The studio loads after the core visualizer, Capture Studio, and Preset Studio so the React/WebGL app remains the priority. It records short canvas-only WebM clips from the live visual canvas, lets users download the latest clip, and exports a JSON recording manifest with metadata only.
@@ -77,175 +90,3 @@ This repo includes a GitHub Pages workflow at `.github/workflows/deploy.yml`.
 After pushing to `main`, enable GitHub Pages in the repository settings and choose **GitHub Actions** as the Pages source.
 
 ## Performance controls
-
-The app can be used with the side panel or as a full-screen visual instrument.
-
-### Keyboard shortcuts
-
-```text
-Space  play / pause
-C      cinematic view
-F      browser fullscreen
-N      next trip preset
-R      random trip
-T      cycle transition style
-S      slow flow
-A      auto trip
-0      safe mode
-1      Dream motion profile
-2      Cruise motion profile
-3      Live motion profile
-4      Warp motion profile
-```
-
-### Preset Studio
-
-Preset Studio stores visual recipes in browser `localStorage`. It saves the control state, not the audio file.
-
-A saved preset includes:
-
-- Visual mode
-- Palette
-- Phi / 3-6-9 / equation overlays
-- Audio reactive on/off
-- Motion pressure
-- Glow
-- Audio Engine v2 controls
-- Transition style and morph speed
-- Source trip label and timestamp
-
-Preset packs export as JSON so users can share a tuned scene without sharing audio.
-
-### Capture Studio
-
-Capture Studio stores a small local frame gallery in the browser. It is a boot-safe sidecar, loaded after the core app has already mounted.
-
-A capture includes:
-
-- PNG image data for the local gallery / download
-- Scene label from the visible app badge when available
-- Capture timestamp
-- Canvas width and height
-
-Capture manifests export as JSON metadata only. They do not include audio files or image bytes.
-
-### Recording Studio
-
-Recording Studio records short canvas-only WebM clips from the live canvas. It is a boot-safe sidecar and does not block the app if the browser lacks recording support.
-
-A recording includes:
-
-- WebM video bytes for direct local download
-- Scene label from the visible app badge when available
-- Recording timestamp
-- Canvas width and height
-- Clip duration
-- MIME type and approximate file size
-
-Recording manifests export as JSON metadata only. They do not include audio files or video bytes.
-
-### Liquid Light Pack
-
-Liquid Light is a softer preset family for public demos, ambient music, projector use, chill sessions, and slower visual journeys.
-
-- **Aurora Veil** uses Cosmic Drift with Aurora Phi, very low audio drive, soft high sparkle, and slow motion.
-- **Liquid Glass** uses Acid Melt with Abyss Cyan, lower beat punch, and smooth midrange flow.
-- **Plasma Garden** uses Kaleido Trip with gentle mid-driven bloom.
-- **Dream Pool** uses Cosmic Drift with low response, moderate glow, and reflective slow motion.
-
-### Machine Cathedral Pack
-
-Machine Cathedral is a cyber/geometry preset family for more structured, digital, and performance-oriented visuals.
-
-- **Circuit Cathedral** uses Tunnel Bloom with Abyss Cyan, grid/equation overlays, and mid/high-driven circuit motion.
-- **Glyph Rain** uses Pixel Melt with Abyss Cyan, grid/equation overlays, high sparkle, and glitch energy.
-- **Neon Lattice** uses Tunnel Bloom with Violet Gold Duality, phi/grid overlays, and stronger beat pulse.
-- **Vector Shrine** uses Julia Mirror with Solar Ember, phi/grid/equation overlays, and slower vector-style recursion.
-
-### Audio Engine v2
-
-Audio Engine v2 shapes the raw Web Audio analysis before it reaches the visual shaders.
-
-Controls:
-
-- **Audio speed / drive** — global reactivity level
-- **Response** — smooth drift at low values, snappy stage motion at high values
-- **Bass impact** — how much bass pushes the visuals
-- **Mids motion** — how much midrange drives flow and geometry
-- **High sparkle** — how much highs add shimmer, detail, and pixel/glow activity
-- **Beat punch** — how strongly beat/onset pulses land
-
-If audio-reactive motion feels too fast, lower **Audio speed / drive**, lower **Response**, press **S** for Slow Flow, or press **0** for Safe Mode.
-
-### Transition Engine
-
-The Transition Engine creates a bridge overlay before visual-state changes land. It does not replace the shader engine; it wraps it with stage-level motion so changes feel intentional instead of abrupt.
-
-Available transition styles:
-
-- **Bloom Flash** — bright portal flare
-- **Warp Tunnel** — radial lens sweep
-- **Glitch Cut** — pixel tear jump
-- **Soft Fade** — gentle crossfade veil
-- **Beat Pulse** — ring pulse bridge
-
-Use the **Morph speed** slider to tune how long the bridge lasts.
-
-### Motion profiles
-
-- **Dream** — slow ambient drift
-- **Cruise** — smooth balanced motion
-- **Live** — stage-ready energy
-- **Warp** — maximum face-melt
-
-## Safe Mode
-
-Safe Mode switches the engine into a calmer, lower-motion configuration:
-
-- Cosmic Drift mode
-- Audio reactive off
-- Low motion pressure
-- Low audio drive
-- Gentle Audio Engine v2 band settings
-- Lower glow
-- Geometry/equation overlays off
-
-It is meant for public demos, older hardware, browser uncertainty, and projection setups where stability matters more than maximum intensity.
-
-## Visual addresses
-
-Every scene can be saved as a portable address:
-
-```text
-INFINITYLENS369://scene?mode=cosmic-drift&center=-0.743643887037151,0.13182590420533&zoom=1.000e+0&palette=aurora-phi&overlays=phi&audio=bass-reactive&time=42.369
-```
-
-The address is not a scientific claim. It is a replay cue for the visual state: formula/mode, center, zoom, palette, overlays, and audio time. v1.8 receipts, preset exports, capture manifests, and recording manifests remain creative replay cues, not evidence claims.
-
-## Project stance
-
-InfinityLens369 is for:
-
-- Fractal and shader exploration
-- Music video source visuals
-- Live projection / ambient art
-- Math-inspired creativity
-- Local-first audio-reactive visuals
-- Parallax-style symbolic overlays with clean boundaries
-- Sharing local preset recipes without sharing audio
-- Capturing local visual frames without uploading audio
-- Recording local canvas-only visual clips without embedding audio
-
-InfinityLens369 is not for:
-
-- Claiming proof of hidden physics
-- Medical, psychological, or spiritual diagnosis
-- Representing generated visuals as empirical evidence
-
-## v2.0 direction
-
-The v2.0 roadmap can add standalone Liquid Light shaders, standalone Machine Cathedral shaders, longer export workflows, performance controller support, composable visual layers, and more deeply integrated Preset / Capture / Recording studios.
-
-## License
-
-MIT — see `LICENSE`.
