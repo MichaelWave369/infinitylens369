@@ -31,6 +31,7 @@ export type VisualSettings = {
   showEquations: boolean;
   audioReactive: boolean;
   zoomSpeed: number;
+  audioDrive: number;
   glow: number;
 };
 
