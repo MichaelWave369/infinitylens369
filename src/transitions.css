@@ -1,0 +1,251 @@
+.transition-card {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.8rem;
+  padding: 0.82rem;
+  border: 1px solid rgba(112, 240, 255, 0.16);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(112, 240, 255, 0.13), transparent 12rem),
+    radial-gradient(circle at 85% 100%, rgba(244, 200, 106, 0.10), transparent 11rem),
+    rgba(255, 255, 255, 0.045);
+}
+
+.transition-card > span {
+  color: var(--cyan);
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.transition-card strong {
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.9rem;
+}
+
+.transition-card small {
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.transition-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.transition-row button {
+  min-width: 88px;
+}
+
+.compact-slider {
+  margin: 0.2rem 0 0;
+}
+
+.stage-transition {
+  --transition-ms: 900ms;
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+  animation-duration: var(--transition-ms);
+  animation-timing-function: cubic-bezier(0.18, 0.86, 0.28, 1);
+  animation-fill-mode: both;
+}
+
+.stage-transition::before,
+.stage-transition::after {
+  content: '';
+  position: absolute;
+  inset: -18%;
+  z-index: -1;
+  opacity: 0;
+  animation-duration: var(--transition-ms);
+  animation-timing-function: cubic-bezier(0.18, 0.86, 0.28, 1);
+  animation-fill-mode: both;
+}
+
+.stage-transition span {
+  padding: 0.82rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(4, 5, 14, 0.58);
+  box-shadow:
+    0 0 28px rgba(112, 240, 255, 0.28),
+    0 0 80px rgba(166, 132, 255, 0.26);
+  backdrop-filter: blur(18px);
+  font-size: clamp(0.78rem, 1.8vw, 1.2rem);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  animation: transitionLabel var(--transition-ms) ease both;
+}
+
+.stage-transition.bloom {
+  animation-name: transitionVeil;
+}
+
+.stage-transition.bloom::before {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.92) 0 2%, rgba(244, 200, 106, 0.58) 3% 8%, rgba(255, 108, 157, 0.28) 11% 24%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(112, 240, 255, 0.36), transparent 62%);
+  animation-name: bloomBridge;
+}
+
+.stage-transition.bloom::after {
+  border: 2px solid rgba(255, 255, 255, 0.26);
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle at 50% 50%, transparent 0 18px, rgba(255, 255, 255, 0.20) 20px 22px);
+  animation-name: ringBridge;
+}
+
+.stage-transition.warp {
+  animation-name: transitionVeil;
+}
+
+.stage-transition.warp::before {
+  background:
+    conic-gradient(from 0deg, transparent, rgba(112, 240, 255, 0.34), rgba(255, 108, 157, 0.28), rgba(244, 200, 106, 0.36), transparent),
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.40), transparent 18%, rgba(5, 6, 16, 0.72) 62%, transparent 76%);
+  animation-name: warpBridge;
+}
+
+.stage-transition.warp::after {
+  background: repeating-radial-gradient(circle at center, rgba(255, 255, 255, 0.28) 0 1px, transparent 2px 34px);
+  animation-name: tunnelBridge;
+}
+
+.stage-transition.glitch {
+  animation-name: glitchVeil;
+}
+
+.stage-transition.glitch::before {
+  background:
+    repeating-linear-gradient(90deg, rgba(112, 240, 255, 0.0) 0 18px, rgba(112, 240, 255, 0.28) 19px 20px, rgba(255, 108, 157, 0.22) 21px 26px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.0) 0 14px, rgba(255, 255, 255, 0.14) 15px 16px);
+  animation-name: glitchBridge;
+}
+
+.stage-transition.glitch::after {
+  background: linear-gradient(90deg, rgba(255, 108, 157, 0.24), transparent 22%, rgba(112, 240, 255, 0.28) 52%, transparent 78%, rgba(244, 200, 106, 0.20));
+  animation-name: glitchSlice;
+}
+
+.stage-transition.fade {
+  background: rgba(2, 3, 10, 0.68);
+  animation-name: fadeBridge;
+}
+
+.stage-transition.fade::before {
+  background:
+    radial-gradient(circle at 30% 30%, rgba(166, 132, 255, 0.22), transparent 24rem),
+    radial-gradient(circle at 70% 70%, rgba(112, 240, 255, 0.18), transparent 26rem);
+  animation-name: fadeGlow;
+}
+
+.stage-transition.pulse {
+  animation-name: transitionVeil;
+}
+
+.stage-transition.pulse::before {
+  background: repeating-radial-gradient(circle at center, transparent 0 34px, rgba(112, 240, 255, 0.28) 35px 38px, rgba(255, 108, 157, 0.18) 39px 42px);
+  animation-name: pulseBridge;
+}
+
+.stage-transition.pulse::after {
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.52), transparent 7%, rgba(244, 200, 106, 0.24) 16%, transparent 42%);
+  animation-name: pulseCore;
+}
+
+@keyframes transitionVeil {
+  0% { opacity: 0; }
+  18% { opacity: 1; }
+  72% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes bloomBridge {
+  0% { opacity: 0; transform: scale(0.38); filter: blur(24px); }
+  42% { opacity: 1; transform: scale(1.18); filter: blur(8px); }
+  100% { opacity: 0; transform: scale(2.25); filter: blur(32px); }
+}
+
+@keyframes ringBridge {
+  0% { opacity: 0; transform: scale(0.18) rotate(0deg); }
+  48% { opacity: 0.66; transform: scale(0.86) rotate(90deg); }
+  100% { opacity: 0; transform: scale(1.72) rotate(180deg); }
+}
+
+@keyframes warpBridge {
+  0% { opacity: 0; transform: scale(0.65) rotate(0deg); filter: blur(20px); }
+  48% { opacity: 0.86; transform: scale(1.06) rotate(190deg); filter: blur(4px); }
+  100% { opacity: 0; transform: scale(1.8) rotate(360deg); filter: blur(24px); }
+}
+
+@keyframes tunnelBridge {
+  0% { opacity: 0; transform: scale(1.8); }
+  42% { opacity: 0.55; transform: scale(0.82); }
+  100% { opacity: 0; transform: scale(0.32); }
+}
+
+@keyframes glitchVeil {
+  0% { opacity: 0; transform: translateX(0); }
+  12% { opacity: 1; transform: translateX(-8px); }
+  24% { transform: translateX(11px); }
+  38% { transform: translateX(-4px); }
+  64% { opacity: 0.88; transform: translateX(8px); }
+  100% { opacity: 0; transform: translateX(0); }
+}
+
+@keyframes glitchBridge {
+  0% { opacity: 0; transform: translateX(-12%); }
+  20% { opacity: 0.76; transform: translateX(8%); }
+  44% { opacity: 0.52; transform: translateX(-4%); }
+  100% { opacity: 0; transform: translateX(14%); }
+}
+
+@keyframes glitchSlice {
+  0% { opacity: 0; clip-path: inset(20% 0 72% 0); }
+  34% { opacity: 0.74; clip-path: inset(44% 0 28% 0); }
+  60% { opacity: 0.54; clip-path: inset(8% 0 78% 0); }
+  100% { opacity: 0; clip-path: inset(70% 0 8% 0); }
+}
+
+@keyframes fadeBridge {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes fadeGlow {
+  0% { opacity: 0; filter: blur(20px); }
+  42% { opacity: 1; filter: blur(8px); }
+  100% { opacity: 0; filter: blur(30px); }
+}
+
+@keyframes pulseBridge {
+  0% { opacity: 0; transform: scale(0.72); }
+  35% { opacity: 0.7; transform: scale(1.02); }
+  100% { opacity: 0; transform: scale(1.44); }
+}
+
+@keyframes pulseCore {
+  0% { opacity: 0; transform: scale(0.24); }
+  42% { opacity: 0.95; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.8); }
+}
+
+@keyframes transitionLabel {
+  0% { opacity: 0; transform: translateY(12px) scale(0.94); }
+  26% { opacity: 1; transform: translateY(0) scale(1); }
+  72% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-10px) scale(1.04); }
+}
