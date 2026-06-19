@@ -1,0 +1,47 @@
+export type FractalMode = 'mandelbrot' | 'julia';
+
+export type PaletteName =
+  | 'violet-gold-duality'
+  | 'solar-ember'
+  | 'abyss-cyan'
+  | 'aurora-phi';
+
+export type AudioFeatures = {
+  bass: number;
+  mid: number;
+  high: number;
+  rms: number;
+  beat: number;
+  waveform: number;
+};
+
+export type VisualSettings = {
+  mode: FractalMode;
+  palette: PaletteName;
+  showPhi: boolean;
+  showGrid369: boolean;
+  showEquations: boolean;
+  audioReactive: boolean;
+  zoomSpeed: number;
+  glow: number;
+};
+
+export type CameraState = {
+  centerX: number;
+  centerY: number;
+  zoom: number;
+  rotation: number;
+};
+
+export type VisualAddress = {
+  protocol: 'INFINITYLENS369://scene';
+  mode: FractalMode;
+  center: [number, number];
+  zoom: number;
+  rotation: number;
+  palette: PaletteName;
+  overlays: string[];
+  audioMode: 'bass-reactive' | 'static';
+  time: number;
+  createdAt: string;
+};
