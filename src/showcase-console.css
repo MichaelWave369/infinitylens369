@@ -1,0 +1,118 @@
+.showcase-console {
+  border-color: rgba(255, 207, 112, 0.26);
+  background:
+    radial-gradient(circle at top left, rgba(255, 207, 112, 0.1), transparent 36%),
+    rgba(8, 10, 24, 0.74);
+}
+
+.showcase-console h2 {
+  margin-bottom: 0.45rem;
+}
+
+.showcase-mode-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin: 0.75rem 0;
+}
+
+.showcase-mode-grid button {
+  min-height: 6.25rem;
+  padding: 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.055);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.showcase-mode-grid button:hover,
+.showcase-mode-grid button.active {
+  transform: translateY(-1px);
+  border-color: rgba(255, 207, 112, 0.5);
+  background: rgba(255, 207, 112, 0.12);
+}
+
+.showcase-mode-grid strong,
+.showcase-mode-grid span,
+.showcase-mode-grid em {
+  display: block;
+}
+
+.showcase-mode-grid strong {
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.showcase-mode-grid span {
+  margin-top: 0.32rem;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  opacity: 0.76;
+}
+
+.showcase-mode-grid em {
+  margin-top: 0.5rem;
+  font-size: 0.66rem;
+  font-style: normal;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 207, 112, 0.88);
+}
+
+.showcase-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-top: 0.65rem;
+}
+
+.showcase-actions button {
+  min-height: 2.4rem;
+}
+
+.showcase-console-status,
+.showcase-hint {
+  margin: 0.65rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  opacity: 0.78;
+}
+
+.showcase-hint {
+  color: rgba(255, 207, 112, 0.82);
+}
+
+.infinity-showcase-active .stage-badge,
+.infinity-showcase-active .visual-shell,
+.infinity-showcase-active canvas {
+  filter: saturate(1.08) contrast(1.04);
+}
+
+.infinity-showcase-safe .visual-shell,
+.infinity-showcase-safe canvas {
+  filter: saturate(0.88) brightness(0.9) contrast(0.96);
+}
+
+.infinity-showcase-gallery .visual-shell,
+.infinity-showcase-gallery canvas {
+  filter: saturate(1.1) brightness(1.02);
+}
+
+.infinity-showcase-performance .stage-badge {
+  transform: scale(1.01);
+}
+
+.infinity-showcase-performance .control-panel {
+  box-shadow: 0 0 34px rgba(255, 207, 112, 0.12);
+}
+
+@media (max-width: 720px) {
+  .showcase-mode-grid,
+  .showcase-actions {
+    grid-template-columns: 1fr;
+  }
+}
