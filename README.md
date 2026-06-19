@@ -2,9 +2,21 @@
 
 **Drop a song. Open a portal.**
 
-InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, and replayable visual-address receipts.
+InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, and replayable visual-address receipts.
 
 This project is intentionally claim-safe: it is an art, math, and software visualization tool. It is **not** a physics proof, consciousness proof, medical tool, or scientific claim engine.
+
+## v1.9 Performance Console release
+
+v1.9 adds a boot-safe **Performance Console** sidecar for live demos and public playback. It loads after the core React/WebGL app, Preset Studio, Capture Studio, and Recording Studio, then adds a compact live-control panel plus a `?` keyboard overlay.
+
+Performance Console features:
+
+- Keyboard shortcut overlay with the current live performance map
+- Quick actions for Cinematic, Fullscreen, Next Trip, Random Trip, Auto Trip, Slow Flow, Safe Mode, and Reset
+- Performer contrast toggle for higher stage readability
+- Boot-safe loading after the visualizer is already mounted
+- Version sync for Performance Console labels
 
 ## v1.8.1 UI sync and studio dock hotfix
 
@@ -54,6 +66,7 @@ Recording Studio features:
 - Preset Studio for local save/load/import/export of trip recipes
 - Capture Studio for local frame gallery and capture manifests
 - Recording Studio for local canvas-only WebM clips and recording manifests
+- Performance Console for live shortcut overlays and fast stage controls
 - Trip presets and random trip generation
 - Transition Engine for smoother mode/preset bridges
 - Safe Mode and Reset Visuals for public demos
@@ -90,3 +103,5 @@ This repo includes a GitHub Pages workflow at `.github/workflows/deploy.yml`.
 After pushing to `main`, enable GitHub Pages in the repository settings and choose **GitHub Actions** as the Pages source.
 
 ## Performance controls
+
+Press `?` in the app to open the Performance Console keyboard map. The core keyboard shortcuts remain local and browser-only.
