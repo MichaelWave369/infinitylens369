@@ -2,9 +2,23 @@
 
 **Drop a song. Open a portal.**
 
-InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, Layer Console overlay scenes, Launch Console onboarding helpers, Gallery Console scene discovery, Roadmap Console feedback/runway tools, System Health Console browser readiness checks, Accessibility Console comfort controls, Showcase Console public demo modes, Share Console public handoff notes, Launch Packet Console release-copy tools, and replayable visual-address receipts.
+InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, Layer Console overlay scenes, Launch Console onboarding helpers, Gallery Console scene discovery, Roadmap Console feedback/runway tools, System Health Console browser readiness checks, Accessibility Console comfort controls, Showcase Console public demo modes, Share Console public handoff notes, Launch Packet Console release-copy tools, Visual Cleanup identity tuning, and replayable visual-address receipts.
 
 This project is intentionally claim-safe: it is an art, math, and software visualization tool. It is **not** a physics proof, consciousness proof, medical tool, or scientific claim engine.
+
+## v1.18.2 Circuit Cathedral Identity Pass
+
+v1.18.2 refines the active Visual Cleanup sidecar so Circuit Cathedral reads more like a darker cyber-cathedral instead of a bright stained-glass plasma bloom. It keeps the boot-safe sidecar pattern and does not rewrite the React/WebGL core.
+
+Circuit Cathedral identity pass features:
+
+- Keeps the clean public stage with hidden top-left and bottom stage labels
+- Retunes Circuit Cathedral toward Kaleido Trip plus Abyss Cyan
+- Lowers glow, audio drive, response, bass impact, and beat punch for less bloom wash
+- Adds a darker/cooler canvas filter only while Circuit Cathedral is active
+- Adds a more architectural rectilinear/cathedral overlay with cyan/gold circuit ribs
+- Keeps the 3-6-9 grid and equation overlay enabled for machine-temple discipline
+- Preserves the v1.18.1 artifact cleanup and boot-safe loading boundary
 
 ## v1.18 Launch Packet Console release
 
