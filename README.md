@@ -2,9 +2,24 @@
 
 **Drop a song. Open a portal.**
 
-InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, and replayable visual-address receipts.
+InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, Layer Console overlay scenes, and replayable visual-address receipts.
 
 This project is intentionally claim-safe: it is an art, math, and software visualization tool. It is **not** a physics proof, consciousness proof, medical tool, or scientific claim engine.
+
+## v1.10 Layer Console release
+
+v1.10 adds a boot-safe **Layer Console** sidecar for live overlay staging. It loads after the core React/WebGL app and existing studios, then adds one-click layer scenes for quickly shaping the symbolic overlay stack during public playback.
+
+Layer Console features:
+
+- Clean Lens: stage-only view for pure color and motion
+- Geometry Stack: phi spiral, 3-6-9 grid, and equations together
+- Symbolic Field: phi spiral plus equations without the grid
+- Grid Beam: 3-6-9 grid discipline over the live scene
+- Performer Stack: readable geometry with minimal text clutter
+- `L` hotkey to cycle layer scenes
+- Boot-safe loading after the visualizer is already mounted
+- Version sync for Layer Console labels
 
 ## v1.9 Performance Console release
 
@@ -67,6 +82,7 @@ Recording Studio features:
 - Capture Studio for local frame gallery and capture manifests
 - Recording Studio for local canvas-only WebM clips and recording manifests
 - Performance Console for live shortcut overlays and fast stage controls
+- Layer Console for one-click overlay scene stacks
 - Trip presets and random trip generation
 - Transition Engine for smoother mode/preset bridges
 - Safe Mode and Reset Visuals for public demos
@@ -78,30 +94,3 @@ Recording Studio features:
 - Phi spiral, 3-6-9 grid, and equation/signal overlays
 - Replayable visual-address receipts
 - PNG screenshot export
-- JSON receipt export
-
-## Quick start
-
-```bash
-npm install
-npm run dev
-```
-
-Then open the local Vite URL, drop an audio file, press play, and start steering the lens.
-
-## Build
-
-```bash
-npm run build
-npm run preview
-```
-
-## Deploy
-
-This repo includes a GitHub Pages workflow at `.github/workflows/deploy.yml`.
-
-After pushing to `main`, enable GitHub Pages in the repository settings and choose **GitHub Actions** as the Pages source.
-
-## Performance controls
-
-Press `?` in the app to open the Performance Console keyboard map. The core keyboard shortcuts remain local and browser-only.
