@@ -15,8 +15,8 @@ export class AudioFeatureAnalyzer {
   private context: AudioContext | null = null;
   private analyser: AnalyserNode | null = null;
   private source: MediaElementAudioSourceNode | null = null;
-  private frequencyData: Uint8Array | null = null;
-  private waveformData: Uint8Array | null = null;
+  private frequencyData: Uint8Array<ArrayBuffer> | null = null;
+  private waveformData: Uint8Array<ArrayBuffer> | null = null;
   private bassMemory = 0.08;
   private lastBeatAt = 0;
 
