@@ -2,9 +2,22 @@
 
 **Drop a song. Open a portal.**
 
-InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, Layer Console overlay scenes, and replayable visual-address receipts.
+InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, Layer Console overlay scenes, Launch Console onboarding helpers, and replayable visual-address receipts.
 
 This project is intentionally claim-safe: it is an art, math, and software visualization tool. It is **not** a physics proof, consciousness proof, medical tool, or scientific claim engine.
+
+## v1.11 Launch Console release
+
+v1.11 adds a boot-safe **Launch Console** sidecar for public onboarding. It loads after the core React/WebGL app and existing studios, then gives first-time visitors a simple path into the experience.
+
+Launch Console features:
+
+- First Run Guide for new users
+- Demo Journey that cycles safe live controls without touching user audio
+- Copy Share Link for sending the public GitHub Page
+- Shortcut Map action for opening the performance help overlay
+- Boot-safe loading after the visualizer is already mounted
+- Version sync for Launch Console labels
 
 ## v1.10 Layer Console release
 
@@ -83,6 +96,7 @@ Recording Studio features:
 - Recording Studio for local canvas-only WebM clips and recording manifests
 - Performance Console for live shortcut overlays and fast stage controls
 - Layer Console for one-click overlay scene stacks
+- Launch Console for first-run guide, demo journey, share link, and shortcut help
 - Trip presets and random trip generation
 - Transition Engine for smoother mode/preset bridges
 - Safe Mode and Reset Visuals for public demos
