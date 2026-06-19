@@ -26,7 +26,7 @@ window.setTimeout(() => {
 }, 0);
 
 window.setTimeout(() => {
-  import('./capture-studio').catch((error) => {
+  import('./capture-studio-loader').catch((error) => {
     console.warn('InfinityLens369 Capture Studio failed to load. Core visualizer remains available.', error);
   });
 }, 100);
