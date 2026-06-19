@@ -4,7 +4,7 @@ import { buildVisualAddress, downloadTextFile, formatVisualAddress } from './led
 import type { AudioFeatures, CameraState, PaletteName, VisualSettings } from './types';
 import { FractalCanvas } from './visual/FractalCanvas';
 
-const APP_VERSION = 'v1.0.0';
+const APP_VERSION = 'v1.1.0';
 
 const defaultFeatures: AudioFeatures = {
   bass: 0,
@@ -26,6 +26,25 @@ const defaultSettings: VisualSettings = {
   audioDrive: 0.30,
   glow: 0.84,
 };
+
+const safeModeSettings: VisualSettings = {
+  mode: 'cosmic-drift',
+  palette: 'abyss-cyan',
+  showPhi: false,
+  showGrid369: false,
+  showEquations: false,
+  audioReactive: false,
+  zoomSpeed: 0.12,
+  audioDrive: 0.06,
+  glow: 0.42,
+};
+
+const createDefaultCamera = (): CameraState => ({
+  centerX: -0.743643887037151,
+  centerY: 0.13182590420533,
+  zoom: 1,
+  rotation: 0,
+});
 
 const paletteLabels: Record<PaletteName, string> = {
   'violet-gold-duality': 'Violet Gold Duality',
@@ -76,6 +95,10 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       audioDrive: 0.16,
       glow: 0.70,
     },
+  },
+  {
+    label: 'Safe Mode',
+    settings: safeModeSettings,
   },
   {
     label: 'Pixel Melt',
@@ -164,6 +187,8 @@ const motionProfiles: MotionProfile[] = [
   { label: 'Warp', hint: 'maximum face-melt', zoomSpeed: 0.86, audioDrive: 0.72, glow: 0.98 },
 ];
 
+const supportedAudioExtensions = new Set(['mp3', 'wav', 'ogg', 'oga', 'm4a', 'aac', 'flac', 'webm']);
+
 const formatMetric = (value: number) => `${Math.round(value * 100).toString().padStart(2, '0')}%`;
 const formatModeLabel = (mode: VisualSettings['mode']) => mode.replace(/-/g, ' ');
 const clampNumber = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
@@ -179,6 +204,20 @@ const pressureLabel = (mode: VisualSettings['mode']) => {
 };
 
 const randomFloat = (min: number, max: number) => min + Math.random() * (max - min);
+
+const checkWebGL2Support = () => {
+  try {
+    const canvas = document.createElement('canvas');
+    return Boolean(canvas.getContext('webgl2'));
+  } catch {
+    return false;
+  }
+};
+
+const isSupportedAudioFile = (file: File) => {
+  const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
+  return file.type.startsWith('audio/') || supportedAudioExtensions.has(extension);
+};
 
 const shapeAudioFeatures = (features: AudioFeatures, audioDrive: number): AudioFeatures => {
   const drive = clampNumber(audioDrive, 0, 1.5);
@@ -209,14 +248,13 @@ export default function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isCinematic, setIsCinematic] = useState(false);
   const [autoTrip, setAutoTrip] = useState(false);
+  const [hasWebGL2] = useState(checkWebGL2Support);
   const [activeTripLabel, setActiveTripLabel] = useState(tripPresets[0].label);
-  const [camera, setCamera] = useState<CameraState>({
-    centerX: -0.743643887037151,
-    centerY: 0.13182590420533,
-    zoom: 1,
-    rotation: 0,
-  });
+  const [camera, setCamera] = useState<CameraState>(createDefaultCamera);
   const [latestAddress, setLatestAddress] = useState('Drop an audio file, press play, then save a visual address.');
+  const [notice, setNotice] = useState(hasWebGL2
+    ? 'v1.1 ready. Drop audio, use Safe Mode for slower devices, or press 0 any time.'
+    : 'WebGL2 is not available in this browser/device. Try Chrome, Edge, Firefox, or Safari on a GPU-enabled device.');
 
   const visualFeatures = useMemo(
     () => shapeAudioFeatures(features, settings.audioDrive),
@@ -240,6 +278,7 @@ export default function App() {
     const preset = tripPresets[presetIndexRef.current];
     setSettings((current) => ({ ...current, ...preset.settings }));
     setActiveTripLabel(preset.label);
+    setNotice(`Trip preset: ${preset.label}`);
   }, []);
 
   const applyRandomTripPreset = useCallback(() => {
@@ -261,6 +300,14 @@ export default function App() {
       glow: randomFloat(0.44, 0.96),
     }));
     setActiveTripLabel(`Random ${preset.label}`);
+    setNotice(`Random trip generated from ${preset.label}`);
+  }, []);
+
+  const applySafeMode = useCallback(() => {
+    setSettings(safeModeSettings);
+    setAutoTrip(false);
+    setActiveTripLabel('Safe Mode');
+    setNotice('Safe Mode enabled: slower motion, overlays off, audio reaction paused. Use this for older laptops or projectors.');
   }, []);
 
   const applySlowFlow = useCallback(() => {
@@ -273,6 +320,17 @@ export default function App() {
     }));
     setAutoTrip(false);
     setActiveTripLabel('Slow Flow');
+    setNotice('Slow Flow enabled: audio stays reactive, but motion is softened.');
+  }, []);
+
+  const resetVisuals = useCallback(() => {
+    setSettings(defaultSettings);
+    setCamera(createDefaultCamera());
+    setFeatures(defaultFeatures);
+    setAutoTrip(false);
+    setActiveTripLabel('Black Hole Lens');
+    setLatestAddress('Visuals reset. Press play or save a fresh visual address.');
+    setNotice('Visuals reset to the v1.1 default scene.');
   }, []);
 
   const applyMotionProfile = useCallback((profile: MotionProfile) => {
@@ -285,6 +343,7 @@ export default function App() {
     }));
     setAutoTrip(false);
     setActiveTripLabel(`Motion ${profile.label}`);
+    setNotice(`Motion profile: ${profile.label} — ${profile.hint}.`);
   }, []);
 
   const toggleFullscreen = useCallback(async () => {
@@ -308,10 +367,15 @@ export default function App() {
   }, [applyNextTripPreset, autoTrip]);
 
   const ingestFile = useCallback((file: File) => {
-    if (!file.type.startsWith('audio/')) {
-      setAudioName('That file does not look like audio. Try mp3, wav, ogg, or m4a.');
+    if (!isSupportedAudioFile(file)) {
+      const message = 'Unsupported file. Try mp3, wav, ogg, m4a, aac, flac, or webm audio.';
+      setAudioName(message);
+      setNotice(message);
       return;
     }
+
+    audioRef.current?.pause();
+    cancelAnimationFrame(animationRef.current);
 
     if (objectUrlRef.current) {
       URL.revokeObjectURL(objectUrlRef.current);
@@ -323,6 +387,7 @@ export default function App() {
     setAudioName(file.name);
     setIsPlaying(false);
     setFeatures(defaultFeatures);
+    setNotice(`Loaded ${file.name}. Press Play portal when ready.`);
   }, []);
 
   const handleDrop = useCallback(
@@ -336,29 +401,42 @@ export default function App() {
 
   const connectAndPlay = useCallback(async () => {
     const audio = audioRef.current;
-    if (!audio || !audioUrl) return;
-
-    if (!analyzerRef.current) {
-      analyzerRef.current = new AudioFeatureAnalyzer();
+    if (!audioUrl) {
+      setNotice('Drop an audio file first, then press Play portal.');
+      return;
     }
+    if (!audio) return;
 
-    await analyzerRef.current.connect(audio);
-    await audio.play();
-    setIsPlaying(true);
+    try {
+      if (!analyzerRef.current) {
+        analyzerRef.current = new AudioFeatureAnalyzer();
+      }
 
-    const loop = () => {
-      setFeatures(analyzerRef.current?.sample() ?? defaultFeatures);
+      await analyzerRef.current.connect(audio);
+      await audio.play();
+      setIsPlaying(true);
+      setNotice('Portal playing. Use C for Cinematic, F for Fullscreen, S for Slow Flow, or 0 for Safe Mode.');
+
+      const loop = () => {
+        setFeatures(analyzerRef.current?.sample() ?? defaultFeatures);
+        animationRef.current = requestAnimationFrame(loop);
+      };
+
+      cancelAnimationFrame(animationRef.current);
       animationRef.current = requestAnimationFrame(loop);
-    };
-
-    cancelAnimationFrame(animationRef.current);
-    animationRef.current = requestAnimationFrame(loop);
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : 'Unknown browser playback error';
+      setIsPlaying(false);
+      cancelAnimationFrame(animationRef.current);
+      setNotice(`Playback could not start or decode this file. ${detail}`);
+    }
   }, [audioUrl]);
 
   const pause = useCallback(() => {
     audioRef.current?.pause();
     setIsPlaying(false);
     cancelAnimationFrame(animationRef.current);
+    setNotice('Playback paused.');
   }, []);
 
   useEffect(() => {
@@ -380,17 +458,19 @@ export default function App() {
       if (key === 'n') applyNextTripPreset();
       if (key === 'r') applyRandomTripPreset();
       if (key === 's') applySlowFlow();
+      if (key === '0') applySafeMode();
       if (key === 'a') setAutoTrip((current) => !current);
       if (key >= '1' && key <= '4') applyMotionProfile(motionProfiles[Number(key) - 1]);
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [applyMotionProfile, applyNextTripPreset, applyRandomTripPreset, applySlowFlow, connectAndPlay, isPlaying, pause, toggleFullscreen]);
+  }, [applyMotionProfile, applyNextTripPreset, applyRandomTripPreset, applySafeMode, applySlowFlow, connectAndPlay, isPlaying, pause, toggleFullscreen]);
 
   const saveAddress = async () => {
     const address = formatVisualAddress(visualAddress);
     setLatestAddress(address);
+    setNotice('Visual address copied and saved in the latest-address panel.');
     await navigator.clipboard?.writeText(address).catch(() => undefined);
   };
 
@@ -401,11 +481,15 @@ export default function App() {
       formatted: formatVisualAddress(visualAddress),
       audioName,
       activeTripLabel,
+      browserSupport: {
+        webgl2: hasWebGL2,
+      },
       controls: {
         pressure: settings.zoomSpeed,
         audioDrive: settings.audioDrive,
         glow: settings.glow,
       },
+      notice,
       stance: 'Art/math/software visualization only. Not a physics, medical, or consciousness claim.',
     };
     downloadTextFile('infinitylens369-visual-address.json', JSON.stringify(receipt, null, 2));
@@ -413,7 +497,10 @@ export default function App() {
 
   const exportScreenshot = () => {
     const canvas = document.querySelector<HTMLCanvasElement>('.fractal-canvas');
-    if (!canvas) return;
+    if (!canvas) {
+      setNotice('No WebGL frame is available to export on this device/browser.');
+      return;
+    }
 
     const link = document.createElement('a');
     link.download = 'infinitylens369-frame.png';
@@ -421,23 +508,53 @@ export default function App() {
     link.click();
   };
 
+  const handleAudioError = () => {
+    setIsPlaying(false);
+    cancelAnimationFrame(animationRef.current);
+    setNotice('The browser could not decode this audio file. Try another mp3, wav, ogg, m4a, aac, flac, or webm file.');
+  };
+
   return (
     <main className={isCinematic ? 'app-shell is-cinematic' : 'app-shell'}>
-      <audio hidden ref={audioRef} src={audioUrl ?? undefined} onEnded={() => setIsPlaying(false)} />
+      <audio
+        hidden
+        ref={audioRef}
+        src={audioUrl ?? undefined}
+        onEnded={() => {
+          setIsPlaying(false);
+          cancelAnimationFrame(animationRef.current);
+          setNotice('Song ended. Load another track or replay the portal.');
+        }}
+        onError={handleAudioError}
+      />
 
       <section className="stage" aria-label="InfinityLens369 visualization stage">
-        <FractalCanvas features={visualFeatures} settings={settings} onCameraChange={setCamera} />
+        {hasWebGL2 ? (
+          <FractalCanvas features={visualFeatures} settings={settings} onCameraChange={setCamera} />
+        ) : (
+          <div className="stage-fallback glass" role="alert">
+            <strong>WebGL2 is not available here.</strong>
+            <span>InfinityLens369 needs WebGL2 for the shader engine. Try a current Chrome, Edge, Firefox, or Safari browser with GPU acceleration enabled.</span>
+          </div>
+        )}
 
-        {settings.showPhi && <PhiOverlay />}
-        {settings.showGrid369 && <Grid369Overlay />}
-        {settings.showEquations && <EquationOverlay features={visualFeatures} camera={camera} mode={settings.mode} />}
+        {hasWebGL2 && settings.showPhi && <PhiOverlay />}
+        {hasWebGL2 && settings.showGrid369 && <Grid369Overlay />}
+        {hasWebGL2 && settings.showEquations && <EquationOverlay features={visualFeatures} camera={camera} mode={settings.mode} />}
 
         <div className="stage-badge glass" aria-label="InfinityLens369 status">
           <strong>InfinityLens369 {APP_VERSION}</strong>
           <span>{formatModeLabel(settings.mode)}</span>
           <span>drive {formatMetric(settings.audioDrive / 1.5)}</span>
+          {settings.audioReactive ? <span>reactive</span> : <span>safe/static</span>}
           {autoTrip && <span>auto trip</span>}
         </div>
+
+        {notice && (
+          <div className="stage-notice glass" role="status">
+            {notice}
+          </div>
+        )}
 
         {isCinematic && (
           <button className="stage-action glass" type="button" onClick={() => setIsCinematic(false)}>
@@ -455,7 +572,7 @@ export default function App() {
           >
             <input
               type="file"
-              accept="audio/*"
+              accept="audio/*,.mp3,.wav,.ogg,.oga,.m4a,.aac,.flac,.webm"
               onChange={(event) => {
                 const file = event.target.files?.item(0);
                 if (file) ingestFile(file);
@@ -466,8 +583,13 @@ export default function App() {
             <small>{audioName}</small>
           </label>
 
+          <section className="trip-chip" aria-label="System status">
+            <span>System status</span>
+            <strong>{notice}</strong>
+          </section>
+
           <div className="button-row">
-            <button type="button" onClick={connectAndPlay} disabled={!audioUrl || isPlaying}>
+            <button type="button" onClick={connectAndPlay} disabled={!audioUrl || isPlaying || !hasWebGL2}>
               Play portal
             </button>
             <button type="button" onClick={pause} disabled={!isPlaying}>
@@ -490,6 +612,15 @@ export default function App() {
             </button>
             <button type="button" onClick={applyRandomTripPreset}>
               Random trip
+            </button>
+          </div>
+
+          <div className="button-row">
+            <button type="button" onClick={applySafeMode}>
+              Safe mode
+            </button>
+            <button type="button" onClick={resetVisuals}>
+              Reset visuals
             </button>
           </div>
 
@@ -520,7 +651,7 @@ export default function App() {
 
           <div className="trip-chip" aria-label="Keyboard shortcuts">
             <span>Keys</span>
-            <strong>Space play · C cinema · F full · N next · R random · S slow · A auto · 1-4 motion</strong>
+            <strong>Space play · C cinema · F full · N next · R random · S slow · A auto · 0 safe · 1-4 motion</strong>
           </div>
 
           <div className="metrics" aria-label="Audio analysis metrics">
@@ -538,6 +669,7 @@ export default function App() {
               onChange={(event) => {
                 setSettings((current) => ({ ...current, mode: event.target.value as VisualSettings['mode'] }));
                 setActiveTripLabel('Custom signal');
+                setNotice('Custom mode selected.');
               }}
             >
               <option value="black-hole-lens">Black Hole Lens</option>
