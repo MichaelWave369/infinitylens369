@@ -2,23 +2,23 @@
 
 **Drop a song. Open a portal.**
 
-InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, and replayable visual-address receipts.
+InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, and replayable visual-address receipts.
 
 This project is intentionally claim-safe: it is an art, math, and software visualization tool. It is **not** a physics proof, consciousness proof, medical tool, or scientific claim engine.
 
-## v1.7 Capture Studio release
+## v1.8 Recording Studio release
 
-v1.7 keeps the v1.6.1 boot-safe sidecar pattern and adds **Capture Studio**. The studio loads after the core visualizer so the React/WebGL app remains the priority. It lets people capture local PNG frames from the live canvas, keep a small local browser gallery, download recent frames, and export a capture manifest without saving audio or image bytes inside the manifest.
+v1.8 keeps the boot-safe sidecar pattern and adds **Recording Studio**. The studio loads after the core visualizer, Capture Studio, and Preset Studio so the React/WebGL app remains the priority. It records short canvas-only WebM clips from the live visual canvas, lets users download the latest clip, and exports a JSON recording manifest with metadata only.
 
-Capture Studio features:
+Recording Studio features:
 
-- Capture the current canvas as a local PNG frame
-- Keep up to six recent captures in the browser gallery
-- Click thumbnails to download captured PNGs
-- Download the latest capture with one button
-- Export a JSON capture manifest with metadata only
-- Clear the local gallery
-- Keep audio local; captures and manifests do not contain user audio files
+- Canvas-only WebM recording from the live visualizer
+- Start / stop controls in the right-side panel
+- Automatic 30-second max clip length to keep browser memory manageable
+- Download the latest local WebM clip
+- Export a recording manifest with metadata only
+- No audio embedding and no upload path
+- Boot-safe loading after the core visualizer is already mounted
 
 ## Core features
 
@@ -40,6 +40,7 @@ Capture Studio features:
 - Machine Cathedral Pack presets built from stable shader routes
 - Preset Studio for local save/load/import/export of trip recipes
 - Capture Studio for local frame gallery and capture manifests
+- Recording Studio for local canvas-only WebM clips and recording manifests
 - Trip presets and random trip generation
 - Transition Engine for smoother mode/preset bridges
 - Safe Mode and Reset Visuals for public demos
@@ -128,6 +129,21 @@ A capture includes:
 
 Capture manifests export as JSON metadata only. They do not include audio files or image bytes.
 
+### Recording Studio
+
+Recording Studio records short canvas-only WebM clips from the live canvas. It is a boot-safe sidecar and does not block the app if the browser lacks recording support.
+
+A recording includes:
+
+- WebM video bytes for direct local download
+- Scene label from the visible app badge when available
+- Recording timestamp
+- Canvas width and height
+- Clip duration
+- MIME type and approximate file size
+
+Recording manifests export as JSON metadata only. They do not include audio files or video bytes.
+
 ### Liquid Light Pack
 
 Liquid Light is a softer preset family for public demos, ambient music, projector use, chill sessions, and slower visual journeys.
@@ -204,7 +220,7 @@ Every scene can be saved as a portable address:
 INFINITYLENS369://scene?mode=cosmic-drift&center=-0.743643887037151,0.13182590420533&zoom=1.000e+0&palette=aurora-phi&overlays=phi&audio=bass-reactive&time=42.369
 ```
 
-The address is not a scientific claim. It is a replay cue for the visual state: formula/mode, center, zoom, palette, overlays, and audio time. v1.7 receipts, preset exports, and capture manifests remain creative replay cues, not evidence claims.
+The address is not a scientific claim. It is a replay cue for the visual state: formula/mode, center, zoom, palette, overlays, and audio time. v1.8 receipts, preset exports, capture manifests, and recording manifests remain creative replay cues, not evidence claims.
 
 ## Project stance
 
@@ -218,6 +234,7 @@ InfinityLens369 is for:
 - Parallax-style symbolic overlays with clean boundaries
 - Sharing local preset recipes without sharing audio
 - Capturing local visual frames without uploading audio
+- Recording local canvas-only visual clips without embedding audio
 
 InfinityLens369 is not for:
 
@@ -227,7 +244,7 @@ InfinityLens369 is not for:
 
 ## v2.0 direction
 
-The v2.0 roadmap can add standalone Liquid Light shaders, standalone Machine Cathedral shaders, WebM/GIF recording, performance controller support, composable visual layers, and a more deeply integrated Preset Studio / Capture Studio.
+The v2.0 roadmap can add standalone Liquid Light shaders, standalone Machine Cathedral shaders, longer export workflows, performance controller support, composable visual layers, and more deeply integrated Preset / Capture / Recording studios.
 
 ## License
 
