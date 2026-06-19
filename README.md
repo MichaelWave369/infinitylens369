@@ -2,27 +2,27 @@
 
 **Drop a song. Open a portal.**
 
-InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, and replayable visual-address receipts.
+InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, and replayable visual-address receipts.
 
 This project is intentionally claim-safe: it is an art, math, and software visualization tool. It is **not** a physics proof, consciousness proof, medical tool, or scientific claim engine.
 
-## v1.2 Transition Engine release
+## v1.3 Audio Engine v2 release
 
-v1.2 keeps the v1.1 public hardening layer and adds the first Transition Engine pass:
+v1.3 keeps the v1.2 Transition Engine and adds the first Audio Engine v2 pass:
 
-- Stage-level transition bridge for preset and mode changes
-- Transition styles: Bloom Flash, Warp Tunnel, Glitch Cut, Soft Fade, and Beat Pulse
-- Morph speed slider for shorter or longer bridges
-- `T` hotkey to cycle transition styles live
-- Transition-wrapped Next Trip, Random Trip, Auto Trip, Safe Mode, Slow Flow, Reset Visuals, Motion Profiles, and manual mode changes
-- Transition settings added to receipt export
-- Dedicated transition CSS layer isolated from the shader engine
+- Global audio shaping before signals reach the shaders
+- Separate controls for **Bass impact**, **Mids motion**, **High sparkle**, and **Beat punch**
+- **Smooth / Snappy** response control for calmer drift or sharper stage reaction
+- Onset-assisted beat shaping so beat pulses can land with more musical intention
+- Audio Engine v2 settings included in JSON receipt export
+- Updated presets and motion profiles with audio-response tuning
 
 ## Core features
 
 - Drag/drop `.mp3`, `.wav`, `.ogg`, `.oga`, `.m4a`, `.aac`, `.flac`, or `.webm` audio files
 - Local-first playback: your audio stays in your browser
 - Web Audio analysis for bass, mids, highs, waveform energy, and beat pulses
+- Audio Engine v2 signal shaping before the shader engine
 - GPU visual engine using WebGL2
 - Eight visual modes:
   - Black Hole Lens
@@ -37,7 +37,7 @@ v1.2 keeps the v1.1 public hardening layer and adds the first Transition Engine 
 - Transition Engine for smoother mode/preset bridges
 - Safe Mode and Reset Visuals for public demos
 - Auto Trip mode for cycling presets during playback
-- Audio speed / drive control for calming or intensifying audio-reactive motion
+- Audio speed / drive plus per-band impact controls
 - Motion profiles: Dream, Cruise, Live, and Warp
 - Cinematic view and browser fullscreen control
 - Keyboard performance shortcuts
@@ -90,6 +90,21 @@ A      auto trip
 4      Warp motion profile
 ```
 
+### Audio Engine v2
+
+Audio Engine v2 shapes the raw Web Audio analysis before it reaches the visual shaders.
+
+Controls:
+
+- **Audio speed / drive** — global reactivity level
+- **Response** — smooth drift at low values, snappy stage motion at high values
+- **Bass impact** — how much bass pushes the visuals
+- **Mids motion** — how much midrange drives flow and geometry
+- **High sparkle** — how much highs add shimmer, detail, and pixel/glow activity
+- **Beat punch** — how strongly beat/onset pulses land
+
+If audio-reactive motion feels too fast, lower **Audio speed / drive**, lower **Response**, press **S** for Slow Flow, or press **0** for Safe Mode.
+
 ### Transition Engine
 
 The Transition Engine creates a bridge overlay before visual-state changes land. It does not replace the shader engine; it wraps it with stage-level motion so changes feel intentional instead of abrupt.
@@ -111,8 +126,6 @@ Use the **Morph speed** slider to tune how long the bridge lasts.
 - **Live** — stage-ready energy
 - **Warp** — maximum face-melt
 
-If audio-reactive motion feels too fast, lower **Audio speed / drive**, press **S** for Slow Flow, or press **0** for Safe Mode.
-
 ## Safe Mode
 
 Safe Mode switches the engine into a calmer, lower-motion configuration:
@@ -121,6 +134,7 @@ Safe Mode switches the engine into a calmer, lower-motion configuration:
 - Audio reactive off
 - Low motion pressure
 - Low audio drive
+- Gentle Audio Engine v2 band settings
 - Lower glow
 - Geometry/equation overlays off
 
@@ -134,7 +148,7 @@ Every scene can be saved as a portable address:
 INFINITYLENS369://scene?mode=black-hole-lens&center=-0.743643887037151,0.13182590420533&zoom=1.000e+0&palette=solar-ember&overlays=none&audio=bass-reactive&time=42.369
 ```
 
-The address is not a scientific claim. It is a replay cue for the visual state: formula/mode, center, zoom, palette, overlays, and audio time. v1.2 receipts also include the active transition style and transition duration.
+The address is not a scientific claim. It is a replay cue for the visual state: formula/mode, center, zoom, palette, overlays, and audio time. v1.3 receipts also include Transition Engine and Audio Engine v2 settings.
 
 ## Project stance
 
@@ -155,7 +169,7 @@ InfinityLens369 is not for:
 
 ## v2.0 direction
 
-The v2.0 roadmap can add deeper shader morphing, audio engine v2, liquid light modes, machine/circuit modes, preset studio, WebM/GIF recording, performance controller support, and composable visual layers.
+The v2.0 roadmap can add deeper shader morphing, liquid light modes, machine/circuit modes, preset studio, WebM/GIF recording, performance controller support, and composable visual layers.
 
 ## License
 
