@@ -1,0 +1,63 @@
+.launch-console {
+  border-color: rgba(255, 216, 96, 0.24);
+  background: linear-gradient(180deg, rgba(255, 216, 96, 0.08), rgba(14, 18, 34, 0.86));
+}
+
+.launch-console h2 {
+  margin-bottom: 0.35rem;
+}
+
+.launch-action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-top: 0.8rem;
+}
+
+.launch-action-button {
+  min-height: 4.65rem;
+  padding: 0.7rem;
+  border: 1px solid rgba(255, 216, 96, 0.18);
+  border-radius: 0.9rem;
+  background: rgba(255, 216, 96, 0.07);
+  color: #fff7c8;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.launch-action-button:hover,
+.launch-action-button:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(255, 216, 96, 0.55);
+  background: rgba(255, 216, 96, 0.13);
+  outline: none;
+}
+
+.launch-action-button strong {
+  display: block;
+  font-size: 0.8rem;
+  margin-bottom: 0.35rem;
+}
+
+.launch-action-button span {
+  display: block;
+  color: rgba(255, 247, 200, 0.72);
+  font-size: 0.68rem;
+  line-height: 1.25;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.launch-console-status {
+  margin: 0.75rem 0 0;
+  color: rgba(255, 247, 200, 0.78);
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
+@media (max-width: 920px) {
+  .launch-action-grid {
+    grid-template-columns: 1fr;
+  }
+}
