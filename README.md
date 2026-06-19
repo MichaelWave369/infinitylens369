@@ -2,23 +2,21 @@
 
 **Drop a song. Open a portal.**
 
-InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, and replayable visual-address receipts.
+InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, and replayable visual-address receipts.
 
 This project is intentionally claim-safe: it is an art, math, and software visualization tool. It is **not** a physics proof, consciousness proof, medical tool, or scientific claim engine.
 
-## v1.1 public hardening release
+## v1.2 Transition Engine release
 
-v1.1 keeps the v1.0 visual engine intact and adds first-wave public release hardening:
+v1.2 keeps the v1.1 public hardening layer and adds the first Transition Engine pass:
 
-- WebGL2 support check with a clear fallback message
-- Safe Mode for older laptops, projectors, and lower-performance devices
-- Reset Visuals button to return to the default release scene
-- Better unsupported-file messaging for audio imports
-- Playback/decode notices for browser audio errors
-- Visible system-status card in the control panel
-- Stage notice overlay for important runtime messages
-- `0` hotkey for Safe Mode
-- Issue templates for bug reports, visual ideas, and feature requests
+- Stage-level transition bridge for preset and mode changes
+- Transition styles: Bloom Flash, Warp Tunnel, Glitch Cut, Soft Fade, and Beat Pulse
+- Morph speed slider for shorter or longer bridges
+- `T` hotkey to cycle transition styles live
+- Transition-wrapped Next Trip, Random Trip, Auto Trip, Safe Mode, Slow Flow, Reset Visuals, Motion Profiles, and manual mode changes
+- Transition settings added to receipt export
+- Dedicated transition CSS layer isolated from the shader engine
 
 ## Core features
 
@@ -36,6 +34,7 @@ v1.1 keeps the v1.0 visual engine intact and adds first-wave public release hard
   - Mandelbrot
   - Julia Mirror
 - Trip presets and random trip generation
+- Transition Engine for smoother mode/preset bridges
 - Safe Mode and Reset Visuals for public demos
 - Auto Trip mode for cycling presets during playback
 - Audio speed / drive control for calming or intensifying audio-reactive motion
@@ -81,6 +80,7 @@ C      cinematic view
 F      browser fullscreen
 N      next trip preset
 R      random trip
+T      cycle transition style
 S      slow flow
 A      auto trip
 0      safe mode
@@ -89,6 +89,20 @@ A      auto trip
 3      Live motion profile
 4      Warp motion profile
 ```
+
+### Transition Engine
+
+The Transition Engine creates a bridge overlay before visual-state changes land. It does not replace the shader engine; it wraps it with stage-level motion so changes feel intentional instead of abrupt.
+
+Available transition styles:
+
+- **Bloom Flash** — bright portal flare
+- **Warp Tunnel** — radial lens sweep
+- **Glitch Cut** — pixel tear jump
+- **Soft Fade** — gentle crossfade veil
+- **Beat Pulse** — ring pulse bridge
+
+Use the **Morph speed** slider to tune how long the bridge lasts.
 
 ### Motion profiles
 
@@ -120,7 +134,7 @@ Every scene can be saved as a portable address:
 INFINITYLENS369://scene?mode=black-hole-lens&center=-0.743643887037151,0.13182590420533&zoom=1.000e+0&palette=solar-ember&overlays=none&audio=bass-reactive&time=42.369
 ```
 
-The address is not a scientific claim. It is a replay cue for the visual state: formula/mode, center, zoom, palette, overlays, and audio time.
+The address is not a scientific claim. It is a replay cue for the visual state: formula/mode, center, zoom, palette, overlays, and audio time. v1.2 receipts also include the active transition style and transition duration.
 
 ## Project stance
 
@@ -141,7 +155,7 @@ InfinityLens369 is not for:
 
 ## v2.0 direction
 
-The v2.0 roadmap can add smooth mode transitions, audio engine v2, liquid light modes, machine/circuit modes, preset studio, WebM/GIF recording, performance controller support, and composable visual layers.
+The v2.0 roadmap can add deeper shader morphing, audio engine v2, liquid light modes, machine/circuit modes, preset studio, WebM/GIF recording, performance controller support, and composable visual layers.
 
 ## License
 
