@@ -1,10 +1,18 @@
-const RELEASE_VERSION = 'v1.18.0';
+const RELEASE_VERSION = 'v1.18.1';
 
 let scheduledSync: number | undefined;
 let safetyPasses = 0;
 
 const updateText = (element: HTMLElement, next: string) => {
   if (element.textContent !== next) element.textContent = next;
+};
+
+const hideStageChrome = () => {
+  document.querySelectorAll<HTMLElement>('.stage-badge, .stage-notice').forEach((element) => {
+    element.setAttribute('aria-hidden', 'true');
+    element.hidden = true;
+    element.style.display = 'none';
+  });
 };
 
 const patchTextNode = (node: Text) => {
@@ -36,13 +44,14 @@ const patchTextNode = (node: Text) => {
     /v1\.14\.1 System Health Console hotfix is live/i.test(next) ||
     /v1\.15 Accessibility Console is live/i.test(next) ||
     /v1\.16 Showcase Console is live/i.test(next) ||
-    /v1\.17 Share Console is live/i.test(next)
+    /v1\.17 Share Console is live/i.test(next) ||
+    /v1\.18 Launch Packet Console is live/i.test(next)
   ) {
-    next = 'v1.18 Launch Packet Console is live: copy public launch blurbs, tester checklists, creator handoffs, and v2.0 readiness packets.';
+    next = 'v1.18.1 Visual Cleanup Hotfix is live: stage labels are hidden, Circuit Cathedral is retuned, and overlay artifacts are clipped for cleaner public demos.';
   }
 
   if (/stable v1\.(5|11|12|13|14|15|16|17|18) default scene/i.test(next)) {
-    next = next.replace(/stable v1\.(5|11|12|13|14|15|16|17|18) default scene/gi, 'stable v1.18.0 default scene');
+    next = next.replace(/stable v1\.(5|11|12|13|14|15|16|17|18) default scene/gi, 'stable v1.18.1 default scene');
   }
 
   if (next !== current) node.nodeValue = next;
@@ -54,7 +63,7 @@ const scanVisibleText = () => {
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
       const value = node.nodeValue ?? '';
-      return /InfinityLens369\s+v\d+\.\d+\.\d+|Capture Studio\s+v\d+\.\d+\.\d+|Recording Studio\s+v\d+\.\d+\.\d+|Performance Console\s+v\d+\.\d+\.\d+|Layer Console\s+v\d+\.\d+\.\d+|Launch Console\s+v\d+\.\d+\.\d+|Gallery Console\s+v\d+\.\d+\.\d+|Roadmap Console\s+v\d+\.\d+\.\d+|System Health Console\s+v\d+\.\d+\.\d+|Accessibility Console\s+v\d+\.\d+\.\d+|Showcase Console\s+v\d+\.\d+\.\d+|Share Console\s+v\d+\.\d+\.\d+|Launch Packet Console\s+v\d+\.\d+\.\d+|v1\.5 Machine Cathedral Pack|v1\.9 Performance Console is live|v1\.10 Layer Console is live|v1\.11 Launch Console is live|v1\.12 Gallery Console is live|v1\.13 Roadmap Console is live|v1\.14 System Health Console is live|v1\.14\.1 System Health Console hotfix is live|v1\.15 Accessibility Console is live|v1\.16 Showcase Console is live|v1\.17 Share Console is live|stable v1\.(5|11|12|13|14|15|16|17|18) default scene/i.test(value)
+      return /InfinityLens369\s+v\d+\.\d+\.\d+|Capture Studio\s+v\d+\.\d+\.\d+|Recording Studio\s+v\d+\.\d+\.\d+|Performance Console\s+v\d+\.\d+\.\d+|Layer Console\s+v\d+\.\d+\.\d+|Launch Console\s+v\d+\.\d+\.\d+|Gallery Console\s+v\d+\.\d+\.\d+|Roadmap Console\s+v\d+\.\d+\.\d+|System Health Console\s+v\d+\.\d+\.\d+|Accessibility Console\s+v\d+\.\d+\.\d+|Showcase Console\s+v\d+\.\d+\.\d+|Share Console\s+v\d+\.\d+\.\d+|Launch Packet Console\s+v\d+\.\d+\.\d+|v1\.5 Machine Cathedral Pack|v1\.9 Performance Console is live|v1\.10 Layer Console is live|v1\.11 Launch Console is live|v1\.12 Gallery Console is live|v1\.13 Roadmap Console is live|v1\.14 System Health Console is live|v1\.14\.1 System Health Console hotfix is live|v1\.15 Accessibility Console is live|v1\.16 Showcase Console is live|v1\.17 Share Console is live|v1\.18 Launch Packet Console is live|stable v1\.(5|11|12|13|14|15|16|17|18) default scene/i.test(value)
         ? NodeFilter.FILTER_ACCEPT
         : NodeFilter.FILTER_SKIP;
     },
@@ -70,13 +79,7 @@ const scanVisibleText = () => {
 const syncVersionLabels = () => {
   document.documentElement.dataset.infinitylensVersion = RELEASE_VERSION;
   document.title = `InfinityLens369 ${RELEASE_VERSION}`;
-
-  document.querySelectorAll<HTMLElement>('.stage-badge strong').forEach((badge) => {
-    const current = badge.textContent ?? '';
-    if (/InfinityLens369/i.test(current)) {
-      updateText(badge, `InfinityLens369 ${RELEASE_VERSION}`);
-    }
-  });
+  hideStageChrome();
 
   document.querySelectorAll<HTMLElement>('.eyebrow').forEach((label) => {
     const current = label.textContent?.replace(/\s+/g, ' ').trim() ?? '';
