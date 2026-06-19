@@ -1,0 +1,3 @@
+import './recording-studio';
+
+export {};
