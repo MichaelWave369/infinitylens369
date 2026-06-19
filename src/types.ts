@@ -32,6 +32,11 @@ export type VisualSettings = {
   audioReactive: boolean;
   zoomSpeed: number;
   audioDrive: number;
+  audioBassDrive: number;
+  audioMidDrive: number;
+  audioHighDrive: number;
+  audioBeatDrive: number;
+  audioResponse: number;
   glow: number;
 };
 
