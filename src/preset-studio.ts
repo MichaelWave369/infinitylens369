@@ -1,7 +1,7 @@
 import type { FractalMode, PaletteName } from './types';
 
 const PRESET_KEY = 'infinitylens369:preset-studio:v1';
-const APP_VERSION = 'v1.6.0';
+const APP_VERSION = 'v1.6.1';
 
 type AudioEngineSnapshot = {
   audioDrive: number;
@@ -89,7 +89,11 @@ const readPresets = (): SavedPreset[] => {
 };
 
 const writePresets = (presets: SavedPreset[]) => {
-  window.localStorage.setItem(PRESET_KEY, JSON.stringify(presets.slice(0, 24), null, 2));
+  try {
+    window.localStorage.setItem(PRESET_KEY, JSON.stringify(presets.slice(0, 24), null, 2));
+  } catch {
+    announce('Preset Studio could not write to local storage in this browser.');
+  }
 };
 
 const capturePreset = (label: string): SavedPreset | null => {
@@ -337,18 +341,46 @@ const createStudio = () => {
   renderLibrary(studio);
 };
 
-const bootstrapPresetStudio = () => {
-  refreshBadgeVersion();
-  createStudio();
+const guardedBootstrapPresetStudio = () => {
+  try {
+    refreshBadgeVersion();
+    createStudio();
+  } catch (error) {
+    console.warn('InfinityLens369 Preset Studio bootstrap skipped safely.', error);
+  }
 };
 
-const observer = new MutationObserver(bootstrapPresetStudio);
-observer.observe(document.documentElement, { childList: true, subtree: true });
+let bootstrapTimer: number | undefined;
+
+const scheduleBootstrap = () => {
+  if (bootstrapTimer !== undefined) return;
+
+  bootstrapTimer = window.setTimeout(() => {
+    bootstrapTimer = undefined;
+    guardedBootstrapPresetStudio();
+  }, 180);
+};
+
+const startPresetStudio = () => {
+  scheduleBootstrap();
+
+  const root = document.getElementById('root');
+  if (root) {
+    const observer = new MutationObserver(() => scheduleBootstrap());
+    observer.observe(root, { childList: true, subtree: true });
+  }
+
+  window.setInterval(() => {
+    try {
+      refreshBadgeVersion();
+    } catch {
+      // Badge refresh should never affect the core visualizer.
+    }
+  }, 5000);
+};
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', bootstrapPresetStudio, { once: true });
+  document.addEventListener('DOMContentLoaded', startPresetStudio, { once: true });
 } else {
-  bootstrapPresetStudio();
+  startPresetStudio();
 }
-
-window.setInterval(refreshBadgeVersion, 2500);
