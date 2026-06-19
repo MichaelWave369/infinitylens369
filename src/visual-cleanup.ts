@@ -1,5 +1,7 @@
 const CIRCUIT_RETUNE_DELAY_MS = 360;
 
+let initialCircuitRetuneApplied = false;
+
 const setNativeValue = (input: HTMLInputElement | HTMLSelectElement, value: string) => {
   const prototype = input instanceof HTMLSelectElement ? HTMLSelectElement.prototype : HTMLInputElement.prototype;
   const descriptor = Object.getOwnPropertyDescriptor(prototype, 'value');
@@ -59,6 +61,8 @@ const setRange = (labelText: string, value: number) => {
 const updateStageCleanupState = () => {
   document.querySelectorAll<HTMLElement>('.stage-badge, .stage-notice').forEach((element) => {
     element.setAttribute('aria-hidden', 'true');
+    element.hidden = true;
+    element.style.display = 'none';
   });
 };
 
@@ -85,6 +89,25 @@ const applyCircuitCathedralIdentity = () => {
   }));
 };
 
+const shouldRetuneCurrentStage = () => {
+  const stageBadge = normalize(document.querySelector<HTMLElement>('.stage-badge')?.textContent);
+  if (stageBadge.includes('circuit cathedral')) return true;
+
+  return Array.from(document.querySelectorAll<HTMLButtonElement>('button')).some((button) => {
+    const strong = normalize(button.querySelector('strong')?.textContent);
+    if (strong !== 'circuit cathedral') return false;
+
+    const state = normalize(`${button.className} ${button.getAttribute('aria-pressed')} ${button.getAttribute('aria-current')}`);
+    return state.includes('active') || state.includes('selected') || state.includes('true') || state.includes('page');
+  });
+};
+
+const applyCurrentSceneIfNeeded = () => {
+  if (initialCircuitRetuneApplied || !shouldRetuneCurrentStage()) return;
+  initialCircuitRetuneApplied = true;
+  window.setTimeout(applyCircuitCathedralIdentity, CIRCUIT_RETUNE_DELAY_MS);
+};
+
 const wireCircuitCathedralButton = (button: HTMLButtonElement) => {
   if (button.dataset.visualCleanupWired === 'true') return;
   const strong = normalize(button.querySelector('strong')?.textContent);
@@ -103,6 +126,7 @@ const wireButtons = () => {
 const bootstrap = () => {
   updateStageCleanupState();
   wireButtons();
+  applyCurrentSceneIfNeeded();
 
   const root = document.getElementById('root');
   if (!root) return;
@@ -110,6 +134,7 @@ const bootstrap = () => {
   const observer = new MutationObserver(() => {
     updateStageCleanupState();
     wireButtons();
+    applyCurrentSceneIfNeeded();
   });
 
   observer.observe(root, { childList: true, subtree: true });
