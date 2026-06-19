@@ -13,6 +13,7 @@ import './launch-console.css';
 import './gallery-console.css';
 import './roadmap-console.css';
 import './system-health-console.css';
+import './accessibility-console.css';
 import './studio-dock.css';
 
 const rootElement = document.getElementById('root');
@@ -82,7 +83,13 @@ window.setTimeout(() => {
 }, 800);
 
 window.setTimeout(() => {
+  import('./accessibility-console-loader').catch((error) => {
+    console.warn('InfinityLens369 Accessibility Console failed to load. Core visualizer remains available.', error);
+  });
+}, 900);
+
+window.setTimeout(() => {
   import('./version-sync').catch((error) => {
     console.warn('InfinityLens369 version sync failed to load. Core visualizer remains available.', error);
   });
-}, 1050);
+}, 1150);
