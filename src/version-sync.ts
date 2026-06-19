@@ -1,4 +1,4 @@
-const RELEASE_VERSION = 'v1.8.1';
+const RELEASE_VERSION = 'v1.9.0';
 
 let scheduledSync: number | undefined;
 
@@ -26,6 +26,10 @@ const syncVersionLabels = () => {
 
     if (/^Recording Studio\s+v/i.test(current)) {
       updateText(label, `Recording Studio ${RELEASE_VERSION}`);
+    }
+
+    if (/^Performance Console\s+v/i.test(current)) {
+      updateText(label, `Performance Console ${RELEASE_VERSION}`);
     }
   });
 };
