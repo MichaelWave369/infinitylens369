@@ -2,9 +2,24 @@
 
 **Drop a song. Open a portal.**
 
-InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, Layer Console overlay scenes, Launch Console onboarding helpers, Gallery Console scene discovery, Roadmap Console feedback/runway tools, System Health Console browser readiness checks, Accessibility Console comfort controls, and replayable visual-address receipts.
+InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, Layer Console overlay scenes, Launch Console onboarding helpers, Gallery Console scene discovery, Roadmap Console feedback/runway tools, System Health Console browser readiness checks, Accessibility Console comfort controls, Showcase Console public demo modes, and replayable visual-address receipts.
 
 This project is intentionally claim-safe: it is an art, math, and software visualization tool. It is **not** a physics proof, consciousness proof, medical tool, or scientific claim engine.
+
+## v1.16 Showcase Console release
+
+v1.16 adds a boot-safe **Showcase Console** sidecar for public demos, streams, projection, and handing the page to new viewers. It loads after the core React/WebGL app and existing studios, then stages public presentation paths using existing controls.
+
+Showcase Console features:
+
+- Safe Showcase for calmer public entry with Safe/Slow/comfort requests when available
+- Gallery Tour for a guided scene path using Auto Trip, Next, and Random controls
+- Performance Showcase for cinematic/fullscreen projection staging
+- Exit Showcase to clear showcase styling and leave browser fullscreen when allowed
+- Copy Showcase Note for public feedback and demo handoff notes
+- Alt+S shortcut to cycle showcase modes
+- Boot-safe loading after the visualizer is already mounted
+- Version sync for Showcase Console labels
 
 ## v1.15 Accessibility Console release
 
