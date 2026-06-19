@@ -14,14 +14,14 @@ const defaultFeatures: AudioFeatures = {
 };
 
 const defaultSettings: VisualSettings = {
-  mode: 'acid-melt',
+  mode: 'tunnel-bloom',
   palette: 'aurora-phi',
   showPhi: true,
   showGrid369: false,
   showEquations: false,
   audioReactive: true,
-  zoomSpeed: 0.35,
-  glow: 0.9,
+  zoomSpeed: 0.55,
+  glow: 0.95,
 };
 
 const paletteLabels: Record<PaletteName, string> = {
@@ -154,11 +154,11 @@ export default function App() {
         {settings.showEquations && <EquationOverlay features={features} camera={camera} mode={settings.mode} />}
 
         <div className="brand-card glass">
-          <p className="eyebrow">InfinityLens369 v0.2</p>
+          <p className="eyebrow">InfinityLens369 v0.3</p>
           <h1>Drop a song. Open a portal.</h1>
           <p>
-            A local-first fractal atlas where audio, geometry, phi, 3-6-9, and acid-melt visual
-            fields become one navigable performance space.
+            A local-first trip engine where fractals, tunnels, audio, geometry, phi, 3-6-9, and
+            acid-melt fields become one navigable performance space.
           </p>
         </div>
       </section>
@@ -206,6 +206,7 @@ export default function App() {
             value={settings.mode}
             onChange={(event) => setSettings((current) => ({ ...current, mode: event.target.value as VisualSettings['mode'] }))}
           >
+            <option value="tunnel-bloom">Tunnel Bloom</option>
             <option value="acid-melt">Acid Melt</option>
             <option value="mandelbrot">Mandelbrot</option>
             <option value="julia">Julia Mirror</option>
@@ -227,7 +228,7 @@ export default function App() {
         </label>
 
         <label className="slider-row">
-          <span>{settings.mode === 'acid-melt' ? 'Melt pressure' : 'Zoom pressure'}</span>
+          <span>{settings.mode === 'mandelbrot' || settings.mode === 'julia' ? 'Zoom pressure' : settings.mode === 'tunnel-bloom' ? 'Tunnel pressure' : 'Melt pressure'}</span>
           <input
             type="range"
             min="0"
@@ -326,9 +327,15 @@ function Grid369Overlay() {
 }
 
 function EquationOverlay({ features, camera, mode }: { features: AudioFeatures; camera: CameraState; mode: VisualSettings['mode'] }) {
+  const modeFormula = mode === 'acid-melt'
+    ? 'fbm(p) + swirl + audio'
+    : mode === 'tunnel-bloom'
+      ? '1/r tunnel + bloom + beat'
+      : 'z ↦ z² + c';
+
   return (
     <div className="equation-overlay" aria-hidden="true">
-      <span>{mode === 'acid-melt' ? 'fbm(p) + swirl + audio' : 'z ↦ z² + c'}</span>
+      <span>{modeFormula}</span>
       <span>φ ≈ 1.6180339887</span>
       <span>3 · 6 · 9 pulse</span>
       <span>bass {formatMetric(features.bass)} / zoom {camera.zoom.toExponential(2)}</span>
