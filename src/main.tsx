@@ -12,6 +12,7 @@ import './layer-console.css';
 import './launch-console.css';
 import './gallery-console.css';
 import './roadmap-console.css';
+import './system-health-console.css';
 import './studio-dock.css';
 
 const rootElement = document.getElementById('root');
@@ -75,7 +76,13 @@ window.setTimeout(() => {
 }, 700);
 
 window.setTimeout(() => {
+  import('./system-health-console-loader').catch((error) => {
+    console.warn('InfinityLens369 System Health Console failed to load. Core visualizer remains available.', error);
+  });
+}, 800);
+
+window.setTimeout(() => {
   import('./version-sync').catch((error) => {
     console.warn('InfinityLens369 version sync failed to load. Core visualizer remains available.', error);
   });
-}, 950);
+}, 1050);
