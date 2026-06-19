@@ -1,7 +1,7 @@
 {
   "name": "infinitylens369",
   "private": false,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "description": "Drop a song. Open a portal. A local-first fractal atlas and audio-reactive visualization engine.",
   "license": "MIT",
