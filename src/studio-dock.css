@@ -1,0 +1,97 @@
+/* InfinityLens369 v1.8.1 studio dock polish
+   Keeps the right-side studio menu inside the viewport with its own scroll lane. */
+
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+.app-shell {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+.stage {
+  min-height: 0;
+}
+
+.control-panel {
+  align-self: stretch;
+  min-height: 0;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  overflow-x: hidden;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+  scroll-padding-block: 0.75rem 3rem;
+  padding-block: 0.65rem 4.5rem;
+  scrollbar-gutter: stable both-edges;
+}
+
+.control-panel::after {
+  content: '';
+  display: block;
+  min-height: 2.5rem;
+}
+
+.control-panel::-webkit-scrollbar {
+  width: 10px;
+}
+
+.control-panel::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.035);
+  border-radius: 999px;
+}
+
+.control-panel::-webkit-scrollbar-thumb {
+  border: 2px solid rgba(3, 5, 12, 0.94);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(244, 200, 106, 0.78), rgba(112, 240, 255, 0.58));
+}
+
+.control-panel header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  backdrop-filter: blur(18px);
+}
+
+.app-shell.is-cinematic .control-panel,
+.app-shell.cinematic .control-panel {
+  display: none !important;
+}
+
+.app-shell.is-cinematic .stage,
+.app-shell.cinematic .stage {
+  height: 100dvh;
+}
+
+@media (max-width: 920px) {
+  html,
+  body,
+  #root {
+    overflow: auto;
+  }
+
+  .app-shell {
+    height: auto;
+    max-height: none;
+    min-height: 100dvh;
+    overflow: auto;
+  }
+
+  .control-panel {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding-block: 0.85rem 2rem;
+  }
+
+  .control-panel header {
+    position: static;
+  }
+}
