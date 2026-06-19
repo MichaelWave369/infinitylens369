@@ -1,0 +1,43 @@
+name: Feature request
+description: Request a workflow, export, control, or app upgrade
+title: "Feature: "
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping shape the v2.0 roadmap. Keep requests practical and claim-safe.
+  - type: textarea
+    id: feature
+    attributes:
+      label: What feature do you want?
+      placeholder: I want a WebM recording export button...
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why would this help?
+      placeholder: This would help performers capture clips for social posts...
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Feature area
+      options:
+        - Visual modes
+        - Audio engine
+        - Performance controls
+        - Presets / sharing
+        - Export / recording
+        - Stability / browser support
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: What would done look like?
+      placeholder: A button appears in the panel and exports a 10-second clip...
