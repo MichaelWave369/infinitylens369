@@ -1,0 +1,77 @@
+.layer-console {
+  border-color: rgba(255, 216, 105, 0.20);
+  background: linear-gradient(180deg, rgba(24, 27, 42, 0.94), rgba(10, 12, 22, 0.92));
+}
+
+.layer-console h2 {
+  margin: 0.18rem 0 0.35rem;
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+}
+
+.layer-scene-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-top: 0.85rem;
+}
+
+.layer-scene-button {
+  min-height: 4.25rem;
+  padding: 0.72rem 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.055);
+  color: #f8fbff;
+  cursor: pointer;
+  text-align: left;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.layer-scene-button:hover,
+.layer-scene-button:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(255, 216, 105, 0.42);
+  background: rgba(255, 255, 255, 0.085);
+  outline: none;
+}
+
+.layer-scene-button.active {
+  border-color: rgba(255, 216, 105, 0.72);
+  box-shadow: 0 0 0 1px rgba(255, 216, 105, 0.18), 0 0 20px rgba(255, 216, 105, 0.10);
+}
+
+.layer-scene-button strong,
+.layer-scene-button span {
+  display: block;
+}
+
+.layer-scene-button strong {
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+
+.layer-scene-button span {
+  margin-top: 0.25rem;
+  color: #ffd869;
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.layer-console-status {
+  margin: 0.8rem 0 0;
+  color: rgba(238, 242, 255, 0.72);
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
+body.performer-contrast .layer-console {
+  border-color: rgba(255, 216, 105, 0.5);
+}
+
+@media (max-width: 860px) {
+  .layer-scene-grid {
+    grid-template-columns: 1fr;
+  }
+}
