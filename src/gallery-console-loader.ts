@@ -1,0 +1,3 @@
+import './gallery-console';
+
+export {};
