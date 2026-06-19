@@ -9,6 +9,7 @@ import './capture-studio.css';
 import './recording-studio.css';
 import './performance-console.css';
 import './layer-console.css';
+import './launch-console.css';
 import './studio-dock.css';
 
 const rootElement = document.getElementById('root');
@@ -54,7 +55,13 @@ window.setTimeout(() => {
 }, 400);
 
 window.setTimeout(() => {
+  import('./launch-console-loader').catch((error) => {
+    console.warn('InfinityLens369 Launch Console failed to load. Core visualizer remains available.', error);
+  });
+}, 500);
+
+window.setTimeout(() => {
   import('./version-sync').catch((error) => {
     console.warn('InfinityLens369 version sync failed to load. Core visualizer remains available.', error);
   });
-}, 575);
+}, 700);
