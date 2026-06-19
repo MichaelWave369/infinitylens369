@@ -248,7 +248,7 @@ export default function App() {
 
   return (
     <main className={isCinematic ? 'app-shell is-cinematic' : 'app-shell'}>
-      <audio className="audio-engine" ref={audioRef} src={audioUrl ?? undefined} onEnded={() => setIsPlaying(false)} />
+      <audio hidden ref={audioRef} src={audioUrl ?? undefined} onEnded={() => setIsPlaying(false)} />
 
       <section className="stage" aria-label="InfinityLens369 visualization stage">
         <FractalCanvas features={features} settings={settings} onCameraChange={setCamera} />
