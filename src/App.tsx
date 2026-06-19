@@ -4,6 +4,8 @@ import { buildVisualAddress, downloadTextFile, formatVisualAddress } from './led
 import type { AudioFeatures, CameraState, PaletteName, VisualSettings } from './types';
 import { FractalCanvas } from './visual/FractalCanvas';
 
+const APP_VERSION = 'v0.7';
+
 const defaultFeatures: AudioFeatures = {
   bass: 0,
   mid: 0,
@@ -14,14 +16,14 @@ const defaultFeatures: AudioFeatures = {
 };
 
 const defaultSettings: VisualSettings = {
-  mode: 'pixel-melt',
+  mode: 'cosmic-drift',
   palette: 'aurora-phi',
   showPhi: false,
   showGrid369: false,
   showEquations: false,
   audioReactive: true,
-  zoomSpeed: 0.74,
-  glow: 0.86,
+  zoomSpeed: 0.76,
+  glow: 0.90,
 };
 
 const paletteLabels: Record<PaletteName, string> = {
@@ -32,6 +34,19 @@ const paletteLabels: Record<PaletteName, string> = {
 };
 
 const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> = [
+  {
+    label: 'Cosmic Drift',
+    settings: {
+      mode: 'cosmic-drift',
+      palette: 'aurora-phi',
+      showPhi: false,
+      showGrid369: false,
+      showEquations: false,
+      audioReactive: true,
+      zoomSpeed: 0.76,
+      glow: 0.90,
+    },
+  },
   {
     label: 'Pixel Melt',
     settings: {
@@ -107,6 +122,7 @@ const pressureLabel = (mode: VisualSettings['mode']) => {
   if (mode === 'tunnel-bloom') return 'Tunnel pressure';
   if (mode === 'kaleido-trip') return 'Fold pressure';
   if (mode === 'pixel-melt') return 'Pixel pressure';
+  if (mode === 'cosmic-drift') return 'Warp pressure';
   return 'Melt pressure';
 };
 
@@ -145,18 +161,22 @@ export default function App() {
     };
   }, []);
 
+  const applyNextTripPreset = useCallback(() => {
+    presetIndexRef.current = (presetIndexRef.current + 1) % tripPresets.length;
+    const preset = tripPresets[presetIndexRef.current];
+    setSettings((current) => ({ ...current, ...preset.settings }));
+    setActiveTripLabel(preset.label);
+  }, []);
+
   useEffect(() => {
     if (!autoTrip) return undefined;
 
     const interval = window.setInterval(() => {
-      presetIndexRef.current = (presetIndexRef.current + 1) % tripPresets.length;
-      const preset = tripPresets[presetIndexRef.current];
-      setSettings((current) => ({ ...current, ...preset.settings }));
-      setActiveTripLabel(preset.label);
+      applyNextTripPreset();
     }, 18000);
 
     return () => window.clearInterval(interval);
-  }, [autoTrip]);
+  }, [applyNextTripPreset, autoTrip]);
 
   const ingestFile = useCallback((file: File) => {
     if (!file.type.startsWith('audio/')) {
@@ -185,7 +205,7 @@ export default function App() {
     [ingestFile],
   );
 
-  const connectAndPlay = async () => {
+  const connectAndPlay = useCallback(async () => {
     const audio = audioRef.current;
     if (!audio || !audioUrl) return;
 
@@ -204,20 +224,36 @@ export default function App() {
 
     cancelAnimationFrame(animationRef.current);
     animationRef.current = requestAnimationFrame(loop);
-  };
+  }, [audioUrl]);
 
-  const pause = () => {
+  const pause = useCallback(() => {
     audioRef.current?.pause();
     setIsPlaying(false);
     cancelAnimationFrame(animationRef.current);
-  };
+  }, []);
 
-  const applyNextTripPreset = () => {
-    presetIndexRef.current = (presetIndexRef.current + 1) % tripPresets.length;
-    const preset = tripPresets[presetIndexRef.current];
-    setSettings((current) => ({ ...current, ...preset.settings }));
-    setActiveTripLabel(preset.label);
-  };
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const tagName = target?.tagName;
+      if (tagName === 'INPUT' || tagName === 'SELECT' || tagName === 'TEXTAREA') return;
+
+      const key = event.key.toLowerCase();
+
+      if (event.code === 'Space') {
+        event.preventDefault();
+        if (isPlaying) pause();
+        else void connectAndPlay();
+      }
+
+      if (key === 'c') setIsCinematic((current) => !current);
+      if (key === 'n') applyNextTripPreset();
+      if (key === 'a') setAutoTrip((current) => !current);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [applyNextTripPreset, connectAndPlay, isPlaying, pause]);
 
   const saveAddress = async () => {
     const address = formatVisualAddress(visualAddress);
@@ -258,7 +294,7 @@ export default function App() {
         {settings.showEquations && <EquationOverlay features={features} camera={camera} mode={settings.mode} />}
 
         <div className="stage-badge glass" aria-label="InfinityLens369 status">
-          <strong>InfinityLens369 v0.6</strong>
+          <strong>InfinityLens369 {APP_VERSION}</strong>
           <span>{formatModeLabel(settings.mode)}</span>
           {autoTrip && <span>auto trip</span>}
         </div>
@@ -317,6 +353,11 @@ export default function App() {
             <strong>{activeTripLabel}</strong>
           </div>
 
+          <div className="trip-chip" aria-label="Keyboard shortcuts">
+            <span>Keys</span>
+            <strong>Space play · C cinema · N next · A auto</strong>
+          </div>
+
           <div className="metrics" aria-label="Audio analysis metrics">
             <Metric label="Bass" value={features.bass} />
             <Metric label="Mids" value={features.mid} />
@@ -328,8 +369,12 @@ export default function App() {
             <span>Mode</span>
             <select
               value={settings.mode}
-              onChange={(event) => setSettings((current) => ({ ...current, mode: event.target.value as VisualSettings['mode'] }))}
+              onChange={(event) => {
+                setSettings((current) => ({ ...current, mode: event.target.value as VisualSettings['mode'] }));
+                setActiveTripLabel('Custom signal');
+              }}
             >
+              <option value="cosmic-drift">Cosmic Drift</option>
               <option value="pixel-melt">Pixel Melt</option>
               <option value="kaleido-trip">Kaleido Trip</option>
               <option value="tunnel-bloom">Tunnel Bloom</option>
@@ -462,7 +507,9 @@ function EquationOverlay({ features, camera, mode }: { features: AudioFeatures; 
         ? 'radial fold + mirror + audio'
         : mode === 'pixel-melt'
           ? 'quantize(p) + feedback melt'
-          : 'z ↦ z² + c';
+          : mode === 'cosmic-drift'
+            ? 'starfield + nebula warp + beat'
+            : 'z ↦ z² + c';
 
   return (
     <div className="equation-overlay" aria-hidden="true">
