@@ -83,6 +83,10 @@ input[type='range'] {
     #02030a;
 }
 
+.app-shell.is-cinematic {
+  grid-template-columns: 1fr;
+}
+
 .stage {
   position: relative;
   min-width: 0;
@@ -135,6 +139,14 @@ input[type='range'] {
 
 .stage-badge span {
   color: rgba(255, 255, 255, 0.62);
+}
+
+.stage-action {
+  position: absolute;
+  right: clamp(0.7rem, 1.4vw, 1rem);
+  top: clamp(0.7rem, 1.4vw, 1rem);
+  z-index: 6;
+  padding-inline: 1rem;
 }
 
 .control-panel {
@@ -197,6 +209,11 @@ input[type='range'] {
 
 .button-row.stacked {
   grid-template-columns: 1fr;
+}
+
+.wide-button {
+  width: 100%;
+  margin-top: 0.8rem;
 }
 
 .metrics {
@@ -413,6 +430,12 @@ input[type='range'] {
   .stage-badge {
     max-width: calc(100% - 1.4rem);
     font-size: 0.64rem;
+  }
+
+  .stage-action {
+    top: 3.2rem;
+    left: clamp(0.7rem, 1.4vw, 1rem);
+    right: auto;
   }
 
   .toggle-grid,
