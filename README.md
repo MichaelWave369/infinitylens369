@@ -2,9 +2,26 @@
 
 **Drop a song. Open a portal.**
 
-InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, Layer Console overlay scenes, Launch Console onboarding helpers, Gallery Console scene discovery, Roadmap Console feedback/runway tools, and replayable visual-address receipts.
+InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, Layer Console overlay scenes, Launch Console onboarding helpers, Gallery Console scene discovery, Roadmap Console feedback/runway tools, System Health Console browser readiness checks, and replayable visual-address receipts.
 
 This project is intentionally claim-safe: it is an art, math, and software visualization tool. It is **not** a physics proof, consciousness proof, medical tool, or scientific claim engine.
+
+## v1.14 System Health Console release
+
+v1.14 adds a boot-safe **System Health Console** sidecar for local browser readiness checks. It loads after the core React/WebGL app and existing studios, then reports whether this browser supports the runtime features InfinityLens369 uses.
+
+System Health Console features:
+
+- WebGL2 renderer readiness check
+- Live canvas mount check
+- Web Audio support check
+- Local storage support check for local preset/studio metadata
+- Canvas recording support check for captureStream and MediaRecorder
+- Clipboard and fullscreen support checks
+- Copy Diagnostics for clean feedback reports
+- Soft Reload for safe browser refresh recovery
+- Boot-safe loading after the visualizer is already mounted
+- Version sync for System Health Console labels
 
 ## v1.13 Roadmap Console release
 
