@@ -14,14 +14,14 @@ const defaultFeatures: AudioFeatures = {
 };
 
 const defaultSettings: VisualSettings = {
-  mode: 'tunnel-bloom',
+  mode: 'kaleido-trip',
   palette: 'aurora-phi',
-  showPhi: true,
-  showGrid369: false,
+  showPhi: false,
+  showGrid369: true,
   showEquations: false,
   audioReactive: true,
-  zoomSpeed: 0.55,
-  glow: 0.95,
+  zoomSpeed: 0.62,
+  glow: 0.92,
 };
 
 const paletteLabels: Record<PaletteName, string> = {
@@ -32,6 +32,13 @@ const paletteLabels: Record<PaletteName, string> = {
 };
 
 const formatMetric = (value: number) => `${Math.round(value * 100).toString().padStart(2, '0')}%`;
+
+const pressureLabel = (mode: VisualSettings['mode']) => {
+  if (mode === 'mandelbrot' || mode === 'julia') return 'Zoom pressure';
+  if (mode === 'tunnel-bloom') return 'Tunnel pressure';
+  if (mode === 'kaleido-trip') return 'Fold pressure';
+  return 'Melt pressure';
+};
 
 export default function App() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -153,13 +160,9 @@ export default function App() {
         {settings.showGrid369 && <Grid369Overlay />}
         {settings.showEquations && <EquationOverlay features={features} camera={camera} mode={settings.mode} />}
 
-        <div className="brand-card glass">
-          <p className="eyebrow">InfinityLens369 v0.3</p>
-          <h1>Drop a song. Open a portal.</h1>
-          <p>
-            A local-first trip engine where fractals, tunnels, audio, geometry, phi, 3-6-9, and
-            acid-melt fields become one navigable performance space.
-          </p>
+        <div className="stage-badge glass" aria-label="InfinityLens369 status">
+          <strong>InfinityLens369 v0.4</strong>
+          <span>{settings.mode.replaceAll('-', ' ')}</span>
         </div>
       </section>
 
@@ -206,6 +209,7 @@ export default function App() {
             value={settings.mode}
             onChange={(event) => setSettings((current) => ({ ...current, mode: event.target.value as VisualSettings['mode'] }))}
           >
+            <option value="kaleido-trip">Kaleido Trip</option>
             <option value="tunnel-bloom">Tunnel Bloom</option>
             <option value="acid-melt">Acid Melt</option>
             <option value="mandelbrot">Mandelbrot</option>
@@ -228,7 +232,7 @@ export default function App() {
         </label>
 
         <label className="slider-row">
-          <span>{settings.mode === 'mandelbrot' || settings.mode === 'julia' ? 'Zoom pressure' : settings.mode === 'tunnel-bloom' ? 'Tunnel pressure' : 'Melt pressure'}</span>
+          <span>{pressureLabel(settings.mode)}</span>
           <input
             type="range"
             min="0"
@@ -331,7 +335,9 @@ function EquationOverlay({ features, camera, mode }: { features: AudioFeatures; 
     ? 'fbm(p) + swirl + audio'
     : mode === 'tunnel-bloom'
       ? '1/r tunnel + bloom + beat'
-      : 'z ↦ z² + c';
+      : mode === 'kaleido-trip'
+        ? 'radial fold + mirror + audio'
+        : 'z ↦ z² + c';
 
   return (
     <div className="equation-overlay" aria-hidden="true">
