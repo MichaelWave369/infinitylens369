@@ -1,12 +1,28 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type DragEvent } from 'react';
 import { AudioFeatureAnalyzer } from './audio/analyser';
 import { buildVisualAddress, downloadTextFile, formatVisualAddress } from './ledger/visualAddress';
-import type { AudioFeatures, CameraState, PaletteName, VisualSettings } from './types';
+import type { AudioFeatures, CameraState, FractalMode, PaletteName, VisualSettings } from './types';
 import { FractalCanvas } from './visual/FractalCanvas';
 
-const APP_VERSION = 'v1.3.0';
+const APP_VERSION = 'v1.4.0';
 
 type TransitionStyle = 'bloom' | 'warp' | 'glitch' | 'fade' | 'pulse';
+
+type TripPreset = {
+  label: string;
+  family?: string;
+  hint: string;
+  settings: Partial<VisualSettings>;
+};
+
+type MotionProfile = {
+  label: string;
+  hint: string;
+  zoomSpeed: number;
+  audioDrive: number;
+  audioResponse: number;
+  glow: number;
+};
 
 const transitionOptions: Array<{ value: TransitionStyle; label: string; hint: string }> = [
   { value: 'bloom', label: 'Bloom flash', hint: 'bright portal flare' },
@@ -41,17 +57,25 @@ const gentleAudioEngine = {
   audioResponse: 0.12,
 };
 
+const liquidLightEngine = {
+  audioBassDrive: 0.38,
+  audioMidDrive: 0.58,
+  audioHighDrive: 0.46,
+  audioBeatDrive: 0.24,
+  audioResponse: 0.16,
+};
+
 const defaultSettings: VisualSettings = {
-  mode: 'black-hole-lens',
-  palette: 'solar-ember',
-  showPhi: false,
+  mode: 'cosmic-drift',
+  palette: 'aurora-phi',
+  showPhi: true,
   showGrid369: false,
   showEquations: false,
   audioReactive: true,
-  zoomSpeed: 0.42,
-  audioDrive: 0.30,
-  ...defaultAudioEngine,
-  glow: 0.84,
+  zoomSpeed: 0.22,
+  audioDrive: 0.16,
+  ...liquidLightEngine,
+  glow: 0.72,
 };
 
 const safeModeSettings: VisualSettings = {
@@ -81,9 +105,107 @@ const paletteLabels: Record<PaletteName, string> = {
   'aurora-phi': 'Aurora Phi',
 };
 
-const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> = [
+const modeLabels: Record<FractalMode, string> = {
+  'black-hole-lens': 'Black Hole Lens',
+  'cosmic-drift': 'Cosmic Drift',
+  'pixel-melt': 'Pixel Melt',
+  'kaleido-trip': 'Kaleido Trip',
+  'tunnel-bloom': 'Tunnel Bloom',
+  'acid-melt': 'Acid Melt',
+  mandelbrot: 'Mandelbrot',
+  julia: 'Julia Mirror',
+};
+
+const modeOptions = Object.entries(modeLabels).map(([value, label]) => ({ value: value as FractalMode, label }));
+
+const tripPresets: TripPreset[] = [
+  {
+    label: 'Aurora Veil',
+    family: 'Liquid Light',
+    hint: 'soft aurora curtains with calm shimmer',
+    settings: {
+      mode: 'cosmic-drift',
+      palette: 'aurora-phi',
+      showPhi: true,
+      showGrid369: false,
+      showEquations: false,
+      audioReactive: true,
+      zoomSpeed: 0.18,
+      audioDrive: 0.13,
+      audioBassDrive: 0.30,
+      audioMidDrive: 0.52,
+      audioHighDrive: 0.64,
+      audioBeatDrive: 0.18,
+      audioResponse: 0.12,
+      glow: 0.78,
+    },
+  },
+  {
+    label: 'Liquid Glass',
+    family: 'Liquid Light',
+    hint: 'refractive glass flow and watery ribbons',
+    settings: {
+      mode: 'acid-melt',
+      palette: 'abyss-cyan',
+      showPhi: false,
+      showGrid369: false,
+      showEquations: false,
+      audioReactive: true,
+      zoomSpeed: 0.20,
+      audioDrive: 0.15,
+      audioBassDrive: 0.36,
+      audioMidDrive: 0.72,
+      audioHighDrive: 0.50,
+      audioBeatDrive: 0.20,
+      audioResponse: 0.14,
+      glow: 0.74,
+    },
+  },
+  {
+    label: 'Plasma Garden',
+    family: 'Liquid Light',
+    hint: 'organic mandala blooms with gentle pulse',
+    settings: {
+      mode: 'kaleido-trip',
+      palette: 'aurora-phi',
+      showPhi: true,
+      showGrid369: false,
+      showEquations: false,
+      audioReactive: true,
+      zoomSpeed: 0.22,
+      audioDrive: 0.18,
+      audioBassDrive: 0.40,
+      audioMidDrive: 0.82,
+      audioHighDrive: 0.58,
+      audioBeatDrive: 0.30,
+      audioResponse: 0.18,
+      glow: 0.66,
+    },
+  },
+  {
+    label: 'Dream Pool',
+    family: 'Liquid Light',
+    hint: 'slow reflective cosmic pool',
+    settings: {
+      mode: 'cosmic-drift',
+      palette: 'abyss-cyan',
+      showPhi: false,
+      showGrid369: true,
+      showEquations: false,
+      audioReactive: true,
+      zoomSpeed: 0.14,
+      audioDrive: 0.10,
+      audioBassDrive: 0.28,
+      audioMidDrive: 0.42,
+      audioHighDrive: 0.36,
+      audioBeatDrive: 0.16,
+      audioResponse: 0.10,
+      glow: 0.60,
+    },
+  },
   {
     label: 'Black Hole Lens',
+    hint: 'gravity pressure, photon ring, and cosmic punch',
     settings: {
       mode: 'black-hole-lens',
       palette: 'solar-ember',
@@ -103,6 +225,7 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
   },
   {
     label: 'Cosmic Drift',
+    hint: 'star-warp nebula flight',
     settings: {
       mode: 'cosmic-drift',
       palette: 'aurora-phi',
@@ -122,6 +245,7 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
   },
   {
     label: 'Glass Nebula Slow',
+    hint: 'soft slow-flow cosmic safe groove',
     settings: {
       mode: 'cosmic-drift',
       palette: 'abyss-cyan',
@@ -137,10 +261,12 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
   },
   {
     label: 'Safe Mode',
+    hint: 'stable public demo mode',
     settings: safeModeSettings,
   },
   {
     label: 'Pixel Melt',
+    hint: 'retro DOS-style block melt',
     settings: {
       mode: 'pixel-melt',
       palette: 'aurora-phi',
@@ -160,6 +286,7 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
   },
   {
     label: 'Kaleido Flower',
+    hint: 'mandala symmetry and radial bloom',
     settings: {
       mode: 'kaleido-trip',
       palette: 'aurora-phi',
@@ -179,6 +306,7 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
   },
   {
     label: 'Tunnel Bloom',
+    hint: 'portal tunnel pulses',
     settings: {
       mode: 'tunnel-bloom',
       palette: 'violet-gold-duality',
@@ -198,6 +326,7 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
   },
   {
     label: 'Acid Melt',
+    hint: 'liquid wall color melt',
     settings: {
       mode: 'acid-melt',
       palette: 'aurora-phi',
@@ -217,6 +346,7 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
   },
   {
     label: 'Deep Fractal',
+    hint: 'classic Mandelbrot atlas dive',
     settings: {
       mode: 'mandelbrot',
       palette: 'abyss-cyan',
@@ -236,15 +366,6 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
   },
 ];
 
-type MotionProfile = {
-  label: string;
-  hint: string;
-  zoomSpeed: number;
-  audioDrive: number;
-  audioResponse: number;
-  glow: number;
-};
-
 const motionProfiles: MotionProfile[] = [
   { label: 'Dream', hint: 'slow ambient drift', zoomSpeed: 0.18, audioDrive: 0.10, audioResponse: 0.10, glow: 0.58 },
   { label: 'Cruise', hint: 'smooth balanced motion', zoomSpeed: 0.34, audioDrive: 0.24, audioResponse: 0.28, glow: 0.74 },
@@ -253,10 +374,9 @@ const motionProfiles: MotionProfile[] = [
 ];
 
 const supportedAudioExtensions = new Set(['mp3', 'wav', 'ogg', 'oga', 'm4a', 'aac', 'flac', 'webm']);
-
 const formatMetric = (value: number) => `${Math.round(value * 100).toString().padStart(2, '0')}%`;
-const formatModeLabel = (mode: VisualSettings['mode']) => mode.replace(/-/g, ' ');
 const clampNumber = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+const randomFloat = (min: number, max: number) => min + Math.random() * (max - min);
 
 const pressureLabel = (mode: VisualSettings['mode']) => {
   if (mode === 'mandelbrot' || mode === 'julia') return 'Zoom pressure';
@@ -267,8 +387,6 @@ const pressureLabel = (mode: VisualSettings['mode']) => {
   if (mode === 'black-hole-lens') return 'Gravity pressure';
   return 'Melt pressure';
 };
-
-const randomFloat = (min: number, max: number) => min + Math.random() * (max - min);
 
 const checkWebGL2Support = () => {
   try {
@@ -343,16 +461,16 @@ export default function App() {
   const [hasWebGL2] = useState(checkWebGL2Support);
   const [activeTripLabel, setActiveTripLabel] = useState(tripPresets[0].label);
   const [camera, setCamera] = useState<CameraState>(createDefaultCamera);
-  const [transitionStyle, setTransitionStyle] = useState<TransitionStyle>('bloom');
-  const [transitionMs, setTransitionMs] = useState(900);
+  const [transitionStyle, setTransitionStyle] = useState<TransitionStyle>('fade');
+  const [transitionMs, setTransitionMs] = useState(1200);
   const [transitionState, setTransitionState] = useState<{ active: boolean; style: TransitionStyle; label: string }>({
     active: false,
-    style: 'bloom',
+    style: 'fade',
     label: '',
   });
   const [latestAddress, setLatestAddress] = useState('Drop an audio file, press play, then save a visual address.');
   const [notice, setNotice] = useState(hasWebGL2
-    ? 'v1.3 ready. Audio Engine v2 is live: tune bass, mids, highs, beat punch, and smooth/snappy response.'
+    ? 'v1.4 Liquid Light Pack is live: Aurora Veil, Liquid Glass, Plasma Garden, and Dream Pool are in the trip cycle.'
     : 'WebGL2 is not available in this browser/device. Try Chrome, Edge, Firefox, or Safari on a GPU-enabled device.');
 
   const visualFeatures = useMemo(() => {
@@ -396,17 +514,20 @@ export default function App() {
     };
   }, []);
 
-  const applyNextTripPreset = useCallback(() => {
-    presetIndexRef.current = (presetIndexRef.current + 1) % tripPresets.length;
-    const preset = tripPresets[presetIndexRef.current];
-
-    triggerTransition(`Next trip · ${preset.label}`, () => {
+  const applyPreset = useCallback((preset: TripPreset, labelPrefix = 'Trip') => {
+    const style = preset.family === 'Liquid Light' ? 'fade' : undefined;
+    triggerTransition(`${labelPrefix} · ${preset.label}`, () => {
       smoothedFeaturesRef.current = defaultFeatures;
       setSettings((current) => ({ ...current, ...preset.settings }));
       setActiveTripLabel(preset.label);
-      setNotice(`Transitioned into trip preset: ${preset.label}`);
-    });
+      setNotice(`${preset.label}: ${preset.hint}.`);
+    }, style);
   }, [triggerTransition]);
+
+  const applyNextTripPreset = useCallback(() => {
+    presetIndexRef.current = (presetIndexRef.current + 1) % tripPresets.length;
+    applyPreset(tripPresets[presetIndexRef.current], 'Next trip');
+  }, [applyPreset]);
 
   const applyRandomTripPreset = useCallback(() => {
     const presetIndex = Math.floor(Math.random() * tripPresets.length);
@@ -425,18 +546,18 @@ export default function App() {
         showPhi: Math.random() > 0.72,
         showGrid369: Math.random() > 0.68,
         showEquations: Math.random() > 0.84,
-        zoomSpeed: randomFloat(0.18, 0.78),
-        audioDrive: randomFloat(0.10, 0.64),
-        audioBassDrive: randomFloat(0.35, 1.12),
-        audioMidDrive: randomFloat(0.35, 1.12),
-        audioHighDrive: randomFloat(0.30, 1.18),
-        audioBeatDrive: randomFloat(0.20, 1.05),
-        audioResponse: randomFloat(0.12, 0.76),
+        zoomSpeed: randomFloat(0.14, 0.78),
+        audioDrive: randomFloat(0.08, 0.64),
+        audioBassDrive: randomFloat(0.25, 1.12),
+        audioMidDrive: randomFloat(0.30, 1.12),
+        audioHighDrive: randomFloat(0.24, 1.18),
+        audioBeatDrive: randomFloat(0.14, 1.05),
+        audioResponse: randomFloat(0.08, 0.76),
         glow: randomFloat(0.44, 0.96),
       }));
       setActiveTripLabel(randomLabel);
-      setNotice(`Random trip generated from ${preset.label}`);
-    }, 'glitch');
+      setNotice(`Random trip generated from ${preset.label}.`);
+    }, preset.family === 'Liquid Light' ? 'fade' : 'glitch');
   }, [triggerTransition]);
 
   const applySafeMode = useCallback(() => {
@@ -445,7 +566,7 @@ export default function App() {
       setSettings(safeModeSettings);
       setAutoTrip(false);
       setActiveTripLabel('Safe Mode');
-      setNotice('Safe Mode enabled: slower motion, overlays off, audio reaction paused. Use this for older laptops or projectors.');
+      setNotice('Safe Mode enabled: slower motion, overlays off, audio reaction paused.');
     }, 'fade');
   }, [triggerTransition]);
 
@@ -473,10 +594,10 @@ export default function App() {
       setCamera(createDefaultCamera());
       setFeatures(defaultFeatures);
       setAutoTrip(false);
-      setActiveTripLabel('Black Hole Lens');
+      setActiveTripLabel('Aurora Veil');
       setLatestAddress('Visuals reset. Press play or save a fresh visual address.');
-      setNotice('Visuals reset to the v1.3 default scene.');
-    }, 'bloom');
+      setNotice('Visuals reset to the v1.4 Liquid Light default scene.');
+    }, 'fade');
   }, [triggerTransition]);
 
   const applyMotionProfile = useCallback((profile: MotionProfile) => {
@@ -535,9 +656,7 @@ export default function App() {
     audioRef.current?.pause();
     cancelAnimationFrame(animationRef.current);
 
-    if (objectUrlRef.current) {
-      URL.revokeObjectURL(objectUrlRef.current);
-    }
+    if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
 
     const url = URL.createObjectURL(file);
     objectUrlRef.current = url;
@@ -549,14 +668,11 @@ export default function App() {
     setNotice(`Loaded ${file.name}. Press Play portal when ready.`);
   }, []);
 
-  const handleDrop = useCallback(
-    (event: DragEvent<HTMLLabelElement>) => {
-      event.preventDefault();
-      const file = event.dataTransfer.files.item(0);
-      if (file) ingestFile(file);
-    },
-    [ingestFile],
-  );
+  const handleDrop = useCallback((event: DragEvent<HTMLLabelElement>) => {
+    event.preventDefault();
+    const file = event.dataTransfer.files.item(0);
+    if (file) ingestFile(file);
+  }, [ingestFile]);
 
   const connectAndPlay = useCallback(async () => {
     const audio = audioRef.current;
@@ -567,10 +683,7 @@ export default function App() {
     if (!audio) return;
 
     try {
-      if (!analyzerRef.current) {
-        analyzerRef.current = new AudioFeatureAnalyzer();
-      }
-
+      if (!analyzerRef.current) analyzerRef.current = new AudioFeatureAnalyzer();
       await analyzerRef.current.connect(audio);
       await audio.play();
       setIsPlaying(true);
@@ -605,7 +718,6 @@ export default function App() {
       if (tagName === 'INPUT' || tagName === 'SELECT' || tagName === 'TEXTAREA') return;
 
       const key = event.key.toLowerCase();
-
       if (event.code === 'Space') {
         event.preventDefault();
         if (isPlaying) pause();
@@ -641,10 +753,7 @@ export default function App() {
       formatted: formatVisualAddress(visualAddress),
       audioName,
       activeTripLabel,
-      transitionEngine: {
-        style: transitionStyle,
-        durationMs: transitionMs,
-      },
+      transitionEngine: { style: transitionStyle, durationMs: transitionMs },
       audioEngineV2: {
         drive: settings.audioDrive,
         bassImpact: settings.audioBassDrive,
@@ -653,460 +762,253 @@ export default function App() {
         beatPunch: settings.audioBeatDrive,
         response: settings.audioResponse,
       },
-      browserSupport: {
-        webgl2: hasWebGL2,
-      },
-      controls: {
-        pressure: settings.zoomSpeed,
-        audioDrive: settings.audioDrive,
-        glow: settings.glow,
-      },
-      notice,
-      stance: 'Art/math/software visualization only. Not a physics, medical, or consciousness claim.',
+      browserSupport: { webgl2: hasWebGL2 },
+      controls: { pressure: settings.zoomSpeed, glow: settings.glow },
+      claimBoundary: 'Creative visual receipt only. Not scientific, medical, spiritual, or physics evidence.',
     };
-    downloadTextFile('infinitylens369-visual-address.json', JSON.stringify(receipt, null, 2));
+
+    downloadTextFile(`infinitylens369-${Date.now()}.json`, JSON.stringify(receipt, null, 2));
+    setNotice('JSON receipt exported.');
   };
 
-  const exportScreenshot = () => {
-    const canvas = document.querySelector<HTMLCanvasElement>('.fractal-canvas');
+  const saveFrame = () => {
+    const canvas = document.querySelector<HTMLCanvasElement>('.stage canvas');
     if (!canvas) {
-      setNotice('No WebGL frame is available to export on this device/browser.');
+      setNotice('No canvas frame found yet.');
       return;
     }
 
-    const link = document.createElement('a');
-    link.download = 'infinitylens369-frame.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+    const anchor = document.createElement('a');
+    anchor.download = `infinitylens369-frame-${Date.now()}.png`;
+    anchor.href = canvas.toDataURL('image/png');
+    anchor.click();
+    setNotice('PNG frame export started.');
   };
 
-  const handleAudioError = () => {
-    setIsPlaying(false);
-    cancelAnimationFrame(animationRef.current);
-    setNotice('The browser could not decode this audio file. Try another mp3, wav, ogg, m4a, aac, flac, or webm file.');
+  const setVisualSetting = <K extends keyof VisualSettings>(key: K, value: VisualSettings[K]) => {
+    setSettings((current) => ({ ...current, [key]: value }));
   };
+
+  const stageStyle = { '--transition-ms': `${transitionMs}ms` } as CSSProperties;
+  const currentTransition = transitionOptions.find((option) => option.value === transitionStyle) ?? transitionOptions[0];
 
   return (
-    <main className={isCinematic ? 'app-shell is-cinematic' : 'app-shell'}>
+    <main className={`app-shell ${isCinematic ? 'cinematic' : ''}`}>
       <audio
-        hidden
         ref={audioRef}
         src={audioUrl ?? undefined}
+        className="hidden-audio"
         onEnded={() => {
           setIsPlaying(false);
           cancelAnimationFrame(animationRef.current);
-          setNotice('Song ended. Load another track or replay the portal.');
+          setNotice('Playback ended.');
         }}
-        onError={handleAudioError}
       />
 
-      <section className="stage" aria-label="InfinityLens369 visualization stage">
+      <section className="stage" style={stageStyle}>
         {hasWebGL2 ? (
           <FractalCanvas features={visualFeatures} settings={settings} onCameraChange={setCamera} />
         ) : (
-          <div className="stage-fallback glass" role="alert">
-            <strong>WebGL2 is not available here.</strong>
-            <span>InfinityLens369 needs WebGL2 for the shader engine. Try a current Chrome, Edge, Firefox, or Safari browser with GPU acceleration enabled.</span>
+          <div className="support-card">
+            <p className="eyebrow">WebGL2 unavailable</p>
+            <h1>InfinityLens369 needs a GPU-enabled WebGL2 browser.</h1>
+            <p>Try Chrome, Edge, Firefox, or Safari on a newer device.</p>
           </div>
         )}
 
-        {hasWebGL2 && settings.showPhi && <PhiOverlay />}
-        {hasWebGL2 && settings.showGrid369 && <Grid369Overlay />}
-        {hasWebGL2 && settings.showEquations && <EquationOverlay features={visualFeatures} camera={camera} mode={settings.mode} />}
-
         {transitionState.active && (
-          <div
-            className={`stage-transition ${transitionState.style}`}
-            style={{ '--transition-ms': `${transitionMs}ms` } as CSSProperties}
-            aria-hidden="true"
-          >
+          <div className={`transition-overlay transition-${transitionState.style}`}>
             <span>{transitionState.label}</span>
           </div>
         )}
 
-        <div className="stage-badge glass" aria-label="InfinityLens369 status">
+        <div className="stage-badge">
           <strong>InfinityLens369 {APP_VERSION}</strong>
-          <span>{formatModeLabel(settings.mode)}</span>
-          <span>{transitionOptions.find((option) => option.value === transitionStyle)?.label}</span>
-          <span>drive {formatMetric(settings.audioDrive / 1.5)}</span>
-          <span>response {formatMetric(settings.audioResponse)}</span>
-          {settings.audioReactive ? <span>reactive</span> : <span>safe/static</span>}
-          {autoTrip && <span>auto trip</span>}
+          <span>{activeTripLabel}</span>
+          {autoTrip && <em>auto trip</em>}
         </div>
 
-        {notice && (
-          <div className="stage-notice glass" role="status">
-            {notice}
-          </div>
-        )}
+        <div className="stage-notice">{notice}</div>
 
         {isCinematic && (
-          <button className="stage-action glass" type="button" onClick={() => setIsCinematic(false)}>
+          <button className="show-controls" type="button" onClick={() => setIsCinematic(false)}>
             Show controls
           </button>
         )}
       </section>
 
       {!isCinematic && (
-        <aside className="control-panel glass" aria-label="InfinityLens369 controls">
-          <label
-            className="dropzone"
-            onDragOver={(event) => event.preventDefault()}
-            onDrop={handleDrop}
-          >
+        <aside className="control-panel">
+          <header>
+            <p className="eyebrow">Local-first visualizer</p>
+            <h1>Drop a song. Open a portal.</h1>
+            <p>{audioName}</p>
+          </header>
+
+          <label className="drop-zone" onDragOver={(event) => event.preventDefault()} onDrop={handleDrop}>
             <input
               type="file"
               accept="audio/*,.mp3,.wav,.ogg,.oga,.m4a,.aac,.flac,.webm"
               onChange={(event) => {
-                const file = event.target.files?.item(0);
+                const file = event.currentTarget.files?.item(0);
                 if (file) ingestFile(file);
               }}
             />
-            <span className="drop-icon">∞</span>
-            <strong>Drop MP3/WAV/OGG/M4A</strong>
-            <small>{audioName}</small>
+            <span>Drop audio or choose a file</span>
           </label>
 
-          <section className="trip-chip" aria-label="System status">
-            <span>System status</span>
-            <strong>{notice}</strong>
-          </section>
-
           <div className="button-row">
-            <button type="button" onClick={connectAndPlay} disabled={!audioUrl || isPlaying || !hasWebGL2}>
-              Play portal
+            <button type="button" onClick={() => (isPlaying ? pause() : void connectAndPlay())}>
+              {isPlaying ? 'Pause' : 'Play portal'}
             </button>
-            <button type="button" onClick={pause} disabled={!isPlaying}>
-              Pause
-            </button>
+            <button type="button" onClick={() => setIsCinematic(true)}>Cinematic</button>
+            <button type="button" onClick={() => void toggleFullscreen()}>Fullscreen</button>
           </div>
 
           <div className="button-row">
-            <button type="button" onClick={() => setIsCinematic(true)}>
-              Cinematic
-            </button>
-            <button type="button" onClick={toggleFullscreen}>
-              Fullscreen
-            </button>
+            <button type="button" onClick={applyNextTripPreset}>Next trip</button>
+            <button type="button" onClick={applyRandomTripPreset}>Random trip</button>
+            <button type="button" onClick={() => setAutoTrip((current) => !current)}>{autoTrip ? 'Auto trip on' : 'Auto trip'}</button>
           </div>
 
           <div className="button-row">
-            <button type="button" onClick={applyNextTripPreset}>
-              Next trip
-            </button>
-            <button type="button" onClick={applyRandomTripPreset}>
-              Random trip
-            </button>
+            <button type="button" onClick={applySlowFlow}>Slow flow</button>
+            <button type="button" onClick={applySafeMode}>Safe mode</button>
+            <button type="button" onClick={resetVisuals}>Reset visuals</button>
           </div>
 
-          <div className="button-row">
-            <button type="button" onClick={applySafeMode}>
-              Safe mode
-            </button>
-            <button type="button" onClick={resetVisuals}>
-              Reset visuals
-            </button>
-          </div>
-
-          <button className="wide-button" type="button" onClick={applySlowFlow}>
-            Slow flow
-          </button>
-
-          <section className="transition-card" aria-label="Transition engine controls">
-            <span>Transition engine</span>
-            <strong>{transitionOptions.find((option) => option.value === transitionStyle)?.label}</strong>
-            <small>Bridges Next, Random, Auto, Safe, Reset, Motion, and manual mode changes.</small>
-            <div className="transition-row">
-              <select value={transitionStyle} onChange={(event) => setTransitionStyle(event.target.value as TransitionStyle)}>
-                {transitionOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <button type="button" onClick={cycleTransitionStyle}>Cycle</button>
-            </div>
-            <label className="slider-row compact-slider">
-              <span>Morph speed · {(transitionMs / 1000).toFixed(2)}s</span>
-              <input
-                type="range"
-                min="450"
-                max="1800"
-                step="50"
-                value={transitionMs}
-                onChange={(event) => setTransitionMs(Number(event.target.value))}
-              />
-            </label>
-          </section>
-
-          <section className="motion-card" aria-label="Motion profiles">
-            <span>Motion profiles</span>
-            <div className="motion-grid">
-              {motionProfiles.map((profile, index) => (
-                <button key={profile.label} type="button" onClick={() => applyMotionProfile(profile)}>
-                  <strong>{index + 1}. {profile.label}</strong>
-                  <small>{profile.hint}</small>
+          <section className="control-group">
+            <h2>Liquid Light Pack</h2>
+            <div className="trip-chip-grid">
+              {tripPresets.slice(0, 4).map((preset) => (
+                <button key={preset.label} type="button" className="trip-chip" onClick={() => applyPreset(preset, 'Liquid Light')}>
+                  <strong>{preset.label}</strong>
+                  <span>{preset.hint}</span>
                 </button>
               ))}
             </div>
           </section>
 
-          <button className="wide-button" type="button" onClick={() => setAutoTrip((current) => !current)}>
-            {autoTrip ? 'Stop auto trip' : 'Auto trip'}
-          </button>
-
-          <div className="trip-chip" aria-label="Active trip preset">
-            <span>Trip preset</span>
-            <strong>{activeTripLabel}</strong>
-          </div>
-
-          <div className="trip-chip" aria-label="Keyboard shortcuts">
-            <span>Keys</span>
-            <strong>Space play · C cinema · F full · N next · R random · T transition · S slow · A auto · 0 safe · 1-4 motion</strong>
-          </div>
-
-          <div className="metrics" aria-label="Audio analysis metrics">
-            <Metric label="Bass" value={features.bass} />
-            <Metric label="Mids" value={features.mid} />
-            <Metric label="Highs" value={features.high} />
-            <Metric label="Beat" value={features.beat} />
-            <Metric label="Energy" value={features.rms} />
-            <Metric label="Drive" value={settings.audioDrive / 1.5} />
-          </div>
-
-          <label className="field-row">
-            <span>Mode</span>
+          <section className="control-group">
+            <h2>Visual mode</h2>
             <select
               value={settings.mode}
               onChange={(event) => {
-                const mode = event.target.value as VisualSettings['mode'];
-                triggerTransition(`Mode · ${formatModeLabel(mode)}`, () => {
+                const mode = event.currentTarget.value as FractalMode;
+                triggerTransition(`Mode · ${modeLabels[mode]}`, () => {
                   smoothedFeaturesRef.current = defaultFeatures;
-                  setSettings((current) => ({ ...current, mode }));
-                  setActiveTripLabel('Custom signal');
-                  setNotice('Custom mode selected through the v1.3 transition engine.');
+                  setVisualSetting('mode', mode);
+                  setActiveTripLabel(modeLabels[mode]);
+                  setNotice(`Manual mode selected: ${modeLabels[mode]}.`);
                 });
               }}
             >
-              <option value="black-hole-lens">Black Hole Lens</option>
-              <option value="cosmic-drift">Cosmic Drift</option>
-              <option value="pixel-melt">Pixel Melt</option>
-              <option value="kaleido-trip">Kaleido Trip</option>
-              <option value="tunnel-bloom">Tunnel Bloom</option>
-              <option value="acid-melt">Acid Melt</option>
-              <option value="mandelbrot">Mandelbrot</option>
-              <option value="julia">Julia Mirror</option>
-            </select>
-          </label>
-
-          <label className="field-row">
-            <span>Palette</span>
-            <select
-              value={settings.palette}
-              onChange={(event) => setSettings((current) => ({ ...current, palette: event.target.value as PaletteName }))}
-            >
-              {Object.entries(paletteLabels).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
+              {modeOptions.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </select>
-          </label>
 
-          <label className="slider-row">
-            <span>{pressureLabel(settings.mode)}</span>
-            <input
-              type="range"
-              min="0"
-              max="1.2"
-              step="0.01"
-              value={settings.zoomSpeed}
-              onChange={(event) => setSettings((current) => ({ ...current, zoomSpeed: Number(event.target.value) }))}
-            />
-          </label>
+            <select value={settings.palette} onChange={(event) => setVisualSetting('palette', event.currentTarget.value as PaletteName)}>
+              {(Object.keys(paletteLabels) as PaletteName[]).map((palette) => (
+                <option key={palette} value={palette}>{paletteLabels[palette]}</option>
+              ))}
+            </select>
+          </section>
 
-          <label className="slider-row">
-            <span>Audio speed / drive</span>
-            <input
-              type="range"
-              min="0"
-              max="1.5"
-              step="0.01"
-              value={settings.audioDrive}
-              onChange={(event) => setSettings((current) => ({ ...current, audioDrive: Number(event.target.value) }))}
-            />
-          </label>
-
-          <section className="transition-card" aria-label="Audio Engine v2 controls">
-            <span>Audio Engine v2</span>
-            <strong>Smooth / Snappy · {formatMetric(settings.audioResponse)}</strong>
-            <small>Shape the audio before it reaches every shader. Lower values drift. Higher values punch.</small>
-            <label className="slider-row compact-slider">
-              <span>Response</span>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={settings.audioResponse}
-                onChange={(event) => setSettings((current) => ({ ...current, audioResponse: Number(event.target.value) }))}
-              />
-            </label>
-            <label className="slider-row compact-slider">
-              <span>Bass impact · {formatMetric(settings.audioBassDrive / 1.5)}</span>
-              <input
-                type="range"
-                min="0"
-                max="1.5"
-                step="0.01"
-                value={settings.audioBassDrive}
-                onChange={(event) => setSettings((current) => ({ ...current, audioBassDrive: Number(event.target.value) }))}
-              />
-            </label>
-            <label className="slider-row compact-slider">
-              <span>Mids motion · {formatMetric(settings.audioMidDrive / 1.5)}</span>
-              <input
-                type="range"
-                min="0"
-                max="1.5"
-                step="0.01"
-                value={settings.audioMidDrive}
-                onChange={(event) => setSettings((current) => ({ ...current, audioMidDrive: Number(event.target.value) }))}
-              />
-            </label>
-            <label className="slider-row compact-slider">
-              <span>High sparkle · {formatMetric(settings.audioHighDrive / 1.5)}</span>
-              <input
-                type="range"
-                min="0"
-                max="1.5"
-                step="0.01"
-                value={settings.audioHighDrive}
-                onChange={(event) => setSettings((current) => ({ ...current, audioHighDrive: Number(event.target.value) }))}
-              />
-            </label>
-            <label className="slider-row compact-slider">
-              <span>Beat punch · {formatMetric(settings.audioBeatDrive / 1.5)}</span>
-              <input
-                type="range"
-                min="0"
-                max="1.5"
-                step="0.01"
-                value={settings.audioBeatDrive}
-                onChange={(event) => setSettings((current) => ({ ...current, audioBeatDrive: Number(event.target.value) }))}
-              />
+          <section className="control-group">
+            <h2>Transition Engine</h2>
+            <select value={transitionStyle} onChange={(event) => setTransitionStyle(event.currentTarget.value as TransitionStyle)}>
+              {transitionOptions.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+            <p>{currentTransition.hint}</p>
+            <button type="button" onClick={cycleTransitionStyle}>Cycle transition</button>
+            <label>
+              Morph speed {transitionMs}ms
+              <input type="range" min="350" max="2200" step="50" value={transitionMs} onChange={(event) => setTransitionMs(Number(event.currentTarget.value))} />
             </label>
           </section>
 
-          <label className="slider-row">
-            <span>Glow</span>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={settings.glow}
-              onChange={(event) => setSettings((current) => ({ ...current, glow: Number(event.target.value) }))}
-            />
-          </label>
+          <section className="control-group">
+            <h2>Motion Profiles</h2>
+            <div className="motion-grid">
+              {motionProfiles.map((profile, index) => (
+                <button key={profile.label} type="button" className="motion-card" onClick={() => applyMotionProfile(profile)}>
+                  <strong>{index + 1}. {profile.label}</strong>
+                  <span>{profile.hint}</span>
+                </button>
+              ))}
+            </div>
+          </section>
 
-          <div className="toggle-grid">
-            <Toggle label="Audio reactive" checked={settings.audioReactive} onChange={(audioReactive) => setSettings((current) => ({ ...current, audioReactive }))} />
-            <Toggle label="Phi spiral" checked={settings.showPhi} onChange={(showPhi) => setSettings((current) => ({ ...current, showPhi }))} />
-            <Toggle label="369 grid" checked={settings.showGrid369} onChange={(showGrid369) => setSettings((current) => ({ ...current, showGrid369 }))} />
-            <Toggle label="Equations" checked={settings.showEquations} onChange={(showEquations) => setSettings((current) => ({ ...current, showEquations }))} />
-          </div>
+          <section className="control-group">
+            <h2>Audio Engine v2</h2>
+            <label>
+              Audio speed / drive {formatMetric(settings.audioDrive)}
+              <input type="range" min="0" max="1" step="0.01" value={settings.audioDrive} onChange={(event) => setVisualSetting('audioDrive', Number(event.currentTarget.value))} />
+            </label>
+            <label>
+              Response {formatMetric(settings.audioResponse)}
+              <input type="range" min="0" max="1" step="0.01" value={settings.audioResponse} onChange={(event) => setVisualSetting('audioResponse', Number(event.currentTarget.value))} />
+            </label>
+            <label>
+              Bass impact {formatMetric(settings.audioBassDrive)}
+              <input type="range" min="0" max="1.25" step="0.01" value={settings.audioBassDrive} onChange={(event) => setVisualSetting('audioBassDrive', Number(event.currentTarget.value))} />
+            </label>
+            <label>
+              Mids motion {formatMetric(settings.audioMidDrive)}
+              <input type="range" min="0" max="1.25" step="0.01" value={settings.audioMidDrive} onChange={(event) => setVisualSetting('audioMidDrive', Number(event.currentTarget.value))} />
+            </label>
+            <label>
+              High sparkle {formatMetric(settings.audioHighDrive)}
+              <input type="range" min="0" max="1.25" step="0.01" value={settings.audioHighDrive} onChange={(event) => setVisualSetting('audioHighDrive', Number(event.currentTarget.value))} />
+            </label>
+            <label>
+              Beat punch {formatMetric(settings.audioBeatDrive)}
+              <input type="range" min="0" max="1.25" step="0.01" value={settings.audioBeatDrive} onChange={(event) => setVisualSetting('audioBeatDrive', Number(event.currentTarget.value))} />
+            </label>
+          </section>
 
-          <div className="button-row stacked">
-            <button type="button" onClick={saveAddress}>Save visual address</button>
-            <button type="button" onClick={exportReceipt}>Export receipt JSON</button>
-            <button type="button" onClick={exportScreenshot}>Export PNG frame</button>
-          </div>
+          <section className="control-group">
+            <h2>Visual Controls</h2>
+            <label>
+              {pressureLabel(settings.mode)} {formatMetric(settings.zoomSpeed)}
+              <input type="range" min="0" max="1" step="0.01" value={settings.zoomSpeed} onChange={(event) => setVisualSetting('zoomSpeed', Number(event.currentTarget.value))} />
+            </label>
+            <label>
+              Glow {formatMetric(settings.glow)}
+              <input type="range" min="0" max="1" step="0.01" value={settings.glow} onChange={(event) => setVisualSetting('glow', Number(event.currentTarget.value))} />
+            </label>
+            <label><input type="checkbox" checked={settings.audioReactive} onChange={(event) => setVisualSetting('audioReactive', event.currentTarget.checked)} /> Audio reactive</label>
+            <label><input type="checkbox" checked={settings.showPhi} onChange={(event) => setVisualSetting('showPhi', event.currentTarget.checked)} /> Phi spiral</label>
+            <label><input type="checkbox" checked={settings.showGrid369} onChange={(event) => setVisualSetting('showGrid369', event.currentTarget.checked)} /> 3-6-9 grid</label>
+            <label><input type="checkbox" checked={settings.showEquations} onChange={(event) => setVisualSetting('showEquations', event.currentTarget.checked)} /> Equation overlay</label>
+          </section>
 
-          <section className="address-card" aria-label="Latest visual address">
-            <span>Latest address</span>
+          <section className="control-group meter-grid">
+            <div>Bass <strong>{formatMetric(features.bass)}</strong></div>
+            <div>Mids <strong>{formatMetric(features.mid)}</strong></div>
+            <div>Highs <strong>{formatMetric(features.high)}</strong></div>
+            <div>Beat <strong>{formatMetric(features.beat)}</strong></div>
+          </section>
+
+          <section className="control-group">
+            <h2>Receipts</h2>
+            <div className="button-row">
+              <button type="button" onClick={() => void saveAddress()}>Save address</button>
+              <button type="button" onClick={saveFrame}>Save frame</button>
+              <button type="button" onClick={exportReceipt}>Export JSON</button>
+            </div>
             <code>{latestAddress}</code>
           </section>
+
+          <footer>
+            <p>Shortcuts: Space play/pause · C cinematic · F fullscreen · N next · R random · T transition · S slow · A auto · 0 safe · 1-4 motion.</p>
+            <p>Claim-safe creative software. Visual receipts are replay cues, not scientific proof.</p>
+          </footer>
         </aside>
       )}
     </main>
-  );
-}
-
-function Metric({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="metric">
-      <span>{label}</span>
-      <strong>{formatMetric(value)}</strong>
-      <i style={{ transform: `scaleX(${Math.max(0.02, Math.min(1, value))})` }} />
-    </div>
-  );
-}
-
-function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (checked: boolean) => void }) {
-  return (
-    <label className="toggle">
-      <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} />
-      <span>{label}</span>
-    </label>
-  );
-}
-
-function PhiOverlay() {
-  return (
-    <svg className="phi-overlay" viewBox="0 0 1000 1000" aria-hidden="true">
-      <path
-        d="M500 500 C620 500 620 680 500 680 C280 680 280 360 500 360 C850 360 850 860 500 860 C-70 860 -70 140 500 140 C1250 140 1250 1040 500 1040"
-      />
-      <circle cx="500" cy="500" r="222" />
-      <circle cx="500" cy="500" r="359" />
-    </svg>
-  );
-}
-
-function Grid369Overlay() {
-  const points = [3, 6, 9];
-  return (
-    <svg className="grid369-overlay" viewBox="0 0 1000 1000" aria-hidden="true">
-      <circle cx="500" cy="500" r="320" />
-      <circle cx="500" cy="500" r="180" />
-      <path d="M500 112 L836 694 L164 694 Z" />
-      <path d="M500 888 L164 306 L836 306 Z" />
-      {points.map((point, index) => {
-        const angle = (-90 + index * 120) * (Math.PI / 180);
-        const x = 500 + Math.cos(angle) * 320;
-        const y = 500 + Math.sin(angle) * 320;
-        return (
-          <text key={point} x={x} y={y}>
-            {point}
-          </text>
-        );
-      })}
-    </svg>
-  );
-}
-
-function EquationOverlay({ features, camera, mode }: { features: AudioFeatures; camera: CameraState; mode: VisualSettings['mode'] }) {
-  const modeFormula = mode === 'acid-melt'
-    ? 'fbm(p) + swirl + audio'
-    : mode === 'tunnel-bloom'
-      ? '1/r tunnel + bloom + beat'
-      : mode === 'kaleido-trip'
-        ? 'radial fold + mirror + audio'
-        : mode === 'pixel-melt'
-          ? 'quantize(p) + feedback melt'
-          : mode === 'cosmic-drift'
-            ? 'starfield + nebula warp + beat'
-            : mode === 'black-hole-lens'
-              ? 'lens(r) + accretion + beat'
-              : 'z ↦ z² + c';
-
-  return (
-    <div className="equation-overlay" aria-hidden="true">
-      <span>{modeFormula}</span>
-      <span>φ ≈ 1.6180339887</span>
-      <span>3 · 6 · 9 pulse</span>
-      <span>bass {formatMetric(features.bass)} / zoom {camera.zoom.toExponential(2)}</span>
-    </div>
   );
 }
