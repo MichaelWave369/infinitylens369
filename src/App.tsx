@@ -4,7 +4,7 @@ import { buildVisualAddress, downloadTextFile, formatVisualAddress } from './led
 import type { AudioFeatures, CameraState, PaletteName, VisualSettings } from './types';
 import { FractalCanvas } from './visual/FractalCanvas';
 
-const APP_VERSION = 'v0.8';
+const APP_VERSION = 'v0.9';
 
 const defaultFeatures: AudioFeatures = {
   bass: 0,
@@ -22,7 +22,8 @@ const defaultSettings: VisualSettings = {
   showGrid369: false,
   showEquations: false,
   audioReactive: true,
-  zoomSpeed: 0.88,
+  zoomSpeed: 0.52,
+  audioDrive: 0.42,
   glow: 0.92,
 };
 
@@ -43,7 +44,8 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       showGrid369: false,
       showEquations: false,
       audioReactive: true,
-      zoomSpeed: 0.88,
+      zoomSpeed: 0.52,
+      audioDrive: 0.42,
       glow: 0.92,
     },
   },
@@ -56,8 +58,23 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       showGrid369: false,
       showEquations: false,
       audioReactive: true,
-      zoomSpeed: 0.76,
+      zoomSpeed: 0.48,
+      audioDrive: 0.44,
       glow: 0.90,
+    },
+  },
+  {
+    label: 'Glass Nebula Slow',
+    settings: {
+      mode: 'cosmic-drift',
+      palette: 'abyss-cyan',
+      showPhi: true,
+      showGrid369: false,
+      showEquations: false,
+      audioReactive: true,
+      zoomSpeed: 0.30,
+      audioDrive: 0.24,
+      glow: 0.76,
     },
   },
   {
@@ -69,7 +86,8 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       showGrid369: false,
       showEquations: false,
       audioReactive: true,
-      zoomSpeed: 0.74,
+      zoomSpeed: 0.46,
+      audioDrive: 0.46,
       glow: 0.86,
     },
   },
@@ -82,7 +100,8 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       showGrid369: false,
       showEquations: false,
       audioReactive: true,
-      zoomSpeed: 0.92,
+      zoomSpeed: 0.42,
+      audioDrive: 0.38,
       glow: 0.42,
     },
   },
@@ -95,7 +114,8 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       showGrid369: true,
       showEquations: false,
       audioReactive: true,
-      zoomSpeed: 0.82,
+      zoomSpeed: 0.46,
+      audioDrive: 0.42,
       glow: 0.92,
     },
   },
@@ -108,7 +128,8 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       showGrid369: false,
       showEquations: false,
       audioReactive: true,
-      zoomSpeed: 0.68,
+      zoomSpeed: 0.40,
+      audioDrive: 0.36,
       glow: 0.88,
     },
   },
@@ -121,7 +142,8 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
       showGrid369: false,
       showEquations: true,
       audioReactive: true,
-      zoomSpeed: 0.46,
+      zoomSpeed: 0.32,
+      audioDrive: 0.30,
       glow: 0.68,
     },
   },
@@ -129,6 +151,7 @@ const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> =
 
 const formatMetric = (value: number) => `${Math.round(value * 100).toString().padStart(2, '0')}%`;
 const formatModeLabel = (mode: VisualSettings['mode']) => mode.replace(/-/g, ' ');
+const clampNumber = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 const pressureLabel = (mode: VisualSettings['mode']) => {
   if (mode === 'mandelbrot' || mode === 'julia') return 'Zoom pressure';
@@ -141,6 +164,21 @@ const pressureLabel = (mode: VisualSettings['mode']) => {
 };
 
 const randomFloat = (min: number, max: number) => min + Math.random() * (max - min);
+
+const shapeAudioFeatures = (features: AudioFeatures, audioDrive: number): AudioFeatures => {
+  const drive = clampNumber(audioDrive, 0, 1.5);
+  const softDrive = drive * (0.64 + drive * 0.24);
+  const beatDrive = Math.min(1, drive * 0.78);
+
+  return {
+    bass: clampNumber(features.bass * softDrive, 0, 1),
+    mid: clampNumber(features.mid * softDrive, 0, 1),
+    high: clampNumber(features.high * softDrive, 0, 1),
+    rms: clampNumber(features.rms * softDrive, 0, 1),
+    beat: clampNumber(features.beat * beatDrive, 0, 1),
+    waveform: clampNumber(features.waveform * softDrive, 0, 1),
+  };
+};
 
 export default function App() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -164,6 +202,11 @@ export default function App() {
     rotation: 0,
   });
   const [latestAddress, setLatestAddress] = useState('Drop an audio file, press play, then save a visual address.');
+
+  const visualFeatures = useMemo(
+    () => shapeAudioFeatures(features, settings.audioDrive),
+    [features, settings.audioDrive],
+  );
 
   const visualAddress = useMemo(() => {
     const time = audioRef.current?.currentTime ?? 0;
@@ -198,10 +241,23 @@ export default function App() {
       showPhi: Math.random() > 0.72,
       showGrid369: Math.random() > 0.68,
       showEquations: Math.random() > 0.84,
-      zoomSpeed: randomFloat(0.42, 1.08),
+      zoomSpeed: randomFloat(0.20, 0.82),
+      audioDrive: randomFloat(0.14, 0.78),
       glow: randomFloat(0.46, 0.98),
     }));
     setActiveTripLabel(`Random ${preset.label}`);
+  }, []);
+
+  const applySlowFlow = useCallback(() => {
+    setSettings((current) => ({
+      ...current,
+      audioReactive: true,
+      zoomSpeed: Math.min(current.zoomSpeed, 0.32),
+      audioDrive: 0.18,
+      glow: Math.max(0.42, Math.min(current.glow, 0.78)),
+    }));
+    setAutoTrip(false);
+    setActiveTripLabel('Slow Flow');
   }, []);
 
   useEffect(() => {
@@ -285,12 +341,13 @@ export default function App() {
       if (key === 'c') setIsCinematic((current) => !current);
       if (key === 'n') applyNextTripPreset();
       if (key === 'r') applyRandomTripPreset();
+      if (key === 's') applySlowFlow();
       if (key === 'a') setAutoTrip((current) => !current);
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [applyNextTripPreset, applyRandomTripPreset, connectAndPlay, isPlaying, pause]);
+  }, [applyNextTripPreset, applyRandomTripPreset, applySlowFlow, connectAndPlay, isPlaying, pause]);
 
   const saveAddress = async () => {
     const address = formatVisualAddress(visualAddress);
@@ -304,6 +361,11 @@ export default function App() {
       formatted: formatVisualAddress(visualAddress),
       audioName,
       activeTripLabel,
+      controls: {
+        pressure: settings.zoomSpeed,
+        audioDrive: settings.audioDrive,
+        glow: settings.glow,
+      },
       stance: 'Art/math/software visualization only. Not a physics, medical, or consciousness claim.',
     };
     downloadTextFile('infinitylens369-visual-address.json', JSON.stringify(receipt, null, 2));
@@ -324,15 +386,16 @@ export default function App() {
       <audio hidden ref={audioRef} src={audioUrl ?? undefined} onEnded={() => setIsPlaying(false)} />
 
       <section className="stage" aria-label="InfinityLens369 visualization stage">
-        <FractalCanvas features={features} settings={settings} onCameraChange={setCamera} />
+        <FractalCanvas features={visualFeatures} settings={settings} onCameraChange={setCamera} />
 
         {settings.showPhi && <PhiOverlay />}
         {settings.showGrid369 && <Grid369Overlay />}
-        {settings.showEquations && <EquationOverlay features={features} camera={camera} mode={settings.mode} />}
+        {settings.showEquations && <EquationOverlay features={visualFeatures} camera={camera} mode={settings.mode} />}
 
         <div className="stage-badge glass" aria-label="InfinityLens369 status">
           <strong>InfinityLens369 {APP_VERSION}</strong>
           <span>{formatModeLabel(settings.mode)}</span>
+          <span>drive {formatMetric(settings.audioDrive / 1.5)}</span>
           {autoTrip && <span>auto trip</span>}
         </div>
 
@@ -385,6 +448,10 @@ export default function App() {
             </button>
           </div>
 
+          <button className="wide-button" type="button" onClick={applySlowFlow}>
+            Slow flow
+          </button>
+
           <button className="wide-button" type="button" onClick={() => setAutoTrip((current) => !current)}>
             {autoTrip ? 'Stop auto trip' : 'Auto trip'}
           </button>
@@ -396,7 +463,7 @@ export default function App() {
 
           <div className="trip-chip" aria-label="Keyboard shortcuts">
             <span>Keys</span>
-            <strong>Space play · C cinema · N next · R random · A auto</strong>
+            <strong>Space play · C cinema · N next · R random · S slow · A auto</strong>
           </div>
 
           <div className="metrics" aria-label="Audio analysis metrics">
@@ -404,6 +471,7 @@ export default function App() {
             <Metric label="Mids" value={features.mid} />
             <Metric label="Highs" value={features.high} />
             <Metric label="Energy" value={features.rms} />
+            <Metric label="Drive" value={settings.audioDrive / 1.5} />
           </div>
 
           <label className="field-row">
@@ -449,6 +517,18 @@ export default function App() {
               step="0.01"
               value={settings.zoomSpeed}
               onChange={(event) => setSettings((current) => ({ ...current, zoomSpeed: Number(event.target.value) }))}
+            />
+          </label>
+
+          <label className="slider-row">
+            <span>Audio speed / drive</span>
+            <input
+              type="range"
+              min="0"
+              max="1.5"
+              step="0.01"
+              value={settings.audioDrive}
+              onChange={(event) => setSettings((current) => ({ ...current, audioDrive: Number(event.target.value) }))}
             />
           </label>
 
