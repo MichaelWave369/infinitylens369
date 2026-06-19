@@ -109,36 +109,32 @@ input[type='range'] {
   backdrop-filter: blur(20px);
 }
 
-.brand-card {
+.stage-badge {
   position: absolute;
-  left: clamp(1rem, 3vw, 2rem);
-  bottom: clamp(1rem, 3vw, 2rem);
-  width: min(520px, calc(100% - 2rem));
-  padding: 1.35rem;
-  border-radius: 28px;
-}
-
-.eyebrow {
-  margin: 0 0 0.4rem;
-  color: var(--gold);
-  font-size: 0.78rem;
-  font-weight: 900;
-  letter-spacing: 0.16em;
+  left: clamp(0.7rem, 1.4vw, 1rem);
+  top: clamp(0.7rem, 1.4vw, 1rem);
+  z-index: 5;
+  display: inline-flex;
+  gap: 0.55rem;
+  align-items: center;
+  max-width: min(62vw, 360px);
+  padding: 0.46rem 0.7rem;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
+  pointer-events: none;
 }
 
-.brand-card h1 {
-  margin: 0;
-  font-size: clamp(2.2rem, 5vw, 5rem);
-  line-height: 0.9;
-  letter-spacing: -0.07em;
+.stage-badge strong {
+  color: var(--gold);
+  font-size: 0.72rem;
+  letter-spacing: 0.10em;
 }
 
-.brand-card p:last-child {
-  max-width: 44rem;
-  margin: 0.8rem 0 0;
-  color: var(--text-muted);
-  line-height: 1.55;
+.stage-badge span {
+  color: rgba(255, 255, 255, 0.62);
 }
 
 .control-panel {
@@ -414,8 +410,9 @@ input[type='range'] {
 }
 
 @media (max-width: 520px) {
-  .brand-card {
-    display: none;
+  .stage-badge {
+    max-width: calc(100% - 1.4rem);
+    font-size: 0.64rem;
   }
 
   .toggle-grid,
