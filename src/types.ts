@@ -1,4 +1,4 @@
-export type FractalMode = 'mandelbrot' | 'julia';
+export type FractalMode = 'mandelbrot' | 'julia' | 'acid-melt';
 
 export type PaletteName =
   | 'violet-gold-duality'
