@@ -1,0 +1,73 @@
+.stage-badge,
+.stage-notice {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+.stage,
+.stage canvas,
+.fractal-canvas {
+  overflow: hidden;
+}
+
+.transition-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  animation: visual-cleanup-transition var(--transition-ms, 1200ms) ease both;
+}
+
+.transition-overlay span {
+  display: none !important;
+}
+
+.transition-overlay::before,
+.transition-overlay::after {
+  content: none !important;
+}
+
+@keyframes visual-cleanup-transition {
+  0% { opacity: 0; }
+  20% { opacity: 0.16; }
+  100% { opacity: 0; }
+}
+
+body[data-infinitylens-scene='circuit-cathedral-retuned'] .stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0.26;
+  mix-blend-mode: screen;
+  background:
+    linear-gradient(90deg, transparent 0 11%, rgba(112, 240, 255, 0.18) 11.3% 11.6%, transparent 11.9% 22%, rgba(244, 200, 106, 0.13) 22.3% 22.6%, transparent 22.9% 33%, rgba(112, 240, 255, 0.20) 33.3% 33.6%, transparent 33.9% 66%, rgba(112, 240, 255, 0.20) 66.3% 66.6%, transparent 66.9% 77%, rgba(244, 200, 106, 0.13) 77.3% 77.6%, transparent 77.9% 88%, rgba(112, 240, 255, 0.18) 88.3% 88.6%, transparent 88.9%),
+    linear-gradient(0deg, transparent 0 17%, rgba(112, 240, 255, 0.11) 17.2% 17.5%, transparent 17.7% 36%, rgba(244, 200, 106, 0.12) 36.2% 36.5%, transparent 36.7% 63%, rgba(244, 200, 106, 0.12) 63.2% 63.5%, transparent 63.7% 82%, rgba(112, 240, 255, 0.11) 82.2% 82.5%, transparent 82.7%),
+    radial-gradient(ellipse at 50% 58%, transparent 0 18%, rgba(112, 240, 255, 0.18) 18.3% 18.9%, transparent 19.4% 29%, rgba(244, 200, 106, 0.14) 29.3% 30%, transparent 30.8% 100%);
+}
+
+body[data-infinitylens-scene='circuit-cathedral-retuned'] .stage::before {
+  content: '';
+  position: absolute;
+  inset: 7% 14% 10%;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0.18;
+  mix-blend-mode: screen;
+  border: 1px solid rgba(112, 240, 255, 0.34);
+  border-bottom-color: rgba(244, 200, 106, 0.30);
+  border-radius: 48% 48% 10% 10% / 60% 60% 12% 12%;
+  box-shadow:
+    inset 0 0 42px rgba(112, 240, 255, 0.20),
+    0 0 46px rgba(244, 200, 106, 0.12);
+}
+
+body[data-infinitylens-comfort='reduced-motion'] body[data-infinitylens-scene='circuit-cathedral-retuned'] .stage::before,
+body[data-infinitylens-comfort='reduced-motion'] body[data-infinitylens-scene='circuit-cathedral-retuned'] .stage::after {
+  animation: none !important;
+}
