@@ -67,7 +67,7 @@ const updateStageCleanupState = () => {
 };
 
 const applyCircuitCathedralIdentity = () => {
-  document.body.dataset.infinitylensScene = 'circuit-cathedral-retuned';
+  document.body.dataset.infinitylensScene = 'circuit-cathedral-identity';
 
   setSelectValue('Visual mode', 0, 'kaleido-trip');
   setSelectValue('Visual mode', 1, 'abyss-cyan');
@@ -75,17 +75,17 @@ const applyCircuitCathedralIdentity = () => {
   setCheckbox('Phi spiral', false);
   setCheckbox('3-6-9 grid', true);
   setCheckbox('Equation overlay', true);
-  setRange('Audio speed / drive', 0.18);
-  setRange('Response', 0.34);
-  setRange('Bass impact', 0.32);
-  setRange('Mids motion', 0.78);
-  setRange('High sparkle', 0.68);
-  setRange('Beat punch', 0.22);
-  setRange('Fold pressure', 0.26);
-  setRange('Glow', 0.46);
+  setRange('Audio speed / drive', 0.10);
+  setRange('Response', 0.26);
+  setRange('Bass impact', 0.18);
+  setRange('Mids motion', 0.38);
+  setRange('High sparkle', 0.30);
+  setRange('Beat punch', 0.14);
+  setRange('Fold pressure', 0.16);
+  setRange('Glow', 0.26);
 
   window.dispatchEvent(new CustomEvent('infinitylens369:visual-cleanup-applied', {
-    detail: { scene: 'Circuit Cathedral', identity: 'retuned' },
+    detail: { scene: 'Circuit Cathedral', identity: 'darker-architectural-retune' },
   }));
 };
 
