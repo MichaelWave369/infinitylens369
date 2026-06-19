@@ -7,6 +7,17 @@ type FractalCanvasProps = {
   onCameraChange: (camera: CameraState) => void;
 };
 
+const SAFE_MAX_ZOOM = 95000;
+const SAFE_MIN_ZOOM = 0.25;
+
+const mandelbrotFlightAnchors = [
+  { centerX: -0.743643887037151, centerY: 0.13182590420533, zoom: 1.1 },
+  { centerX: -0.74529, centerY: 0.113075, zoom: 1.2 },
+  { centerX: -0.761574, centerY: -0.0847596, zoom: 1.15 },
+  { centerX: -0.10109636384562, centerY: 0.95628651080914, zoom: 1.05 },
+  { centerX: -1.25066, centerY: 0.02012, zoom: 1.1 },
+];
+
 const vertexShaderSource = `#version 300 es
 in vec2 aPosition;
 out vec2 vUv;
@@ -37,7 +48,7 @@ uniform float uGlow;
 uniform float uPalette;
 uniform float uMode;
 
-const int MAX_ITER = 220;
+const int MAX_ITER = 300;
 
 vec3 paletteVioletGold(float t) {
   vec3 a = vec3(0.08, 0.03, 0.16);
@@ -77,7 +88,6 @@ vec3 pickPalette(float t) {
 float mandelbrot(vec2 p) {
   vec2 z = vec2(0.0);
   vec2 c = p;
-  float iter = 0.0;
 
   for (int i = 0; i < MAX_ITER; i += 1) {
     float x = z.x * z.x - z.y * z.y + c.x;
@@ -85,13 +95,12 @@ float mandelbrot(vec2 p) {
     z = vec2(x, y);
 
     if (dot(z, z) > 4.0) {
-      float smoothIter = float(i) + 1.0 - log2(log(length(z)));
-      iter = smoothIter / float(MAX_ITER);
-      break;
+      float smoothIter = float(i) + 1.0 - log2(max(log(length(z)), 0.0001));
+      return clamp(smoothIter / float(MAX_ITER), 0.0, 1.0);
     }
   }
 
-  return iter;
+  return 0.0;
 }
 
 float julia(vec2 z) {
@@ -99,7 +108,6 @@ float julia(vec2 z) {
     -0.77 + 0.07 * sin(uTime * 0.13 + uMid * 2.0),
     0.156 + 0.05 * cos(uTime * 0.17 + uHigh * 3.0)
   );
-  float iter = 0.0;
 
   for (int i = 0; i < MAX_ITER; i += 1) {
     float x = z.x * z.x - z.y * z.y + c.x;
@@ -107,13 +115,12 @@ float julia(vec2 z) {
     z = vec2(x, y);
 
     if (dot(z, z) > 4.0) {
-      float smoothIter = float(i) + 1.0 - log2(log(length(z)));
-      iter = smoothIter / float(MAX_ITER);
-      break;
+      float smoothIter = float(i) + 1.0 - log2(max(log(length(z)), 0.0001));
+      return clamp(smoothIter / float(MAX_ITER), 0.0, 1.0);
     }
   }
 
-  return iter;
+  return 0.0;
 }
 
 float ring(vec2 p, float radius, float width) {
@@ -125,7 +132,7 @@ void main() {
   float aspect = uResolution.x / max(uResolution.y, 1.0);
   uv.x *= aspect;
 
-  float audioWarp = uBass * 0.055 + uBeat * 0.025;
+  float audioWarp = uBass * 0.035 + uBeat * 0.018;
   float angle = uRotation + audioWarp * sin(uTime * 0.8 + length(uv) * 3.0);
   mat2 rot = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
   vec2 p = rot * uv;
@@ -134,8 +141,11 @@ void main() {
   vec2 field = uCenter + p * scale;
 
   float escaped = uMode < 0.5 ? mandelbrot(field) : julia(field);
-  float edge = pow(escaped, 0.72);
-  vec3 color = pickPalette(edge + uHigh * 0.04);
+  float edge = escaped <= 0.0 ? 0.0 : pow(escaped, 0.70);
+  vec3 color = escaped <= 0.0 ? vec3(0.012, 0.016, 0.030) : pickPalette(edge + uHigh * 0.035);
+
+  float boundarySpark = smoothstep(0.015, 0.18, escaped) * (1.0 - smoothstep(0.58, 0.95, escaped));
+  color += pickPalette(fract(edge + 0.24 + uTime * 0.015)) * boundarySpark * (0.08 + uGlow * 0.16);
 
   float orbitGlow = ring(p, 0.24 + uBass * 0.08, 0.006 + uRms * 0.02);
   float centerGlow = exp(-length(p) * (3.2 - uMid));
@@ -144,7 +154,7 @@ void main() {
 
   float vignette = smoothstep(1.35, 0.22, length(uv));
   color = color * (0.38 + 0.92 * vignette) + glow;
-  color += vec3(uBeat * 0.10, uBeat * 0.06, uBeat * 0.16);
+  color += vec3(uBeat * 0.08, uBeat * 0.045, uBeat * 0.13);
 
   outColor = vec4(color, 1.0);
 }
@@ -218,12 +228,13 @@ export function FractalCanvas({ features, settings, onCameraChange }: FractalCan
   const featuresRef = useRef(features);
   const settingsRef = useRef(settings);
   const cameraRef = useRef<CameraState>({
-    centerX: -0.743643887037151,
-    centerY: 0.13182590420533,
-    zoom: 1,
+    centerX: mandelbrotFlightAnchors[0].centerX,
+    centerY: mandelbrotFlightAnchors[0].centerY,
+    zoom: mandelbrotFlightAnchors[0].zoom,
     rotation: 0,
   });
   const draggingRef = useRef<{ x: number; y: number } | null>(null);
+  const anchorIndexRef = useRef(0);
 
   useEffect(() => {
     featuresRef.current = features;
@@ -289,9 +300,22 @@ export function FractalCanvas({ features, settings, onCameraChange }: FractalCan
       const currentSettings = settingsRef.current;
       const camera = cameraRef.current;
       const audioPower = currentSettings.audioReactive ? currentFeatures.bass : 0;
+      const beatPower = currentSettings.audioReactive ? currentFeatures.beat : 0;
 
-      camera.zoom *= 1 + dt * currentSettings.zoomSpeed * (0.14 + audioPower * 1.1 + currentFeatures.beat * 0.45);
-      camera.zoom = Math.min(camera.zoom, 1.0e9);
+      const zoomPressure = 0.045 + audioPower * 0.24 + beatPower * 0.12;
+      camera.zoom *= 1 + dt * currentSettings.zoomSpeed * zoomPressure;
+
+      if (currentSettings.mode === 'mandelbrot' && camera.zoom > SAFE_MAX_ZOOM) {
+        anchorIndexRef.current = (anchorIndexRef.current + 1) % mandelbrotFlightAnchors.length;
+        const nextAnchor = mandelbrotFlightAnchors[anchorIndexRef.current];
+        camera.centerX = nextAnchor.centerX;
+        camera.centerY = nextAnchor.centerY;
+        camera.zoom = nextAnchor.zoom;
+        camera.rotation += 0.369;
+      } else {
+        camera.zoom = Math.min(camera.zoom, SAFE_MAX_ZOOM);
+      }
+
       camera.rotation += dt * (0.012 + currentFeatures.mid * 0.05);
 
       gl.useProgram(program);
@@ -335,7 +359,10 @@ export function FractalCanvas({ features, settings, onCameraChange }: FractalCan
   const handleWheel = (event: WheelEvent<HTMLCanvasElement>) => {
     event.preventDefault();
     const direction = event.deltaY > 0 ? 0.92 : 1.12;
-    cameraRef.current.zoom = Math.max(0.25, Math.min(1.0e9, cameraRef.current.zoom * direction));
+    cameraRef.current.zoom = Math.max(
+      SAFE_MIN_ZOOM,
+      Math.min(SAFE_MAX_ZOOM, cameraRef.current.zoom * direction),
+    );
   };
 
   const handlePointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
