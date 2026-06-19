@@ -2,9 +2,23 @@
 
 **Drop a song. Open a portal.**
 
-InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, Layer Console overlay scenes, Launch Console onboarding helpers, Gallery Console scene discovery, and replayable visual-address receipts.
+InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, Layer Console overlay scenes, Launch Console onboarding helpers, Gallery Console scene discovery, Roadmap Console feedback/runway tools, and replayable visual-address receipts.
 
 This project is intentionally claim-safe: it is an art, math, and software visualization tool. It is **not** a physics proof, consciousness proof, medical tool, or scientific claim engine.
+
+## v1.13 Roadmap Console release
+
+v1.13 adds a boot-safe **Roadmap Console** sidecar for public feedback and v2.0 runway visibility. It loads after the core React/WebGL app and existing studios, then gives testers a clean way to understand progress, copy structured feedback, and open the issue tracker.
+
+Roadmap Console features:
+
+- v2 runway status cards for the stable core, creator studios, feedback loop, and launch runway
+- Copy Feedback Note for testers who want to report what they tried, loved, or found confusing
+- Copy v2 Runway for sharing the current public release stack
+- Open Issue Tracker for bugs, visual ideas, and public feedback receipts
+- Release Stack note showing the build path from the core visualizer to the current roadmap layer
+- Boot-safe loading after the visualizer is already mounted
+- Version sync for Roadmap Console labels
 
 ## v1.12 Gallery Console release
 
