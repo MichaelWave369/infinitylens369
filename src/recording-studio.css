@@ -1,0 +1,86 @@
+.recording-studio {
+  border-color: rgba(255, 156, 77, 0.34);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255, 156, 77, 0.14), transparent 36%),
+    rgba(10, 8, 24, 0.82);
+}
+
+.recording-studio__header {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+.recording-studio__header h2 {
+  margin: 0.1rem 0 0;
+}
+
+.recording-studio__header span {
+  border: 1px solid rgba(255, 210, 148, 0.32);
+  border-radius: 999px;
+  color: rgba(255, 224, 184, 0.88);
+  font-size: 0.68rem;
+  padding: 0.25rem 0.45rem;
+  white-space: nowrap;
+}
+
+.recording-studio__hint,
+.recording-latest,
+.recording-status {
+  color: rgba(238, 232, 255, 0.74);
+  font-size: 0.72rem;
+  line-height: 1.35;
+  margin: 0.45rem 0 0;
+}
+
+.recording-studio__actions {
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 0.7rem;
+}
+
+.recording-studio__actions button {
+  background: rgba(255, 156, 77, 0.1);
+  border: 1px solid rgba(255, 156, 77, 0.34);
+  min-height: 2.2rem;
+}
+
+.recording-studio__actions button:hover:not(:disabled) {
+  border-color: rgba(255, 224, 184, 0.78);
+  box-shadow: 0 0 20px rgba(255, 156, 77, 0.16);
+}
+
+.recording-studio__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.recording-studio--recording {
+  border-color: rgba(255, 90, 90, 0.58);
+  box-shadow: 0 0 26px rgba(255, 80, 80, 0.14);
+}
+
+.recording-studio--recording .recording-status::before {
+  animation: recordingPulse 1s infinite ease-in-out;
+  background: #ff6b6b;
+  border-radius: 999px;
+  box-shadow: 0 0 12px rgba(255, 80, 80, 0.85);
+  content: '';
+  display: inline-block;
+  height: 0.55rem;
+  margin-right: 0.4rem;
+  width: 0.55rem;
+}
+
+@keyframes recordingPulse {
+  0%, 100% { opacity: 0.45; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+@media (max-width: 860px) {
+  .recording-studio__actions {
+    grid-template-columns: 1fr;
+  }
+}
