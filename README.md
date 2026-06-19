@@ -2,9 +2,24 @@
 
 **Drop a song. Open a portal.**
 
-InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, Layer Console overlay scenes, Launch Console onboarding helpers, and replayable visual-address receipts.
+InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, Layer Console overlay scenes, Launch Console onboarding helpers, Gallery Console scene discovery, and replayable visual-address receipts.
 
 This project is intentionally claim-safe: it is an art, math, and software visualization tool. It is **not** a physics proof, consciousness proof, medical tool, or scientific claim engine.
+
+## v1.12 Gallery Console release
+
+v1.12 adds a boot-safe **Gallery Console** sidecar for public scene discovery. It loads after the core React/WebGL app and existing studios, then gives visitors curated one-click entry points into the best starting experiences.
+
+Gallery Console features:
+
+- Liquid Light entry path for soft aurora and dream-pool lanes
+- Machine Cathedral entry path for cyber-temple and vector-shrine lanes
+- Deep Portal entry path for black-hole/fractal depth exploration
+- Performance Ready entry path for safe/cinematic staging
+- Copy Gallery Note for sharing the public page with a short starter guide
+- v2 runway status note for public-facing progress
+- Boot-safe loading after the visualizer is already mounted
+- Version sync for Gallery Console labels
 
 ## v1.11 Launch Console release
 
@@ -78,33 +93,3 @@ Recording Studio features:
 - Drag/drop `.mp3`, `.wav`, `.ogg`, `.oga`, `.m4a`, `.aac`, `.flac`, or `.webm` audio files
 - Local-first playback: your audio stays in your browser
 - Web Audio analysis for bass, mids, highs, waveform energy, and beat pulses
-- Audio Engine v2 signal shaping before the shader engine
-- GPU visual engine using WebGL2
-- Eight visual shader modes:
-  - Black Hole Lens
-  - Cosmic Drift
-  - Pixel Melt
-  - Kaleido Trip
-  - Tunnel Bloom
-  - Acid Melt
-  - Mandelbrot
-  - Julia Mirror
-- Liquid Light Pack presets built from stable shader routes
-- Machine Cathedral Pack presets built from stable shader routes
-- Preset Studio for local save/load/import/export of trip recipes
-- Capture Studio for local frame gallery and capture manifests
-- Recording Studio for local canvas-only WebM clips and recording manifests
-- Performance Console for live shortcut overlays and fast stage controls
-- Layer Console for one-click overlay scene stacks
-- Launch Console for first-run guide, demo journey, share link, and shortcut help
-- Trip presets and random trip generation
-- Transition Engine for smoother mode/preset bridges
-- Safe Mode and Reset Visuals for public demos
-- Auto Trip mode for cycling presets during playback
-- Audio speed / drive plus per-band impact controls
-- Motion profiles: Dream, Cruise, Live, and Warp
-- Cinematic view and browser fullscreen control
-- Keyboard performance shortcuts
-- Phi spiral, 3-6-9 grid, and equation/signal overlays
-- Replayable visual-address receipts
-- PNG screenshot export
