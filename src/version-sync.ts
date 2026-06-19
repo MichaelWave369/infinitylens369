@@ -1,9 +1,49 @@
-const RELEASE_VERSION = 'v1.9.0';
+const RELEASE_VERSION = 'v1.9.1';
 
 let scheduledSync: number | undefined;
+let safetyPasses = 0;
 
 const updateText = (element: HTMLElement, next: string) => {
   if (element.textContent !== next) element.textContent = next;
+};
+
+const patchTextNode = (node: Text) => {
+  const current = node.nodeValue ?? '';
+  let next = current;
+
+  next = next.replace(/InfinityLens369\s+v\d+\.\d+\.\d+/gi, `InfinityLens369 ${RELEASE_VERSION}`);
+  next = next.replace(/Capture Studio\s+v\d+\.\d+\.\d+/gi, `Capture Studio ${RELEASE_VERSION}`);
+  next = next.replace(/Recording Studio\s+v\d+\.\d+\.\d+/gi, `Recording Studio ${RELEASE_VERSION}`);
+  next = next.replace(/Performance Console\s+v\d+\.\d+\.\d+/gi, `Performance Console ${RELEASE_VERSION}`);
+
+  if (/v1\.5 Machine Cathedral Pack is live/i.test(next)) {
+    next = 'v1.9 Performance Console is live: press ? for shortcuts, use the docked panels for capture/recording, and keep the visualizer local-first.';
+  }
+
+  if (/stable v1\.5 default scene/i.test(next)) {
+    next = next.replace(/stable v1\.5 default scene/gi, 'stable v1.9 default scene');
+  }
+
+  if (next !== current) node.nodeValue = next;
+};
+
+const scanVisibleText = () => {
+  if (!document.body) return;
+
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      const value = node.nodeValue ?? '';
+      return /InfinityLens369\s+v\d+\.\d+\.\d+|Capture Studio\s+v\d+\.\d+\.\d+|Recording Studio\s+v\d+\.\d+\.\d+|Performance Console\s+v\d+\.\d+\.\d+|v1\.5 Machine Cathedral Pack|stable v1\.5 default scene/i.test(value)
+        ? NodeFilter.FILTER_ACCEPT
+        : NodeFilter.FILTER_SKIP;
+    },
+  });
+
+  let node = walker.nextNode();
+  while (node) {
+    patchTextNode(node as Text);
+    node = walker.nextNode();
+  }
 };
 
 const syncVersionLabels = () => {
@@ -32,6 +72,8 @@ const syncVersionLabels = () => {
       updateText(label, `Performance Console ${RELEASE_VERSION}`);
     }
   });
+
+  scanVisibleText();
 };
 
 const queueSync = () => {
@@ -44,6 +86,13 @@ const queueSync = () => {
 };
 
 syncVersionLabels();
+
+const safetySync = window.setInterval(() => {
+  syncVersionLabels();
+  safetyPasses += 1;
+
+  if (safetyPasses >= 20) window.clearInterval(safetySync);
+}, 250);
 
 const root = document.getElementById('root');
 
