@@ -1,0 +1,3 @@
+import './performance-console';
+
+export {};
