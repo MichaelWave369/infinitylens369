@@ -57,7 +57,7 @@ uniform float uGlow;
 uniform float uPalette;
 uniform float uMode;
 
-const int MAX_ITER = 300;
+const int MAX_ITER = 240;
 const float TAU = 6.28318530718;
 
 vec3 hsv2rgb(vec3 c) {
@@ -138,12 +138,9 @@ vec3 pickPalette(float t) {
 
 float mandelbrot(vec2 p) {
   vec2 z = vec2(0.0);
-  vec2 c = p;
 
   for (int i = 0; i < MAX_ITER; i += 1) {
-    float x = z.x * z.x - z.y * z.y + c.x;
-    float y = 2.0 * z.x * z.y + c.y;
-    z = vec2(x, y);
+    z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + p;
 
     if (dot(z, z) > 4.0) {
       float smoothIter = float(i) + 1.0 - log2(max(log(length(z)), 0.0001));
@@ -161,9 +158,7 @@ float julia(vec2 z) {
   );
 
   for (int i = 0; i < MAX_ITER; i += 1) {
-    float x = z.x * z.x - z.y * z.y + c.x;
-    float y = 2.0 * z.x * z.y + c.y;
-    z = vec2(x, y);
+    z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c;
 
     if (dot(z, z) > 4.0) {
       float smoothIter = float(i) + 1.0 - log2(max(log(length(z)), 0.0001));
@@ -191,11 +186,11 @@ vec3 renderFractal(vec2 uv, vec2 p) {
 
   float orbitGlow = ring(p, 0.24 + uBass * 0.08, 0.006 + uRms * 0.02);
   float centerGlow = exp(-length(p) * (3.2 - uMid));
-  vec3 glow = vec3(1.0, 0.76, 0.38) * orbitGlow * (0.2 + uGlow * 0.9);
-  glow += vec3(0.32, 0.64, 1.0) * centerGlow * (0.08 + uRms * 0.18);
+  color += vec3(1.0, 0.76, 0.38) * orbitGlow * (0.2 + uGlow * 0.9);
+  color += vec3(0.32, 0.64, 1.0) * centerGlow * (0.08 + uRms * 0.18);
 
   float vignette = smoothstep(1.35, 0.22, length(uv));
-  color = color * (0.38 + 0.92 * vignette) + glow;
+  color = color * (0.38 + 0.92 * vignette);
   color += vec3(uBeat * 0.08, uBeat * 0.045, uBeat * 0.13);
 
   return color;
@@ -221,9 +216,7 @@ vec3 renderAcidMelt(vec2 uv) {
   vec2 p = uv * 2.0 - 1.0;
   p.x *= aspect;
   p *= 1.85;
-
-  float breath = 1.0 + 0.08 * sin(t * 2.5 + uBass * 8.0 + uBeat * 4.0);
-  p *= breath;
+  p *= 1.0 + 0.08 * sin(t * 2.5 + uBass * 8.0 + uBeat * 4.0);
 
   float spin = uRotation * 0.4 + sin(t * 0.25) * 0.35 + uMid * 0.25;
   mat2 rot = mat2(cos(spin), -sin(spin), sin(spin), cos(spin));
@@ -231,7 +224,6 @@ vec3 renderAcidMelt(vec2 uv) {
 
   float r = length(p);
   float a = atan(p.y, p.x);
-
   float tunnel = sin(14.0 / max(r + 0.16, 0.05) - t * 5.0 + uBass * 8.0);
   float rings = sin(r * (9.0 + uBass * 8.0) - t * 4.4 - uBeat * 5.0);
   float swirl = sin(a * (7.0 + uMid * 5.0) + r * 6.0 - t * 3.2 + uMid * 4.0);
@@ -243,25 +235,12 @@ vec3 renderAcidMelt(vec2 uv) {
   float hotEdge = smoothstep(0.42, 1.0, coreGlow) + 0.45 * smoothstep(0.55, 1.0, secondPlasma);
 
   float hue = fract(0.54 + plasma * 0.22 + secondPlasma * 0.09 + swirl * 0.08 + tunnel * 0.035 + t * 0.035 + uHigh * 0.22);
-  float sat = 0.74 + 0.24 * pulse;
-  float val = 0.10 + 0.68 * coreGlow + 0.30 * plasma + 0.20 * hotEdge;
-
-  vec3 color = hsv2rgb(vec3(hue, sat, val));
+  vec3 color = hsv2rgb(vec3(hue, 0.74 + 0.24 * pulse, 0.10 + 0.68 * coreGlow + 0.30 * plasma + 0.20 * hotEdge));
   color += 0.25 * hsv2rgb(vec3(fract(hue + 0.18), 0.95, coreGlow));
   color += 0.14 * hsv2rgb(vec3(fract(hue + 0.50), 0.82, pulse));
-
-  vec2 shimmerOffset = vec2(sin(t * 1.7), cos(t * 1.3)) * (0.004 + uHigh * 0.006 + uBeat * 0.006);
-  float redShift = fbm((p + shimmerOffset) * 3.4 + t * 0.18);
-  float blueShift = fbm((p - shimmerOffset) * 3.4 - t * 0.18);
-  color.r += redShift * 0.08 * (0.4 + uHigh);
-  color.b += blueShift * 0.10 * (0.4 + uHigh);
-
-  float centerPull = exp(-r * (1.8 + uBass));
-  color += centerPull * vec3(0.24, 0.12, 0.44) * (0.35 + uGlow);
+  color += exp(-r * (1.8 + uBass)) * vec3(0.24, 0.12, 0.44) * (0.35 + uGlow);
   color += vec3(uBeat * 0.11, uBeat * 0.035, uBeat * 0.16);
-
-  float vignette = smoothstep(1.85, 0.16, length(uv * 2.0 - 1.0));
-  color *= 0.42 + 0.94 * vignette;
+  color *= 0.42 + 0.94 * smoothstep(1.85, 0.16, length(uv * 2.0 - 1.0));
   color *= 1.0 + uGlow * 0.78;
 
   return color;
@@ -270,31 +249,24 @@ vec3 renderAcidMelt(vec2 uv) {
 vec3 renderTunnelBloom(vec2 uv) {
   float aspect = uResolution.x / max(uResolution.y, 1.0);
   float t = uTime * (0.52 + uRms * 0.35);
-
   vec2 p = uv * 2.0 - 1.0;
   p.x *= aspect;
-
-  float bassBreath = 1.0 + 0.16 * sin(t * 1.75 + uBass * 7.0 + uBeat * 5.0);
-  p *= bassBreath;
+  p *= 1.0 + 0.16 * sin(t * 1.75 + uBass * 7.0 + uBeat * 5.0);
 
   float r = max(length(p), 0.018);
   float a = atan(p.y, p.x);
   float pull = 1.0 / r;
-
-  float spin = uRotation * 0.72 + t * (0.18 + uMid * 0.32) + pull * 0.035;
-  a += spin + 0.16 * sin(pull * 0.9 + t * 2.2 + uBass * 4.0);
+  a += uRotation * 0.72 + t * (0.18 + uMid * 0.32) + pull * 0.035;
+  a += 0.16 * sin(pull * 0.9 + t * 2.2 + uBass * 4.0);
 
   vec2 tunnelUv = vec2(a / TAU + 0.5, pull * (0.24 + uRms * 0.09) - t * (0.42 + uBass * 0.36));
   float tubeNoise = fbm(vec2(tunnelUv.x * 5.0, tunnelUv.y * 1.25));
   float fineNoise = fbm(vec2(tunnelUv.x * 18.0 + t * 0.12, tunnelUv.y * 2.8 - t * 0.20));
-
   float lanes = abs(sin((a * (6.0 + floor(uMid * 5.0)) + pull * 0.50 - t * 3.2)));
   float ringFlow = sin(pull * (1.6 + uBass * 0.9) - t * (7.0 + uBass * 5.0) + tubeNoise * 3.2);
   float ringMask = smoothstep(0.22, 0.94, 1.0 - abs(ringFlow));
   float laneMask = smoothstep(0.52, 0.96, lanes);
-
   float centerStar = exp(-r * (3.2 - uBass * 0.8));
-  float horizon = smoothstep(1.22, 0.10, r);
   float bloom = ringMask * (0.36 + laneMask * 0.52) + centerStar * (0.65 + uBeat * 1.25);
   bloom += smoothstep(0.72, 1.0, fineNoise) * 0.20 * (0.3 + uHigh);
 
@@ -302,9 +274,7 @@ vec3 renderTunnelBloom(vec2 uv) {
   vec3 color = hsv2rgb(vec3(hue, 0.72 + 0.25 * laneMask, 0.12 + bloom * 0.88));
   color += pickPalette(fract(hue + 0.24 + ringMask * 0.12)) * bloom * (0.38 + uGlow * 0.72);
   color += vec3(0.22, 0.10, 0.52) * centerStar * (0.55 + uBass + uBeat);
-
-  float radialFade = smoothstep(1.65, 0.20, r);
-  color *= 0.34 + 1.04 * radialFade * horizon;
+  color *= 0.34 + 1.04 * smoothstep(1.65, 0.20, r) * smoothstep(1.22, 0.10, r);
   color += vec3(uBeat * 0.10, uBeat * 0.045, uBeat * 0.18);
   color *= 1.0 + uGlow * 0.92;
 
@@ -314,12 +284,9 @@ vec3 renderTunnelBloom(vec2 uv) {
 vec3 renderKaleidoTrip(vec2 uv) {
   float aspect = uResolution.x / max(uResolution.y, 1.0);
   float t = uTime * (0.46 + uRms * 0.38);
-
   vec2 p = uv * 2.0 - 1.0;
   p.x *= aspect;
-
-  float zoomBreath = 1.0 + 0.10 * sin(t * 1.6 + uBass * 7.0 + uBeat * 5.0);
-  p *= zoomBreath;
+  p *= 1.0 + 0.10 * sin(t * 1.6 + uBass * 7.0 + uBeat * 5.0);
 
   float spin = uRotation * 0.62 + t * (0.10 + uMid * 0.22) + sin(t * 0.23) * 0.28;
   mat2 rot = mat2(cos(spin), -sin(spin), sin(spin), cos(spin));
@@ -327,24 +294,19 @@ vec3 renderKaleidoTrip(vec2 uv) {
 
   float r = max(length(p), 0.0001);
   float a = atan(p.y, p.x);
-
   float folds = 6.0 + floor(uMid * 6.0) + floor(uBeat * 3.0);
   float sector = TAU / folds;
   a += 0.38 * sin(r * (2.8 + uBass * 3.0) - t * 1.7) + uBass * 0.22;
-
   float foldedAngle = abs(mod(a + sector * 0.5, sector) - sector * 0.5);
   vec2 q = vec2(cos(foldedAngle), sin(foldedAngle)) * r;
   q += 0.14 * vec2(sin(q.y * 5.0 + t * 1.8 + uBass * 3.0), cos(q.x * 5.0 - t * 1.5 + uHigh * 3.0));
 
   float plasma = fbm(q * (3.0 + uHigh * 2.1) + vec2(t * 0.38, -t * 0.31));
   float crystalNoise = fbm(q * 7.0 - vec2(t * 0.16, t * 0.22));
-  float spokeRaw = sin(foldedAngle * folds * 2.0 + r * (12.0 + uBass * 8.0) - t * 4.2 + plasma * 3.0);
-  float ringRaw = sin(r * (18.0 + uBass * 12.0) - t * (4.5 + uBeat * 5.0) + crystalNoise * 2.0);
-  float spokes = pow(1.0 - abs(spokeRaw), 5.0);
-  float rings = pow(1.0 - abs(ringRaw), 4.0);
+  float spokes = pow(1.0 - abs(sin(foldedAngle * folds * 2.0 + r * (12.0 + uBass * 8.0) - t * 4.2 + plasma * 3.0)), 5.0);
+  float rings = pow(1.0 - abs(sin(r * (18.0 + uBass * 12.0) - t * (4.5 + uBeat * 5.0) + crystalNoise * 2.0)), 4.0);
   float cells = smoothstep(0.42, 1.0, crystalNoise);
   float centerStar = exp(-r * (2.0 - uBass * 0.35));
-
   float mandala = spokes * 0.72 + rings * 0.56 + cells * 0.24 + centerStar * (0.42 + uBeat * 0.65);
   float pulse = 0.5 + 0.5 * sin(t * 4.2 + r * 9.0 + uBass * 8.0);
   float hue = fract(0.74 + foldedAngle * folds * 0.08 + r * 0.10 + plasma * 0.22 + t * 0.026 + uHigh * 0.18);
@@ -353,9 +315,7 @@ vec3 renderKaleidoTrip(vec2 uv) {
   color += pickPalette(fract(hue + 0.18 + rings * 0.14)) * mandala * (0.28 + uGlow * 0.78);
   color += hsv2rgb(vec3(fract(hue + 0.42), 0.82, spokes * 0.24 + uBeat * 0.12));
   color += vec3(0.36, 0.10, 0.52) * centerStar * (0.26 + uGlow + uBass);
-
-  float vignette = smoothstep(1.75, 0.18, length(uv * 2.0 - 1.0));
-  color *= 0.38 + 1.00 * vignette;
+  color *= 0.38 + smoothstep(1.75, 0.18, length(uv * 2.0 - 1.0));
   color += vec3(uBeat * 0.12, uBeat * 0.05, uBeat * 0.18);
   color *= 1.0 + uGlow * 0.86;
 
@@ -365,11 +325,9 @@ vec3 renderKaleidoTrip(vec2 uv) {
 vec3 renderPixelMelt(vec2 uv) {
   float aspect = uResolution.x / max(uResolution.y, 1.0);
   float t = uTime * (0.38 + uRms * 0.55);
-
   float grid = mix(148.0, 36.0, clamp(uBass * 0.95 + uBeat * 0.55, 0.0, 1.0));
   vec2 gridSize = vec2(grid * aspect, grid);
   vec2 pixUv = (floor(uv * gridSize) + 0.5) / gridSize;
-
   vec2 p = pixUv * 2.0 - 1.0;
   p.x *= aspect;
 
@@ -379,31 +337,76 @@ vec3 renderPixelMelt(vec2 uv) {
 
   float r = length(p);
   float a = atan(p.y, p.x);
-
   float cell = fbm(floor((p + 3.0) * (7.0 + uBass * 10.0)) * 0.37 + vec2(t * 0.15, -t * 0.11));
   float bands = sin((p.y + cell * 0.38) * (22.0 + uMid * 18.0) - t * (3.0 + uBass * 5.0));
   float arcs = sin(a * (5.0 + floor(uMid * 7.0)) + 9.0 / max(r + 0.22, 0.08) - t * 3.8);
   float blocks = smoothstep(0.44, 1.0, cell) * 0.55 + pow(1.0 - abs(bands), 4.0) * 0.46 + pow(1.0 - abs(arcs), 4.0) * 0.56;
-
   float checker = step(0.5, fract((floor(uv.x * gridSize.x) + floor(uv.y * gridSize.y)) * 0.5));
   float dither = hash21(floor(uv * uResolution.xy * 0.45));
   float scanline = 0.86 + 0.14 * sin(uv.y * uResolution.y * 3.14159);
   float tear = smoothstep(0.92, 1.0, fbm(vec2(floor(uv.y * 72.0) * 0.08, t * 0.7))) * (0.08 + uBeat * 0.12);
-
   float hue = fract(0.08 + cell * 0.32 + bands * 0.05 + arcs * 0.07 + t * 0.045 + uHigh * 0.28 + checker * 0.03);
-  float value = 0.09 + blocks * 0.90 + dither * 0.06;
-  vec3 color = hsv2rgb(vec3(hue, 0.78 + 0.20 * uRms, value));
 
+  vec3 color = hsv2rgb(vec3(hue, 0.78 + 0.20 * uRms, 0.09 + blocks * 0.90 + dither * 0.06));
   color += pickPalette(fract(hue + 0.18 + cell * 0.20)) * blocks * (0.24 + uGlow * 0.64);
-  color.r += tear * 0.85;
-  color.g += tear * 0.28;
-  color.b += uHigh * smoothstep(0.62, 1.0, dither) * 0.12;
+  color += vec3(tear * 0.85, tear * 0.28, uHigh * smoothstep(0.62, 1.0, dither) * 0.12);
   color *= scanline;
-
-  float vignette = smoothstep(1.75, 0.16, length(uv * 2.0 - 1.0));
-  color *= 0.42 + 0.98 * vignette;
+  color *= 0.42 + 0.98 * smoothstep(1.75, 0.16, length(uv * 2.0 - 1.0));
   color += vec3(uBeat * 0.18, uBeat * 0.07, uBeat * 0.20);
   color *= 1.0 + uGlow * 0.62;
+
+  return color;
+}
+
+vec3 renderCosmicDrift(vec2 uv) {
+  float aspect = uResolution.x / max(uResolution.y, 1.0);
+  float t = uTime * (0.32 + uRms * 0.50);
+  vec2 p = uv * 2.0 - 1.0;
+  p.x *= aspect;
+
+  float drift = uRotation * 0.33 + t * (0.10 + uMid * 0.24);
+  mat2 rot = mat2(cos(drift), -sin(drift), sin(drift), cos(drift));
+  p = rot * p;
+
+  float r = max(length(p), 0.02);
+  float a = atan(p.y, p.x);
+  float pull = 1.0 / (r + 0.08);
+  vec2 warp = vec2(
+    fbm(p * 1.6 + vec2(t * 0.26, -t * 0.18)),
+    fbm(p * 1.6 + vec2(-t * 0.20, t * 0.24))
+  ) - 0.5;
+  vec2 q = p + warp * (0.45 + uMid * 0.75 + uBeat * 0.25);
+
+  float nebulaA = fbm(q * (1.45 + uBass * 1.2) + vec2(t * 0.26, -t * 0.18));
+  float nebulaB = fbm(q * 3.2 - vec2(t * 0.18, t * 0.29));
+  float river = sin(a * (3.0 + floor(uMid * 6.0)) + pull * (1.3 + uBass * 1.1) - t * (2.2 + uBass * 2.4) + nebulaA * 4.0);
+  float lane = pow(1.0 - abs(river), 4.5);
+  float horizon = exp(-r * (1.15 - uBass * 0.18));
+  float core = exp(-r * (5.8 - uBass * 1.6)) * (0.8 + uBeat * 1.6);
+
+  float stars = 0.0;
+  float streaks = 0.0;
+  for (int i = 0; i < 4; i += 1) {
+    float fi = float(i);
+    vec2 starP = q * (24.0 + fi * 22.0) + vec2(t * (1.5 + fi * 0.35), -t * (1.0 + fi * 0.28));
+    vec2 cell = floor(starP);
+    vec2 local = fract(starP) - 0.5;
+    float seed = hash21(cell + fi * 19.7);
+    float star = smoothstep(0.984, 1.0, seed) * exp(-dot(local, local) * (42.0 - uHigh * 16.0));
+    float ray = pow(max(0.0, 1.0 - abs(sin(atan(local.y, local.x) * 4.0 + t * 2.0))), 8.0);
+    stars += star * (0.32 + fi * 0.10 + uHigh * 0.45 + uBeat * 0.35);
+    streaks += star * ray * (0.35 + uBass * 0.55);
+  }
+
+  float hue = fract(0.60 + nebulaA * 0.18 + nebulaB * 0.10 + lane * 0.08 + t * 0.018 + uHigh * 0.18);
+  vec3 color = hsv2rgb(vec3(hue, 0.62 + 0.28 * nebulaB, 0.06 + nebulaA * 0.32 + lane * 0.46 + horizon * 0.14));
+  color += pickPalette(fract(hue + 0.24 + nebulaB * 0.15)) * (lane * 0.32 + nebulaB * 0.18) * (0.45 + uGlow * 0.80);
+  color += vec3(0.55, 0.75, 1.0) * stars;
+  color += vec3(1.0, 0.72, 0.38) * streaks;
+  color += vec3(0.45, 0.20, 0.95) * core * (0.8 + uGlow);
+  color += vec3(uBeat * 0.10, uBeat * 0.06, uBeat * 0.22);
+  color *= 0.46 + 0.92 * smoothstep(1.85, 0.12, length(uv * 2.0 - 1.0));
+  color *= 1.0 + uGlow * 0.72;
 
   return color;
 }
@@ -428,8 +431,10 @@ void main() {
     color = renderTunnelBloom(uv);
   } else if (uMode < 4.5) {
     color = renderKaleidoTrip(uv);
-  } else {
+  } else if (uMode < 5.5) {
     color = renderPixelMelt(uv);
+  } else {
+    color = renderCosmicDrift(uv);
   }
 
   outColor = vec4(color, 1.0);
@@ -462,6 +467,8 @@ const modeIndex = (mode: VisualSettings['mode']) => {
       return 4;
     case 'pixel-melt':
       return 5;
+    case 'cosmic-drift':
+      return 6;
     case 'mandelbrot':
     default:
       return 0;
@@ -594,13 +601,13 @@ export function FractalCanvas({ features, settings, onCameraChange }: FractalCan
       resizeCanvasToDisplaySize(canvas, gl);
 
       const time = (performance.now() - startedAt) / 1000;
-      const settings = settingsRef.current;
-      const audio = settings.audioReactive ? featuresRef.current : emptyFeatures;
+      const currentSettings = settingsRef.current;
+      const audio = currentSettings.audioReactive ? featuresRef.current : emptyFeatures;
       const camera = cameraRef.current;
-      const explorer = isExplorerMode(settings.mode);
+      const explorer = isExplorerMode(currentSettings.mode);
 
       if (explorer) {
-        const bassPush = 1 + (0.0016 + settings.zoomSpeed * 0.0034) * (0.35 + audio.bass * 0.65 + audio.beat * 0.35);
+        const bassPush = 1 + (0.0016 + currentSettings.zoomSpeed * 0.0034) * (0.35 + audio.bass * 0.65 + audio.beat * 0.35);
         camera.zoom = clamp(camera.zoom * bassPush, SAFE_MIN_ZOOM, SAFE_MAX_ZOOM);
         camera.rotation += 0.0015 + audio.mid * 0.002;
 
@@ -612,9 +619,9 @@ export function FractalCanvas({ features, settings, onCameraChange }: FractalCan
           camera.zoom = next.zoom;
         }
       } else {
-        const pulse = 0.08 * Math.sin(time * (0.72 + settings.zoomSpeed * 0.55) + audio.bass * 5 + audio.beat * 2);
+        const pulse = 0.08 * Math.sin(time * (0.72 + currentSettings.zoomSpeed * 0.55) + audio.bass * 5 + audio.beat * 2);
         camera.zoom = 1 + pulse + audio.rms * 0.07;
-        camera.rotation += 0.003 + settings.zoomSpeed * 0.004 + audio.mid * 0.006 + audio.beat * 0.004;
+        camera.rotation += 0.003 + currentSettings.zoomSpeed * 0.004 + audio.mid * 0.006 + audio.beat * 0.004;
       }
 
       gl.useProgram(program);
@@ -629,9 +636,9 @@ export function FractalCanvas({ features, settings, onCameraChange }: FractalCan
       gl.uniform1f(uniforms.high, audio.high);
       gl.uniform1f(uniforms.beat, audio.beat);
       gl.uniform1f(uniforms.rms, audio.rms);
-      gl.uniform1f(uniforms.glow, settings.glow);
-      gl.uniform1f(uniforms.palette, paletteIndex(settings.palette));
-      gl.uniform1f(uniforms.mode, modeIndex(settings.mode));
+      gl.uniform1f(uniforms.glow, currentSettings.glow);
+      gl.uniform1f(uniforms.palette, paletteIndex(currentSettings.palette));
+      gl.uniform1f(uniforms.mode, modeIndex(currentSettings.mode));
 
       gl.drawArrays(gl.TRIANGLES, 0, 6);
 
@@ -684,9 +691,9 @@ export function FractalCanvas({ features, settings, onCameraChange }: FractalCan
   const handleWheel = (event: WheelEvent<HTMLCanvasElement>) => {
     event.preventDefault();
     const camera = cameraRef.current;
-    const settings = settingsRef.current;
+    const currentSettings = settingsRef.current;
 
-    if (isExplorerMode(settings.mode)) {
+    if (isExplorerMode(currentSettings.mode)) {
       const factor = event.deltaY < 0 ? 1.18 : 0.84;
       camera.zoom = clamp(camera.zoom * factor, SAFE_MIN_ZOOM, SAFE_MAX_ZOOM);
     } else {
