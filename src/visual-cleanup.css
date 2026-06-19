@@ -2,6 +2,7 @@
 .stage-notice {
   display: none !important;
   visibility: hidden !important;
+  opacity: 0 !important;
 }
 
 .stage,
@@ -67,7 +68,7 @@ body[data-infinitylens-scene='circuit-cathedral-retuned'] .stage::before {
     0 0 46px rgba(244, 200, 106, 0.12);
 }
 
-body[data-infinitylens-comfort='reduced-motion'] body[data-infinitylens-scene='circuit-cathedral-retuned'] .stage::before,
-body[data-infinitylens-comfort='reduced-motion'] body[data-infinitylens-scene='circuit-cathedral-retuned'] .stage::after {
+body[data-infinitylens-comfort='reduced-motion'][data-infinitylens-scene='circuit-cathedral-retuned'] .stage::before,
+body[data-infinitylens-comfort='reduced-motion'][data-infinitylens-scene='circuit-cathedral-retuned'] .stage::after {
   animation: none !important;
 }
