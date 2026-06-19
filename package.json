@@ -1,0 +1,21 @@
+{
+  "name": "infinitylens369",
+  "private": false,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Drop a song. Open a portal. A local-first fractal atlas and audio-reactive visualization engine.",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "vite": "latest",
+    "typescript": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {}
+}
