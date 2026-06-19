@@ -1,6 +1,9 @@
 const CIRCUIT_RETUNE_DELAY_MS = 360;
+const ACTIVE_SCENE = 'circuit-cathedral-identity';
 
-let initialCircuitRetuneApplied = false;
+let circuitRetuneAppliedForSelection = false;
+let retuneInProgress = false;
+let scheduledSceneSync: number | undefined;
 
 const setNativeValue = (input: HTMLInputElement | HTMLSelectElement, value: string) => {
   const prototype = input instanceof HTMLSelectElement ? HTMLSelectElement.prototype : HTMLInputElement.prototype;
@@ -66,78 +69,130 @@ const updateStageCleanupState = () => {
   });
 };
 
-const applyCircuitCathedralIdentity = () => {
-  document.body.dataset.infinitylensScene = 'circuit-cathedral-identity';
+const setCircuitCathedralScope = (active: boolean) => {
+  if (active) {
+    document.body.dataset.infinitylensScene = ACTIVE_SCENE;
+    return;
+  }
 
-  setSelectValue('Visual mode', 0, 'kaleido-trip');
-  setSelectValue('Visual mode', 1, 'abyss-cyan');
-  setCheckbox('Audio reactive', true);
-  setCheckbox('Phi spiral', false);
-  setCheckbox('3-6-9 grid', true);
-  setCheckbox('Equation overlay', true);
-  setRange('Audio speed / drive', 0.10);
-  setRange('Response', 0.26);
-  setRange('Bass impact', 0.18);
-  setRange('Mids motion', 0.38);
-  setRange('High sparkle', 0.30);
-  setRange('Beat punch', 0.14);
-  setRange('Fold pressure', 0.16);
-  setRange('Glow', 0.26);
+  if (document.body.dataset.infinitylensScene === ACTIVE_SCENE) {
+    delete document.body.dataset.infinitylensScene;
+  }
+};
+
+const isCircuitCathedralButton = (button: HTMLButtonElement) => {
+  return normalize(button.querySelector('strong')?.textContent) === 'circuit cathedral';
+};
+
+const isButtonSelected = (button: HTMLButtonElement) => {
+  const state = normalize(`${button.className} ${button.getAttribute('aria-pressed')} ${button.getAttribute('aria-current')}`);
+  return state.includes('active') || state.includes('selected') || state.includes('true') || state.includes('page');
+};
+
+const isCircuitCathedralSelected = () => {
+  return Array.from(document.querySelectorAll<HTMLButtonElement>('button')).some((button) => {
+    return isCircuitCathedralButton(button) && isButtonSelected(button);
+  });
+};
+
+const applyCircuitCathedralIdentity = () => {
+  if (!isCircuitCathedralSelected()) {
+    setCircuitCathedralScope(false);
+    return;
+  }
+
+  retuneInProgress = true;
+  setCircuitCathedralScope(true);
+
+  try {
+    setSelectValue('Visual mode', 0, 'kaleido-trip');
+    setSelectValue('Visual mode', 1, 'abyss-cyan');
+    setCheckbox('Audio reactive', true);
+    setCheckbox('Phi spiral', false);
+    setCheckbox('3-6-9 grid', true);
+    setCheckbox('Equation overlay', true);
+    setRange('Audio speed / drive', 0.10);
+    setRange('Response', 0.26);
+    setRange('Bass impact', 0.18);
+    setRange('Mids motion', 0.38);
+    setRange('High sparkle', 0.30);
+    setRange('Beat punch', 0.14);
+    setRange('Fold pressure', 0.16);
+    setRange('Glow', 0.26);
+  } finally {
+    window.setTimeout(() => {
+      retuneInProgress = false;
+      scheduleSceneSync();
+    }, 120);
+  }
 
   window.dispatchEvent(new CustomEvent('infinitylens369:visual-cleanup-applied', {
     detail: { scene: 'Circuit Cathedral', identity: 'darker-architectural-retune' },
   }));
 };
 
-const shouldRetuneCurrentStage = () => {
-  const stageBadge = normalize(document.querySelector<HTMLElement>('.stage-badge')?.textContent);
-  if (stageBadge.includes('circuit cathedral')) return true;
+const syncCircuitCathedralScope = () => {
+  updateStageCleanupState();
 
-  return Array.from(document.querySelectorAll<HTMLButtonElement>('button')).some((button) => {
-    const strong = normalize(button.querySelector('strong')?.textContent);
-    if (strong !== 'circuit cathedral') return false;
+  if (isCircuitCathedralSelected()) {
+    if (!circuitRetuneAppliedForSelection) {
+      circuitRetuneAppliedForSelection = true;
+      window.setTimeout(applyCircuitCathedralIdentity, CIRCUIT_RETUNE_DELAY_MS);
+      return;
+    }
 
-    const state = normalize(`${button.className} ${button.getAttribute('aria-pressed')} ${button.getAttribute('aria-current')}`);
-    return state.includes('active') || state.includes('selected') || state.includes('true') || state.includes('page');
-  });
+    setCircuitCathedralScope(true);
+    return;
+  }
+
+  circuitRetuneAppliedForSelection = false;
+  setCircuitCathedralScope(false);
 };
 
-const applyCurrentSceneIfNeeded = () => {
-  if (initialCircuitRetuneApplied || !shouldRetuneCurrentStage()) return;
-  initialCircuitRetuneApplied = true;
-  window.setTimeout(applyCircuitCathedralIdentity, CIRCUIT_RETUNE_DELAY_MS);
+const scheduleSceneSync = () => {
+  if (scheduledSceneSync !== undefined) window.clearTimeout(scheduledSceneSync);
+  scheduledSceneSync = window.setTimeout(() => {
+    scheduledSceneSync = undefined;
+    syncCircuitCathedralScope();
+  }, 120);
 };
 
-const wireCircuitCathedralButton = (button: HTMLButtonElement) => {
+const wireButton = (button: HTMLButtonElement) => {
   if (button.dataset.visualCleanupWired === 'true') return;
-  const strong = normalize(button.querySelector('strong')?.textContent);
-  if (strong !== 'circuit cathedral') return;
 
   button.dataset.visualCleanupWired = 'true';
-  button.addEventListener('click', () => {
-    window.setTimeout(applyCircuitCathedralIdentity, CIRCUIT_RETUNE_DELAY_MS);
+  button.addEventListener('click', scheduleSceneSync);
+};
+
+const wireControl = (control: HTMLInputElement | HTMLSelectElement) => {
+  if (control.dataset.visualCleanupWired === 'true') return;
+
+  control.dataset.visualCleanupWired = 'true';
+  control.addEventListener('change', () => {
+    if (!retuneInProgress) scheduleSceneSync();
   });
 };
 
-const wireButtons = () => {
-  document.querySelectorAll<HTMLButtonElement>('button').forEach(wireCircuitCathedralButton);
+const wireControls = () => {
+  document.querySelectorAll<HTMLButtonElement>('button').forEach(wireButton);
+  document.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select').forEach(wireControl);
 };
 
 const bootstrap = () => {
   updateStageCleanupState();
-  wireButtons();
-  applyCurrentSceneIfNeeded();
+  wireControls();
+  syncCircuitCathedralScope();
 
   const root = document.getElementById('root');
   if (!root) return;
 
   const observer = new MutationObserver(() => {
     updateStageCleanupState();
-    wireButtons();
-    applyCurrentSceneIfNeeded();
+    wireControls();
+    scheduleSceneSync();
   });
 
-  observer.observe(root, { childList: true, subtree: true });
+  observer.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'aria-pressed', 'aria-current'] });
 };
 
 if (document.readyState === 'loading') {
