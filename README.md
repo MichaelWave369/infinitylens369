@@ -2,9 +2,24 @@
 
 **Drop a song. Open a portal.**
 
-InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, Layer Console overlay scenes, Launch Console onboarding helpers, Gallery Console scene discovery, Roadmap Console feedback/runway tools, System Health Console browser readiness checks, Accessibility Console comfort controls, Showcase Console public demo modes, and replayable visual-address receipts.
+InfinityLens369 is a public, browser-based fractal atlas and audio-reactive visualization engine. It turns local audio files into live GPU visuals, trip modes, symbolic geometry overlays, palette shifts, cinematic performance controls, transition bridges, audio-engine shaping, Liquid Light presets, Machine Cathedral presets, local preset saving, local frame capture, local WebM clip recording, Performance Console live controls, Layer Console overlay scenes, Launch Console onboarding helpers, Gallery Console scene discovery, Roadmap Console feedback/runway tools, System Health Console browser readiness checks, Accessibility Console comfort controls, Showcase Console public demo modes, Share Console public handoff notes, and replayable visual-address receipts.
 
 This project is intentionally claim-safe: it is an art, math, and software visualization tool. It is **not** a physics proof, consciousness proof, medical tool, or scientific claim engine.
+
+## v1.17 Share Console release
+
+v1.17 adds a boot-safe **Share Console** sidecar for public handoff. It loads after the core React/WebGL app and existing studios, then gives viewers clean copy-ready notes for sharing, onboarding, showcase invites, and claim-safe boundaries.
+
+Share Console features:
+
+- Copy App Link for clean public sharing
+- Copy Quick Start for first-time users
+- Copy Showcase Invite for social/demo handoff
+- Copy Safety Note for claim-safe public context
+- Open Repo for project/source access
+- Copy Feedback Ask for structured tester notes
+- Boot-safe loading after the visualizer is already mounted
+- Version sync for Share Console labels
 
 ## v1.16 Showcase Console release
 
