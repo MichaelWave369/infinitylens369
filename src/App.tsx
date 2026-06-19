@@ -4,7 +4,7 @@ import { buildVisualAddress, downloadTextFile, formatVisualAddress } from './led
 import type { AudioFeatures, CameraState, FractalMode, PaletteName, VisualSettings } from './types';
 import { FractalCanvas } from './visual/FractalCanvas';
 
-const APP_VERSION = 'v1.4.0';
+const APP_VERSION = 'v1.5.0';
 
 type TransitionStyle = 'bloom' | 'warp' | 'glitch' | 'fade' | 'pulse';
 
@@ -63,6 +63,14 @@ const liquidLightEngine = {
   audioHighDrive: 0.46,
   audioBeatDrive: 0.24,
   audioResponse: 0.16,
+};
+
+const machineCathedralEngine = {
+  audioBassDrive: 0.54,
+  audioMidDrive: 0.86,
+  audioHighDrive: 0.92,
+  audioBeatDrive: 0.42,
+  audioResponse: 0.38,
 };
 
 const defaultSettings: VisualSettings = {
@@ -201,6 +209,90 @@ const tripPresets: TripPreset[] = [
       audioBeatDrive: 0.16,
       audioResponse: 0.10,
       glow: 0.60,
+    },
+  },
+  {
+    label: 'Circuit Cathedral',
+    family: 'Machine Cathedral',
+    hint: 'glowing circuit-temple geometry with grid discipline',
+    settings: {
+      mode: 'tunnel-bloom',
+      palette: 'abyss-cyan',
+      showPhi: false,
+      showGrid369: true,
+      showEquations: true,
+      audioReactive: true,
+      zoomSpeed: 0.30,
+      audioDrive: 0.22,
+      audioBassDrive: 0.50,
+      audioMidDrive: 0.90,
+      audioHighDrive: 0.84,
+      audioBeatDrive: 0.36,
+      audioResponse: 0.32,
+      glow: 0.76,
+    },
+  },
+  {
+    label: 'Glyph Rain',
+    family: 'Machine Cathedral',
+    hint: 'symbolic data rain with pixel-glitch energy',
+    settings: {
+      mode: 'pixel-melt',
+      palette: 'abyss-cyan',
+      showPhi: false,
+      showGrid369: true,
+      showEquations: true,
+      audioReactive: true,
+      zoomSpeed: 0.34,
+      audioDrive: 0.28,
+      audioBassDrive: 0.44,
+      audioMidDrive: 0.74,
+      audioHighDrive: 1.04,
+      audioBeatDrive: 0.48,
+      audioResponse: 0.52,
+      glow: 0.86,
+    },
+  },
+  {
+    label: 'Neon Lattice',
+    family: 'Machine Cathedral',
+    hint: 'wireframe tunnel lattice and node-field pulse',
+    settings: {
+      mode: 'tunnel-bloom',
+      palette: 'violet-gold-duality',
+      showPhi: true,
+      showGrid369: true,
+      showEquations: false,
+      audioReactive: true,
+      zoomSpeed: 0.46,
+      audioDrive: 0.32,
+      audioBassDrive: 0.70,
+      audioMidDrive: 0.76,
+      audioHighDrive: 0.78,
+      audioBeatDrive: 0.72,
+      audioResponse: 0.46,
+      glow: 0.92,
+    },
+  },
+  {
+    label: 'Vector Shrine',
+    family: 'Machine Cathedral',
+    hint: 'retro vector altar with equations and mirror recursion',
+    settings: {
+      mode: 'julia',
+      palette: 'solar-ember',
+      showPhi: true,
+      showGrid369: true,
+      showEquations: true,
+      audioReactive: true,
+      zoomSpeed: 0.24,
+      audioDrive: 0.20,
+      audioBassDrive: 0.52,
+      audioMidDrive: 0.62,
+      audioHighDrive: 0.72,
+      audioBeatDrive: 0.30,
+      audioResponse: 0.26,
+      glow: 0.68,
     },
   },
   {
@@ -388,6 +480,12 @@ const pressureLabel = (mode: VisualSettings['mode']) => {
   return 'Melt pressure';
 };
 
+const presetTransitionStyle = (preset: TripPreset): TransitionStyle | undefined => {
+  if (preset.family === 'Liquid Light') return 'fade';
+  if (preset.family === 'Machine Cathedral') return 'warp';
+  return undefined;
+};
+
 const checkWebGL2Support = () => {
   try {
     const canvas = document.createElement('canvas');
@@ -470,7 +568,7 @@ export default function App() {
   });
   const [latestAddress, setLatestAddress] = useState('Drop an audio file, press play, then save a visual address.');
   const [notice, setNotice] = useState(hasWebGL2
-    ? 'v1.4 Liquid Light Pack is live: Aurora Veil, Liquid Glass, Plasma Garden, and Dream Pool are in the trip cycle.'
+    ? 'v1.5 Machine Cathedral Pack is live: Circuit Cathedral, Glyph Rain, Neon Lattice, and Vector Shrine are in the trip cycle.'
     : 'WebGL2 is not available in this browser/device. Try Chrome, Edge, Firefox, or Safari on a GPU-enabled device.');
 
   const visualFeatures = useMemo(() => {
@@ -515,13 +613,12 @@ export default function App() {
   }, []);
 
   const applyPreset = useCallback((preset: TripPreset, labelPrefix = 'Trip') => {
-    const style = preset.family === 'Liquid Light' ? 'fade' : undefined;
     triggerTransition(`${labelPrefix} · ${preset.label}`, () => {
       smoothedFeaturesRef.current = defaultFeatures;
       setSettings((current) => ({ ...current, ...preset.settings }));
       setActiveTripLabel(preset.label);
       setNotice(`${preset.label}: ${preset.hint}.`);
-    }, style);
+    }, presetTransitionStyle(preset));
   }, [triggerTransition]);
 
   const applyNextTripPreset = useCallback(() => {
@@ -557,7 +654,7 @@ export default function App() {
       }));
       setActiveTripLabel(randomLabel);
       setNotice(`Random trip generated from ${preset.label}.`);
-    }, preset.family === 'Liquid Light' ? 'fade' : 'glitch');
+    }, preset.family === 'Liquid Light' ? 'fade' : preset.family === 'Machine Cathedral' ? 'warp' : 'glitch');
   }, [triggerTransition]);
 
   const applySafeMode = useCallback(() => {
@@ -596,7 +693,7 @@ export default function App() {
       setAutoTrip(false);
       setActiveTripLabel('Aurora Veil');
       setLatestAddress('Visuals reset. Press play or save a fresh visual address.');
-      setNotice('Visuals reset to the v1.4 Liquid Light default scene.');
+      setNotice('Visuals reset to the stable v1.5 default scene. Machine Cathedral presets are ready in the control panel.');
     }, 'fade');
   }, [triggerTransition]);
 
@@ -882,6 +979,18 @@ export default function App() {
             <div className="trip-chip-grid">
               {tripPresets.slice(0, 4).map((preset) => (
                 <button key={preset.label} type="button" className="trip-chip" onClick={() => applyPreset(preset, 'Liquid Light')}>
+                  <strong>{preset.label}</strong>
+                  <span>{preset.hint}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="control-group">
+            <h2>Machine Cathedral Pack</h2>
+            <div className="trip-chip-grid">
+              {tripPresets.slice(4, 8).map((preset) => (
+                <button key={preset.label} type="button" className="trip-chip" onClick={() => applyPreset(preset, 'Machine Cathedral')}>
                   <strong>{preset.label}</strong>
                   <span>{preset.hint}</span>
                 </button>
