@@ -1,4 +1,4 @@
-const RELEASE_VERSION = 'v1.10.0';
+const RELEASE_VERSION = 'v1.11.0';
 
 let scheduledSync: number | undefined;
 let safetyPasses = 0;
@@ -16,13 +16,14 @@ const patchTextNode = (node: Text) => {
   next = next.replace(/Recording Studio\s+v\d+\.\d+\.\d+/gi, `Recording Studio ${RELEASE_VERSION}`);
   next = next.replace(/Performance Console\s+v\d+\.\d+\.\d+/gi, `Performance Console ${RELEASE_VERSION}`);
   next = next.replace(/Layer Console\s+v\d+\.\d+\.\d+/gi, `Layer Console ${RELEASE_VERSION}`);
+  next = next.replace(/Launch Console\s+v\d+\.\d+\.\d+/gi, `Launch Console ${RELEASE_VERSION}`);
 
-  if (/v1\.5 Machine Cathedral Pack is live/i.test(next) || /v1\.9 Performance Console is live/i.test(next)) {
-    next = 'v1.10 Layer Console is live: use one-click overlay stacks for Clean Lens, Geometry Stack, Symbolic Field, and Grid Beam.';
+  if (/v1\.5 Machine Cathedral Pack is live/i.test(next) || /v1\.9 Performance Console is live/i.test(next) || /v1\.10 Layer Console is live/i.test(next)) {
+    next = 'v1.11 Launch Console is live: guide first-time visitors, run demo journeys, copy share links, and open shortcut help.';
   }
 
   if (/stable v1\.5 default scene/i.test(next)) {
-    next = next.replace(/stable v1\.5 default scene/gi, 'stable v1.10 default scene');
+    next = next.replace(/stable v1\.5 default scene/gi, 'stable v1.11 default scene');
   }
 
   if (next !== current) node.nodeValue = next;
@@ -34,7 +35,7 @@ const scanVisibleText = () => {
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
       const value = node.nodeValue ?? '';
-      return /InfinityLens369\s+v\d+\.\d+\.\d+|Capture Studio\s+v\d+\.\d+\.\d+|Recording Studio\s+v\d+\.\d+\.\d+|Performance Console\s+v\d+\.\d+\.\d+|Layer Console\s+v\d+\.\d+\.\d+|v1\.5 Machine Cathedral Pack|v1\.9 Performance Console is live|stable v1\.5 default scene/i.test(value)
+      return /InfinityLens369\s+v\d+\.\d+\.\d+|Capture Studio\s+v\d+\.\d+\.\d+|Recording Studio\s+v\d+\.\d+\.\d+|Performance Console\s+v\d+\.\d+\.\d+|Layer Console\s+v\d+\.\d+\.\d+|Launch Console\s+v\d+\.\d+\.\d+|v1\.5 Machine Cathedral Pack|v1\.9 Performance Console is live|v1\.10 Layer Console is live|stable v1\.5 default scene/i.test(value)
         ? NodeFilter.FILTER_ACCEPT
         : NodeFilter.FILTER_SKIP;
     },
@@ -76,6 +77,10 @@ const syncVersionLabels = () => {
     if (/^Layer Console\s+v/i.test(current)) {
       updateText(label, `Layer Console ${RELEASE_VERSION}`);
     }
+
+    if (/^Launch Console\s+v/i.test(current)) {
+      updateText(label, `Launch Console ${RELEASE_VERSION}`);
+    }
   });
 
   scanVisibleText();
@@ -96,7 +101,7 @@ const safetySync = window.setInterval(() => {
   syncVersionLabels();
   safetyPasses += 1;
 
-  if (safetyPasses >= 20) window.clearInterval(safetySync);
+  if (safetyPasses >= 24) window.clearInterval(safetySync);
 }, 250);
 
 const root = document.getElementById('root');
