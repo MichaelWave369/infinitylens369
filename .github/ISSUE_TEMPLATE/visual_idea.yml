@@ -1,0 +1,41 @@
+name: Visual idea
+description: Suggest a new mode, palette, overlay, or performance behavior
+title: "Visual idea: "
+labels: [visual-idea]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for mode concepts, shader ideas, palettes, overlays, performance controls, or stage/demo improvements.
+  - type: input
+    id: idea_name
+    attributes:
+      label: Idea name
+      placeholder: Liquid Glass, Circuit Cathedral, Aurora Veil, etc.
+    validations:
+      required: true
+  - type: textarea
+    id: visual_feel
+    attributes:
+      label: What should it feel like?
+      placeholder: Describe the look, motion, colors, and music reaction.
+    validations:
+      required: true
+  - type: textarea
+    id: audio_mapping
+    attributes:
+      label: Audio reaction idea
+      description: How should bass, mids, highs, beat, or energy affect it?
+      placeholder: Bass bends the tunnel, highs create sparkles...
+  - type: textarea
+    id: references
+    attributes:
+      label: References or inspiration
+      description: Optional links, screenshots, sketches, or words.
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Claim-safe framing
+      options:
+        - label: I understand this is for creative visualization, not scientific/medical/spiritual proof.
+          required: true
