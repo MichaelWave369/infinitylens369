@@ -31,6 +31,74 @@ const paletteLabels: Record<PaletteName, string> = {
   'aurora-phi': 'Aurora Phi',
 };
 
+const tripPresets: Array<{ label: string; settings: Partial<VisualSettings> }> = [
+  {
+    label: 'Pixel Melt',
+    settings: {
+      mode: 'pixel-melt',
+      palette: 'aurora-phi',
+      showPhi: false,
+      showGrid369: false,
+      showEquations: false,
+      audioReactive: true,
+      zoomSpeed: 0.74,
+      glow: 0.86,
+    },
+  },
+  {
+    label: 'Kaleido Flower',
+    settings: {
+      mode: 'kaleido-trip',
+      palette: 'aurora-phi',
+      showPhi: false,
+      showGrid369: false,
+      showEquations: false,
+      audioReactive: true,
+      zoomSpeed: 0.92,
+      glow: 0.42,
+    },
+  },
+  {
+    label: 'Tunnel Bloom',
+    settings: {
+      mode: 'tunnel-bloom',
+      palette: 'violet-gold-duality',
+      showPhi: true,
+      showGrid369: true,
+      showEquations: false,
+      audioReactive: true,
+      zoomSpeed: 0.82,
+      glow: 0.92,
+    },
+  },
+  {
+    label: 'Acid Melt',
+    settings: {
+      mode: 'acid-melt',
+      palette: 'aurora-phi',
+      showPhi: false,
+      showGrid369: false,
+      showEquations: false,
+      audioReactive: true,
+      zoomSpeed: 0.68,
+      glow: 0.88,
+    },
+  },
+  {
+    label: 'Deep Fractal',
+    settings: {
+      mode: 'mandelbrot',
+      palette: 'abyss-cyan',
+      showPhi: true,
+      showGrid369: false,
+      showEquations: true,
+      audioReactive: true,
+      zoomSpeed: 0.46,
+      glow: 0.68,
+    },
+  },
+];
+
 const formatMetric = (value: number) => `${Math.round(value * 100).toString().padStart(2, '0')}%`;
 const formatModeLabel = (mode: VisualSettings['mode']) => mode.replace(/-/g, ' ');
 
@@ -47,6 +115,7 @@ export default function App() {
   const analyzerRef = useRef<AudioFeatureAnalyzer | null>(null);
   const objectUrlRef = useRef<string | null>(null);
   const animationRef = useRef(0);
+  const presetIndexRef = useRef(0);
 
   const [features, setFeatures] = useState<AudioFeatures>(defaultFeatures);
   const [settings, setSettings] = useState<VisualSettings>(defaultSettings);
@@ -54,6 +123,8 @@ export default function App() {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isCinematic, setIsCinematic] = useState(false);
+  const [autoTrip, setAutoTrip] = useState(false);
+  const [activeTripLabel, setActiveTripLabel] = useState(tripPresets[0].label);
   const [camera, setCamera] = useState<CameraState>({
     centerX: -0.743643887037151,
     centerY: 0.13182590420533,
@@ -73,6 +144,19 @@ export default function App() {
       cancelAnimationFrame(animationRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (!autoTrip) return undefined;
+
+    const interval = window.setInterval(() => {
+      presetIndexRef.current = (presetIndexRef.current + 1) % tripPresets.length;
+      const preset = tripPresets[presetIndexRef.current];
+      setSettings((current) => ({ ...current, ...preset.settings }));
+      setActiveTripLabel(preset.label);
+    }, 18000);
+
+    return () => window.clearInterval(interval);
+  }, [autoTrip]);
 
   const ingestFile = useCallback((file: File) => {
     if (!file.type.startsWith('audio/')) {
@@ -128,6 +212,13 @@ export default function App() {
     cancelAnimationFrame(animationRef.current);
   };
 
+  const applyNextTripPreset = () => {
+    presetIndexRef.current = (presetIndexRef.current + 1) % tripPresets.length;
+    const preset = tripPresets[presetIndexRef.current];
+    setSettings((current) => ({ ...current, ...preset.settings }));
+    setActiveTripLabel(preset.label);
+  };
+
   const saveAddress = async () => {
     const address = formatVisualAddress(visualAddress);
     setLatestAddress(address);
@@ -139,6 +230,7 @@ export default function App() {
       address: visualAddress,
       formatted: formatVisualAddress(visualAddress),
       audioName,
+      activeTripLabel,
       stance: 'Art/math/software visualization only. Not a physics, medical, or consciousness claim.',
     };
     downloadTextFile('infinitylens369-visual-address.json', JSON.stringify(receipt, null, 2));
@@ -156,6 +248,8 @@ export default function App() {
 
   return (
     <main className={isCinematic ? 'app-shell is-cinematic' : 'app-shell'}>
+      <audio className="audio-engine" ref={audioRef} src={audioUrl ?? undefined} onEnded={() => setIsPlaying(false)} />
+
       <section className="stage" aria-label="InfinityLens369 visualization stage">
         <FractalCanvas features={features} settings={settings} onCameraChange={setCamera} />
 
@@ -164,8 +258,9 @@ export default function App() {
         {settings.showEquations && <EquationOverlay features={features} camera={camera} mode={settings.mode} />}
 
         <div className="stage-badge glass" aria-label="InfinityLens369 status">
-          <strong>InfinityLens369 v0.5</strong>
+          <strong>InfinityLens369 v0.6</strong>
           <span>{formatModeLabel(settings.mode)}</span>
+          {autoTrip && <span>auto trip</span>}
         </div>
 
         {isCinematic && (
@@ -195,8 +290,6 @@ export default function App() {
             <small>{audioName}</small>
           </label>
 
-          <audio ref={audioRef} src={audioUrl ?? undefined} onEnded={() => setIsPlaying(false)} />
-
           <div className="button-row">
             <button type="button" onClick={connectAndPlay} disabled={!audioUrl || isPlaying}>
               Play portal
@@ -209,6 +302,20 @@ export default function App() {
           <button className="wide-button" type="button" onClick={() => setIsCinematic(true)}>
             Cinematic view
           </button>
+
+          <div className="button-row">
+            <button type="button" onClick={applyNextTripPreset}>
+              Next trip
+            </button>
+            <button type="button" onClick={() => setAutoTrip((current) => !current)}>
+              {autoTrip ? 'Stop auto' : 'Auto trip'}
+            </button>
+          </div>
+
+          <div className="trip-chip" aria-label="Active trip preset">
+            <span>Trip preset</span>
+            <strong>{activeTripLabel}</strong>
+          </div>
 
           <div className="metrics" aria-label="Audio analysis metrics">
             <Metric label="Bass" value={features.bass} />
