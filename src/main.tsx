@@ -10,6 +10,7 @@ import './recording-studio.css';
 import './performance-console.css';
 import './layer-console.css';
 import './launch-console.css';
+import './gallery-console.css';
 import './studio-dock.css';
 
 const rootElement = document.getElementById('root');
@@ -61,7 +62,13 @@ window.setTimeout(() => {
 }, 500);
 
 window.setTimeout(() => {
+  import('./gallery-console-loader').catch((error) => {
+    console.warn('InfinityLens369 Gallery Console failed to load. Core visualizer remains available.', error);
+  });
+}, 600);
+
+window.setTimeout(() => {
   import('./version-sync').catch((error) => {
     console.warn('InfinityLens369 version sync failed to load. Core visualizer remains available.', error);
   });
-}, 700);
+}, 850);
