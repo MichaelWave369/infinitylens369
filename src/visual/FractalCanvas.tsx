@@ -323,6 +323,69 @@ vec3 renderTunnelBloom(vec2 uv) {
   return color;
 }
 
+vec3 renderKaleidoTrip(vec2 uv) {
+  float aspect = uResolution.x / max(uResolution.y, 1.0);
+  float t = uTime * (0.46 + uRms * 0.38);
+
+  vec2 p = uv * 2.0 - 1.0;
+  p.x *= aspect;
+
+  float zoomBreath = 1.0 + 0.10 * sin(t * 1.6 + uBass * 7.0 + uBeat * 5.0);
+  p *= zoomBreath;
+
+  float spin = uRotation * 0.62 + t * (0.10 + uMid * 0.22) + sin(t * 0.23) * 0.28;
+  mat2 rot = mat2(cos(spin), -sin(spin), sin(spin), cos(spin));
+  p = rot * p;
+
+  float r = max(length(p), 0.0001);
+  float a = atan(p.y, p.x);
+
+  float folds = 6.0 + floor(uMid * 6.0) + floor(uBeat * 3.0);
+  float sector = TAU / folds;
+  a += 0.38 * sin(r * (2.8 + uBass * 3.0) - t * 1.7) + uBass * 0.22;
+
+  float foldedAngle = abs(mod(a + sector * 0.5, sector) - sector * 0.5);
+  vec2 q = vec2(cos(foldedAngle), sin(foldedAngle)) * r;
+
+  q += 0.14 * vec2(
+    sin(q.y * 5.0 + t * 1.8 + uBass * 3.0),
+    cos(q.x * 5.0 - t * 1.5 + uHigh * 3.0)
+  );
+
+  float plasma = fbm(q * (3.0 + uHigh * 2.1) + vec2(t * 0.38, -t * 0.31));
+  float crystalNoise = fbm(q * 7.0 - vec2(t * 0.16, t * 0.22));
+  float spokeRaw = sin(foldedAngle * folds * 2.0 + r * (12.0 + uBass * 8.0) - t * 4.2 + plasma * 3.0);
+  float ringRaw = sin(r * (18.0 + uBass * 12.0) - t * (4.5 + uBeat * 5.0) + crystalNoise * 2.0);
+  float spokes = pow(1.0 - abs(spokeRaw), 5.0);
+  float rings = pow(1.0 - abs(ringRaw), 4.0);
+  float cells = smoothstep(0.42, 1.0, crystalNoise);
+  float centerStar = exp(-r * (2.0 - uBass * 0.35));
+
+  float mandala = spokes * 0.72 + rings * 0.56 + cells * 0.24 + centerStar * (0.42 + uBeat * 0.65);
+  float pulse = 0.5 + 0.5 * sin(t * 4.2 + r * 9.0 + uBass * 8.0);
+
+  float hue = fract(
+    0.74 +
+    foldedAngle * folds * 0.08 +
+    r * 0.10 +
+    plasma * 0.22 +
+    t * 0.026 +
+    uHigh * 0.18
+  );
+
+  vec3 color = hsv2rgb(vec3(hue, 0.70 + 0.28 * pulse, 0.10 + mandala * 0.82 + plasma * 0.16));
+  color += pickPalette(fract(hue + 0.18 + rings * 0.14)) * mandala * (0.28 + uGlow * 0.78);
+  color += hsv2rgb(vec3(fract(hue + 0.42), 0.82, spokes * 0.24 + uBeat * 0.12));
+  color += vec3(0.36, 0.10, 0.52) * centerStar * (0.26 + uGlow + uBass);
+
+  float vignette = smoothstep(1.75, 0.18, length(uv * 2.0 - 1.0));
+  color *= 0.38 + 1.00 * vignette;
+  color += vec3(uBeat * 0.12, uBeat * 0.05, uBeat * 0.18);
+  color *= 1.0 + uGlow * 0.86;
+
+  return color;
+}
+
 void main() {
   vec2 uv = vUv;
   vec2 centered = uv * 2.0 - 1.0;
@@ -339,8 +402,10 @@ void main() {
     color = renderFractal(centered, p);
   } else if (uMode < 2.5) {
     color = renderAcidMelt(uv);
-  } else {
+  } else if (uMode < 3.5) {
     color = renderTunnelBloom(uv);
+  } else {
+    color = renderKaleidoTrip(uv);
   }
 
   outColor = vec4(color, 1.0);
@@ -369,6 +434,8 @@ const modeIndex = (mode: VisualSettings['mode']) => {
       return 2;
     case 'tunnel-bloom':
       return 3;
+    case 'kaleido-trip':
+      return 4;
     case 'mandelbrot':
     default:
       return 0;
@@ -522,7 +589,9 @@ export function FractalCanvas({ features, settings, onCameraChange }: FractalCan
 
       const performanceModeSpin = currentSettings.mode === 'tunnel-bloom'
         ? 0.16 + currentFeatures.mid * 0.20 + currentFeatures.beat * 0.10
-        : 0.09 + currentFeatures.mid * 0.14;
+        : currentSettings.mode === 'kaleido-trip'
+          ? 0.12 + currentFeatures.mid * 0.24 + currentFeatures.high * 0.14 + currentFeatures.beat * 0.12
+          : 0.09 + currentFeatures.mid * 0.14;
       camera.rotation += dt * (isExplorerMode ? 0.012 + currentFeatures.mid * 0.05 : performanceModeSpin);
 
       gl.useProgram(program);
@@ -530,7 +599,7 @@ export function FractalCanvas({ features, settings, onCameraChange }: FractalCan
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
       gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
 
-      const performanceMode = currentSettings.mode === 'acid-melt' || currentSettings.mode === 'tunnel-bloom';
+      const performanceMode = currentSettings.mode === 'acid-melt' || currentSettings.mode === 'tunnel-bloom' || currentSettings.mode === 'kaleido-trip';
       gl.uniform2f(uniforms.resolution, canvas.width, canvas.height);
       gl.uniform2f(uniforms.center, camera.centerX, camera.centerY);
       gl.uniform1f(uniforms.zoom, performanceMode ? 1 : camera.zoom);
