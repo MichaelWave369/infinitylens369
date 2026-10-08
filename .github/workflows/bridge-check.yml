@@ -1,0 +1,29 @@
+name: MBL Visual Bridge validation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths:
+      - 'src/bridge/**'
+      - 'src/App.tsx'
+      - 'scripts/mbl-bridge.test.mjs'
+      - '.github/workflows/bridge-check.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Protocol tests
+        run: node --experimental-strip-types --test scripts/mbl-bridge.test.mjs
+      - name: Verify Vite and TypeScript
+        run: npm run build

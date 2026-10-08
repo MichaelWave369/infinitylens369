@@ -3,6 +3,7 @@ import { AudioFeatureAnalyzer } from './audio/analyser';
 import { buildVisualAddress, downloadTextFile, formatVisualAddress } from './ledger/visualAddress';
 import type { AudioFeatures, CameraState, FractalMode, PaletteName, VisualSettings } from './types';
 import { FractalCanvas } from './visual/FractalCanvas';
+import { isMblBridgeCommand, isMblBridgeHello, MBL_BRIDGE_CHANNEL, MBL_BRIDGE_VERSION, MBL_MODES, MBL_PALETTES, trustedMblParentOrigin } from './bridge/mblBridge';
 
 const APP_VERSION = 'v1.5.0';
 
@@ -696,6 +697,50 @@ export default function App() {
       setNotice('Visuals reset to the stable v1.5 default scene. Machine Cathedral presets are ready in the control panel.');
     }, 'fade');
   }, [triggerTransition]);
+
+  // The bridge is dormant on the standalone page. Only the known MBL parent
+  // may send a tiny allowlisted collection of visual commands.
+  useEffect(() => {
+    if (window.parent === window) return;
+    const parentOrigin = trustedMblParentOrigin(document.referrer);
+    if (!parentOrigin) return;
+
+    const sendReady = () => {
+      window.parent.postMessage({
+        channel: MBL_BRIDGE_CHANNEL,
+        kind: 'ready',
+        version: MBL_BRIDGE_VERSION,
+        modes: [...MBL_MODES],
+        palettes: [...MBL_PALETTES],
+        mode: settings.mode,
+        palette: settings.palette,
+      }, parentOrigin);
+    };
+    const handleMessage = (event: MessageEvent) => {
+      if (event.source !== window.parent || event.origin !== parentOrigin) return;
+      if (isMblBridgeHello(event.data)) {
+        sendReady();
+        return;
+      }
+      if (!isMblBridgeCommand(event.data)) return;
+      const { action, value, requestId } = event.data;
+      if (action === 'mode') setSettings((current) => ({ ...current, mode: value as FractalMode }));
+      if (action === 'palette') setSettings((current) => ({ ...current, palette: value as PaletteName }));
+      if (action === 'safe') applySafeMode();
+      if (action === 'reset') resetVisuals();
+      window.parent.postMessage({
+        channel: MBL_BRIDGE_CHANNEL,
+        kind: 'ack',
+        version: MBL_BRIDGE_VERSION,
+        requestId,
+        action,
+      }, parentOrigin);
+    };
+
+    window.addEventListener('message', handleMessage);
+    sendReady();
+    return () => window.removeEventListener('message', handleMessage);
+  }, [applySafeMode, resetVisuals, settings.mode, settings.palette]);
 
   const applyMotionProfile = useCallback((profile: MotionProfile) => {
     triggerTransition(`Motion ${profile.label}`, () => {
