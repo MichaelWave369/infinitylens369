@@ -199,3 +199,13 @@ Recording Studio features:
 - Drag/drop `.mp3`, `.wav`, `.ogg`, `.oga`, `.m4a`, `.aac`, `.flac`, or `.webm` audio files
 - Local-first playback: your audio stays in your browser
 - Web Audio analysis for bass, mids, highs, waveform energy, and beat pulses
+
+## MBL Visual Bridge v1 (opt-in parent controls)
+
+When the InfinityLens page is deliberately embedded at `https://michaelwave369.github.io/infinitylens369/` **from** `https://michaelwave369.github.io/MoreBounceLabs/`, it accepts four allowlisted `postMessage` presentation commands from the direct parent iframe host: **mode, palette, safe, reset**. The receiver checks the direct parent window, exact trusted origin, trusted document referrer path, protocol version, action and value allowlists; rejects everything else without side effects. The standalone InfinityLens page does not enable a parent command receiver.
+
+The child emits a versioned `ready` message with supported modes/palettes, current scene and palette. The parent may send `hello` to re-request readiness. Accepted commands receive an `ack` receipt and subsequent ready/status updates when scene state changes.
+
+No audio data, Suno iframe access, local file access, waveform extraction, arbitrary scripts, external URLs, authentication or storage crossing is implemented. This is a **visual-control bridge**, not a cross-origin audio bridge. The matching [MoreBounceLabs PR](https://github.com/MichaelWave369/MoreBounceLabs/pulls) adds the parent controls. Both repositories must publish compatible bridge versions to enable remote control.
+
+Run `node --experimental-strip-types --test scripts/mbl-bridge.test.mjs` to exercise positive/negative protocol and trust checks.
